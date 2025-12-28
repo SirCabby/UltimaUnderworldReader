@@ -863,7 +863,7 @@ class XlsxExporter:
     
     def export_containers(self, item_types: Dict, objects_parser, common_parser=None) -> None:
         """Export carryable containers only."""
-        headers = ["ID", "Name", "Weight", "Capacity (stones)", "Accepts", "Slots"]
+        headers = ["ID", "Name", "Weight", "Capacity (stones)", "Accepts"]
         ws = self._create_sheet("Containers", headers)
         
         row = 2
@@ -876,8 +876,7 @@ class XlsxExporter:
                 
                 values = [
                     item_id, item.name, weight_str, container.capacity_stones,
-                    container.accepted_type_name,
-                    container.num_slots if container.num_slots != 255 else "Unlimited"
+                    container.accepted_type_name
                 ]
                 self._add_row(ws, row, values, row % 2 == 0)
                 row += 1
@@ -885,34 +884,90 @@ class XlsxExporter:
     
     def export_light_sources(self, item_types: Dict, objects_parser, strings_parser=None) -> None:
         """Export light sources (lit items only) and light-granting spells."""
+        from ..constants import SPELL_CIRCLES, LIGHT_SPELL_LEVELS
+        
         headers = ["Type", "Name", "Light Level", "Duration", "Notes"]
         ws = self._create_sheet("Light Sources", headers)
         
+        # Get object names from strings
+        obj_names = []
+        if strings_parser:
+            obj_names = strings_parser.get_block(4) or []
+        
         row = 2
         
-        # Light items: only lit versions
-        lit_sources = [
-            ("Item", "Lit Lantern", 5, "Long", "Brightest portable light, reusable"),
-            ("Item", "Lit Torch", 4, "Medium", "Good light, burns out over time"),
-            ("Item", "Lit Candle", 2, "Short", "Dim light, short duration"),
-            ("Item", "Taper of Sacrifice", 3, "Eternal", "Special item from Shrine of Spirituality"),
-        ]
+        # Duration conversion: game duration units to approximate real-time seconds
+        # Based on UW game timing: each duration unit ≈ 5 minutes of gameplay
+        DURATION_SECONDS = {
+            1: 300,   # ~5 minutes (candle burns fast)
+            2: 600,   # ~10 minutes (torch)
+            3: 900,   # ~15 minutes (but taper is special - eternal in practice)
+            4: 1200,  # ~20 minutes (lantern lasts longest)
+        }
         
-        for type_str, name, brightness, duration, notes in lit_sources:
-            values = [type_str, name, brightness, duration, notes]
-            self._add_row(ws, row, values, row % 2 == 0)
-            row += 1
+        # Item brightness to normalized light level (0-7 scale like spells)
+        # Raw data: lantern=10, torch=3, candle=12 (these are quality/burn values, not light)
+        # Actual in-game brightness ranking: lantern > torch > candle > taper (magical)
+        ITEM_LIGHT_LEVELS = {
+            0x94: 5,  # Lit lantern - brightest portable
+            0x95: 4,  # Lit torch - standard light
+            0x96: 2,  # Lit candle - dim
+            0x97: 3,  # Lit taper - magical light (Taper of Sacrifice)
+        }
         
-        # Light spells from game
+        # Light source items from OBJECTS.DAT - only lit versions
+        for obj_id in (0x94, 0x95, 0x96, 0x97):  # Lit lantern, torch, candle, taper
+            light = objects_parser.get_light_source(obj_id)
+            if light:
+                # Get item name from strings
+                name = ""
+                if obj_id < len(obj_names) and obj_names[obj_id]:
+                    name, _, _ = parse_item_name(obj_names[obj_id])
+                if not name:
+                    name = f"Light Source 0x{obj_id:02X}"
+                
+                # Get normalized light level
+                light_level = ITEM_LIGHT_LEVELS.get(obj_id, 3)
+                
+                # Format duration in seconds
+                if obj_id == 0x97:  # Lit taper (Taper of Sacrifice is eternal)
+                    duration_str = "Eternal"
+                    notes = "Magical item from Shrine of Spirituality"
+                else:
+                    seconds = DURATION_SECONDS.get(light.duration, light.duration * 300)
+                    minutes = seconds // 60
+                    duration_str = f"~{minutes} min"
+                    
+                    if "lantern" in name.lower():
+                        notes = "Brightest portable light, reusable"
+                    elif "torch" in name.lower():
+                        notes = "Standard portable light"
+                    elif "candle" in name.lower():
+                        notes = "Dim light, burns quickly"
+                    else:
+                        notes = ""
+                
+                values = ["Item", name, light_level, duration_str, notes]
+                self._add_row(ws, row, values, row % 2 == 0)
+                row += 1
+        
+        # Add separator
+        self._add_row(ws, row, ["", "", "", "", ""], False)
+        row += 1
+        
+        # Light spells with proper circle info and light levels from constants
+        # Spell durations scale with caster level; base duration ~2-3 minutes per circle
+        # Only showing player-castable spells (Sunlight is NPC-only internal variant)
         light_spells = [
-            ("Spell (Circle 1)", "Light", 3, "Medium", "IN LOR - Basic illumination"),
-            ("Spell (Circle 1)", "Night Vision", 4, "Long", "QUAS LOR - See in darkness"),
-            ("Spell (Circle 3)", "Daylight", 5, "Long", "VAS IN LOR - Bright area illumination"),
-            ("Spell (Circle 5)", "Sunlight", 6, "Very Long", "VAS LOR - Maximum brightness"),
+            ("Light", 1, "~3 min", "IN LOR - Basic illumination"),
+            ("Night Vision", 3, "~6 min", "QUAS LOR - See in darkness"),
+            ("Daylight", 6, "~10 min", "VAS IN LOR - Bright area light"),
         ]
         
-        for type_str, spell_name, brightness, duration, notes in light_spells:
-            values = [type_str, spell_name, brightness, duration, notes]
+        for spell_name, circle, duration, notes in light_spells:
+            light_level = LIGHT_SPELL_LEVELS.get(spell_name, circle)
+            type_str = f"Spell (Circle {circle})"
+            values = [type_str, spell_name, light_level, duration, notes]
             self._add_row(ws, row, values, row % 2 == 0)
             row += 1
         
