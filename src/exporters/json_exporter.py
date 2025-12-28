@@ -520,11 +520,19 @@ class JsonExporter:
                             item.quantity, item.quality, item.special_link, level_num
                         )
                         
+                        # Determine actual quantity (not enchantment data)
+                        # If is_quantity and quantity >= 512, it's actually enchantment data
+                        actual_quantity = 1
+                        if item.is_quantity:
+                            if item.quantity < 512:
+                                actual_quantity = item.quantity
+                            # else: quantity >= 512 is enchantment data, show as 1
+                        
                         content_item = {
                             'object_id': item.object_id,
                             'name': item.name or get_item_name(item.object_id),
                             'category': category_map.get(obj_class, 'misc'),
-                            'quantity': item.quantity if item.is_quantity else 1,
+                            'quantity': actual_quantity,
                         }
                         # Only include description and effect if they have meaningful values
                         if item_desc:
@@ -665,6 +673,13 @@ class JsonExporter:
                 'has_conversation': conv_slot > 0,
                 'conversation_slot': conv_slot,
             }
+            
+            # Add NPC inventory if they have items (using special_link)
+            special_link = npc.special_link
+            if special_link > 0:
+                inventory = get_container_contents(level, special_link)
+                if inventory:
+                    web_npc['inventory'] = inventory
             
             npcs_by_level[level].append(web_npc)
         

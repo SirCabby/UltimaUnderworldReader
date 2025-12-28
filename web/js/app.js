@@ -53,6 +53,7 @@ const state = {
     filters: {
         categories: new Set(),  // Active category filters
         search: '',
+        enchantedOnly: false,   // Show only enchanted items
     },
     selectedMarker: null,
 };
@@ -80,6 +81,8 @@ const elements = {
     statVisible: null,
     coordDisplay: null,
     coordValue: null,
+    enchantedFilter: null,
+    enchantedCount: null,
 };
 
 // ============================================================================
@@ -137,6 +140,8 @@ function cacheElements() {
     elements.statVisible = document.getElementById('stat-visible');
     elements.coordDisplay = document.getElementById('coord-display');
     elements.coordValue = document.getElementById('coord-value');
+    elements.enchantedFilter = document.getElementById('enchanted-filter');
+    elements.enchantedCount = document.getElementById('enchanted-count');
 }
 
 async function loadData() {
@@ -183,8 +188,17 @@ function setupEventListeners() {
     document.getElementById('select-all-categories').addEventListener('click', selectAllCategories);
     document.getElementById('deselect-all-categories').addEventListener('click', deselectAllCategories);
     
+    // Enchanted filter
+    elements.enchantedFilter.addEventListener('change', handleEnchantedFilter);
+    
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboard);
+}
+
+function handleEnchantedFilter(e) {
+    state.filters.enchantedOnly = e.target.checked;
+    renderMarkers();
+    updateStats();
 }
 
 function handleWheel(e) {
@@ -409,6 +423,31 @@ function updateCategoryCounts() {
             countEl.textContent = categoryCounts[cat.id] || 0;
         }
     });
+    
+    // Update enchanted item count
+    updateEnchantedCount();
+}
+
+/**
+ * Count and display the number of enchanted items on the current level
+ */
+function updateEnchantedCount() {
+    const level = state.data.levels[state.currentLevel];
+    if (!level || !elements.enchantedCount) return;
+    
+    let enchantedCount = 0;
+    
+    // Count enchanted objects
+    level.objects.forEach(obj => {
+        if (isEnchanted(obj)) enchantedCount++;
+    });
+    
+    // Count NPCs with enchanted items in inventory
+    level.npcs.forEach(npc => {
+        if (isEnchanted(npc)) enchantedCount++;
+    });
+    
+    elements.enchantedCount.textContent = enchantedCount;
 }
 
 function selectAllCategories() {
@@ -490,6 +529,12 @@ function renderMarkers() {
 }
 
 function shouldShowItem(item) {
+    // Check enchanted filter first
+    if (state.filters.enchantedOnly) {
+        if (!isEnchanted(item)) return false;
+    }
+    
+    // Then apply search filter
     if (!state.filters.search) return true;
     const searchTerm = state.filters.search;
     
@@ -502,6 +547,64 @@ function shouldShowItem(item) {
         if (hasMatchingContent(item.contents, searchTerm)) return true;
     }
     
+    // Check inventory recursively (for NPCs)
+    if (item.inventory && item.inventory.length > 0) {
+        if (hasMatchingContent(item.inventory, searchTerm)) return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Check if an effect string represents a true magical enchantment
+ * Excludes: keys ("Opens lock #X"), books/scrolls ("Text #X")
+ */
+function isMagicalEffect(effect) {
+    if (!effect) return false;
+    
+    // Exclude keys that open locks
+    if (effect.startsWith('Opens lock')) return false;
+    
+    // Exclude books/scrolls with text
+    if (effect.startsWith('Text #')) return false;
+    
+    // Everything else with an effect is considered enchanted
+    return true;
+}
+
+/**
+ * Check if an item is enchanted (has an effect field with magical properties)
+ * Also recursively checks container contents and NPC inventory
+ */
+function isEnchanted(item) {
+    // Check if item itself has a magical effect (not just text or lock info)
+    if (isMagicalEffect(item.effect)) return true;
+    
+    // Check container contents recursively
+    if (item.contents && item.contents.length > 0) {
+        if (hasEnchantedContent(item.contents)) return true;
+    }
+    
+    // Check NPC inventory recursively
+    if (item.inventory && item.inventory.length > 0) {
+        if (hasEnchantedContent(item.inventory)) return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Recursively check if any content item is enchanted
+ */
+function hasEnchantedContent(contents) {
+    for (const contentItem of contents) {
+        if (isMagicalEffect(contentItem.effect)) return true;
+        
+        // Check nested containers
+        if (contentItem.contents && contentItem.contents.length > 0) {
+            if (hasEnchantedContent(contentItem.contents)) return true;
+        }
+    }
     return false;
 }
 
@@ -588,10 +691,14 @@ function showTooltip(e, item, isNpc) {
         if (item.attitude) {
             html += `<div class="tooltip-info">Attitude: ${item.attitude}</div>`;
         }
+        // Show inventory count for NPCs
+        if (item.inventory && item.inventory.length > 0) {
+            html += `<div class="tooltip-info" style="color: var(--text-accent);">🎒 ${item.inventory.length} item${item.inventory.length > 1 ? 's' : ''} carried</div>`;
+        }
     } else {
         html += `<div class="tooltip-info">${formatCategory(item.category)}</div>`;
-        // Show effect preview in tooltip (truncated) - this IS the enchantment info
-        if (item.effect) {
+        // Show effect preview in tooltip only for truly magical effects
+        if (isMagicalEffect(item.effect)) {
             html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">✨ ${escapeHtml(truncateText(item.effect, 50))}</div>`;
         }
         // Show description preview (truncated) for books/scrolls/keys
@@ -703,6 +810,16 @@ function renderObjectDetails(item, isNpc) {
                 <span class="detail-value">${item.has_conversation ? 'Yes' : 'No'}</span>
             </div>
         `;
+        
+        // Show inventory count if NPC has items
+        if (item.inventory && item.inventory.length > 0) {
+            html += `
+            <div class="detail-row">
+                <span class="detail-label">Carrying</span>
+                <span class="detail-value" style="color: var(--text-accent);">${item.inventory.length} item${item.inventory.length > 1 ? 's' : ''}</span>
+            </div>
+            `;
+        }
     } else {
         const catColor = getCategoryColor(item.category);
         html += `
@@ -725,11 +842,11 @@ function renderObjectDetails(item, isNpc) {
             `;
         }
         
-        // Show effect/enchantment if available
-        if (item.effect) {
+        // Show effect/enchantment only for truly magical effects
+        if (isMagicalEffect(item.effect)) {
             html += `
                 <div class="detail-effect">
-                    <div class="detail-label" style="margin-bottom: 4px;">✨ Effect</div>
+                    <div class="detail-label" style="margin-bottom: 4px;">✨ Enchantment</div>
                     <div class="effect-text">${escapeHtml(item.effect)}</div>
                 </div>
             `;
@@ -759,6 +876,14 @@ function renderObjectDetails(item, isNpc) {
             elements.objectDetails.appendChild(contentsEl);
         }
     }
+    
+    // Add NPC inventory if this is an NPC with items (using DOM elements for click handling)
+    if (isNpc && item.inventory && item.inventory.length > 0) {
+        const inventoryEl = renderNpcInventory(item.inventory, item);
+        if (inventoryEl) {
+            elements.objectDetails.appendChild(inventoryEl);
+        }
+    }
 }
 
 /**
@@ -783,7 +908,7 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
     contents.forEach(item => {
         const catColor = getCategoryColor(item.category);
         const qty = item.quantity > 1 ? ` (×${item.quantity})` : '';
-        const hasEffect = item.effect ? ' ✨' : '';
+        const hasEffect = isMagicalEffect(item.effect) ? ' ✨' : '';
         const hasContents = item.contents && item.contents.length > 0;
         
         const contentItem = document.createElement('div');
@@ -804,9 +929,9 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
         nameDiv.style.color = 'var(--text-primary)';
         nameDiv.textContent = `${item.name || 'Unknown'}${qty}${hasEffect}${hasContents ? ' 📦' : ''}`;
         
-        // Build info line with category and optional effect preview
+        // Build info line with category and optional effect preview (only for magical effects)
         let infoText = formatCategory(item.category);
-        if (item.effect) {
+        if (isMagicalEffect(item.effect)) {
             infoText += ` • ${truncateText(item.effect, 30)}`;
         }
         
@@ -858,6 +983,220 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
 }
 
 /**
+ * Render NPC inventory as a list with clickable items
+ * Returns a DOM element for click handling
+ */
+function renderNpcInventory(inventory, parentNpc = null) {
+    if (!inventory || inventory.length === 0) return null;
+    
+    const container = document.createElement('div');
+    container.className = 'npc-inventory';
+    container.style.marginTop = '12px';
+    
+    const header = document.createElement('div');
+    header.className = 'inventory-header';
+    header.style.cssText = 'color: var(--text-accent); font-size: 0.85rem; margin-bottom: 6px;';
+    header.textContent = '🎒 Inventory:';
+    container.appendChild(header);
+    
+    inventory.forEach(item => {
+        const catColor = getCategoryColor(item.category);
+        const qty = item.quantity > 1 ? ` (×${item.quantity})` : '';
+        const hasEffect = isMagicalEffect(item.effect) ? ' ✨' : '';
+        const hasContents = item.contents && item.contents.length > 0;
+        
+        const inventoryItem = document.createElement('div');
+        inventoryItem.className = 'inventory-item selectable-content';
+        inventoryItem.dataset.itemId = item.id || item.object_id || '';
+        inventoryItem.style.cssText = `
+            background: var(--bg-tertiary); 
+            border-left: 3px solid ${catColor};
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+        `;
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.style.color = 'var(--text-primary)';
+        nameDiv.textContent = `${item.name || 'Unknown'}${qty}${hasEffect}${hasContents ? ' 📦' : ''}`;
+        
+        // Build info line with category and optional effect preview (only for magical effects)
+        let infoText = formatCategory(item.category);
+        if (isMagicalEffect(item.effect)) {
+            infoText += ` • ${truncateText(item.effect, 30)}`;
+        }
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.style.cssText = 'color: var(--text-muted); font-size: 0.75rem;';
+        infoDiv.textContent = infoText;
+        
+        inventoryItem.appendChild(nameDiv);
+        inventoryItem.appendChild(infoDiv);
+        
+        // Show description preview for readable items (books, scrolls)
+        if (item.description && item.description.length > 0) {
+            const descDiv = document.createElement('div');
+            descDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px; font-style: italic;';
+            descDiv.textContent = truncateText(item.description, 50);
+            inventoryItem.appendChild(descDiv);
+        }
+        
+        // Add hover effects
+        inventoryItem.addEventListener('mouseenter', () => {
+            inventoryItem.style.background = 'var(--bg-elevated)';
+            inventoryItem.style.transform = 'translateX(2px)';
+        });
+        inventoryItem.addEventListener('mouseleave', () => {
+            if (!inventoryItem.classList.contains('selected-content')) {
+                inventoryItem.style.background = 'var(--bg-tertiary)';
+            }
+            inventoryItem.style.transform = 'translateX(0)';
+        });
+        
+        // Add click handler to select this item
+        inventoryItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectInventoryItem(item, parentNpc);
+        });
+        
+        container.appendChild(inventoryItem);
+        
+        // Recursively render nested container contents within inventory
+        if (hasContents) {
+            const nestedContents = renderContainerContents(item.contents, 1, item);
+            if (nestedContents) {
+                container.appendChild(nestedContents);
+            }
+        }
+    });
+    
+    return container;
+}
+
+/**
+ * Select an item from within an NPC's inventory
+ */
+function selectInventoryItem(item, parentNpc = null) {
+    // Clear any previous content selection highlighting
+    document.querySelectorAll('.selectable-content.selected-content').forEach(el => {
+        el.classList.remove('selected-content');
+        el.style.background = 'var(--bg-tertiary)';
+        el.style.borderColor = '';
+    });
+    
+    // Build details for the selected inventory item
+    let html = '<div class="detail-card">';
+    html += `<div class="detail-name">${item.name || 'Unknown Object'}</div>`;
+    
+    const catColor = getCategoryColor(item.category);
+    html += `
+        <div class="detail-row">
+            <span class="detail-label">Category</span>
+            <span class="detail-category" style="background: ${catColor}22; color: ${catColor};">${formatCategory(item.category)}</span>
+        </div>
+    `;
+    
+    // Show quantity only if > 1 (stackable items)
+    if (item.quantity && item.quantity > 1) {
+        html += `
+            <div class="detail-row">
+                <span class="detail-label">Quantity</span>
+                <span class="detail-value">${item.quantity}</span>
+            </div>
+        `;
+    }
+    
+    // Show type-specific details
+    html += getTypeSpecificDetails(item);
+    
+    // Show description if available (books, scrolls, keys, potions, etc.)
+    if (item.description) {
+        html += `
+            <div class="detail-description">
+                <div class="detail-label" style="margin-bottom: 4px;">Description</div>
+                <div class="description-text">${escapeHtml(item.description)}</div>
+            </div>
+        `;
+    }
+    
+    // Show effect/enchantment only for truly magical effects
+    if (isMagicalEffect(item.effect)) {
+        html += `
+            <div class="detail-effect">
+                <div class="detail-label" style="margin-bottom: 4px;">✨ Enchantment</div>
+                <div class="effect-text">${escapeHtml(item.effect)}</div>
+            </div>
+        `;
+    }
+    
+    // Show parent NPC info
+    if (parentNpc) {
+        html += `
+            <div class="detail-row">
+                <span class="detail-label">Carried by</span>
+                <span class="detail-value" style="color: #ff6b6b;">${parentNpc.name || 'NPC'}</span>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    
+    // Add nested container contents if this item is also a container
+    elements.objectDetails.innerHTML = html;
+    
+    if (item.contents && item.contents.length > 0) {
+        const contentsEl = renderContainerContents(item.contents, 0, item);
+        if (contentsEl) {
+            elements.objectDetails.appendChild(contentsEl);
+        }
+    }
+    
+    // Add a "back to NPC" button if there's a parent NPC
+    if (parentNpc) {
+        const backBtn = document.createElement('button');
+        backBtn.className = 'back-to-parent-btn';
+        backBtn.innerHTML = '← Back to ' + (parentNpc.name || 'NPC');
+        backBtn.style.cssText = `
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.15s ease;
+        `;
+        backBtn.addEventListener('mouseenter', () => {
+            backBtn.style.background = 'var(--bg-elevated)';
+            backBtn.style.borderColor = '#ff6b6b';
+            backBtn.style.color = '#ff6b6b';
+        });
+        backBtn.addEventListener('mouseleave', () => {
+            backBtn.style.background = 'var(--bg-tertiary)';
+            backBtn.style.borderColor = 'var(--border-color)';
+            backBtn.style.color = 'var(--text-secondary)';
+        });
+        backBtn.addEventListener('click', () => {
+            renderObjectDetails(parentNpc, true);
+        });
+        elements.objectDetails.appendChild(backBtn);
+    }
+    
+    // Highlight the selected inventory item
+    const selectedEl = document.querySelector(`.selectable-content[data-item-id="${item.id || item.object_id}"]`);
+    if (selectedEl) {
+        selectedEl.classList.add('selected-content');
+        selectedEl.style.background = 'var(--bg-elevated)';
+    }
+}
+
+/**
  * Select an item from within a container
  */
 function selectContainerItem(item, parentContainer = null) {
@@ -903,11 +1242,11 @@ function selectContainerItem(item, parentContainer = null) {
         `;
     }
     
-    // Show effect/enchantment if available
-    if (item.effect) {
+    // Show effect/enchantment only for truly magical effects
+    if (isMagicalEffect(item.effect)) {
         html += `
             <div class="detail-effect">
-                <div class="detail-label" style="margin-bottom: 4px;">✨ Effect</div>
+                <div class="detail-label" style="margin-bottom: 4px;">✨ Enchantment</div>
                 <div class="effect-text">${escapeHtml(item.effect)}</div>
             </div>
         `;
@@ -1012,9 +1351,12 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             ? ` (${npc.creature_type})` 
             : '';
         
+        const hasInventory = npc.inventory && npc.inventory.length > 0;
+        
         card.innerHTML = `
-            <div class="detail-name" style="font-size: 0.9rem;">${npc.name || 'Unknown NPC'}${creatureInfo}</div>
+            <div class="detail-name" style="font-size: 0.9rem;">${npc.name || 'Unknown NPC'}${creatureInfo}${hasInventory ? ' 🎒' : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">NPC - HP: ${npc.hp}</div>
+            ${hasInventory ? `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${npc.inventory.length} item${npc.inventory.length > 1 ? 's' : ''} carried</div>` : ''}
         `;
         
         card.addEventListener('click', () => selectLocationItem(npc, true, tileX, tileY));
