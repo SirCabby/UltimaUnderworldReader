@@ -127,7 +127,7 @@ class XlsxExporter:
     
     def export_weapons(self, item_types: Dict, objects_parser) -> None:
         """Export weapons."""
-        headers = ["ID", "Name", "Type", "Slash", "Bash", "Stab", "Skill", "Durability", "Mass", "Value"]
+        headers = ["ID", "Name", "Type", "Slash", "Bash", "Stab", "Skill", "Durability", "Weight", "Value"]
         ws = self._create_sheet("Weapons", headers)
         
         row = 2
@@ -136,8 +136,10 @@ class XlsxExporter:
             weapon = objects_parser.get_melee_weapon(item_id)
             if item and weapon:
                 skill = weapon.skill_type.name if hasattr(weapon.skill_type, 'name') else str(weapon.skill_type)
+                # Weight in stones (mass / 10), skip if undefined (0 or 63)
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
                 values = [item_id, item.name, "Melee", weapon.slash_damage, weapon.bash_damage,
-                         weapon.stab_damage, skill, weapon.durability, item.mass, item.value]
+                         weapon.stab_damage, skill, weapon.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
                 row += 1
         
@@ -145,15 +147,17 @@ class XlsxExporter:
             item = item_types.get(item_id)
             weapon = objects_parser.get_ranged_weapon(item_id)
             if item and weapon:
+                # Weight in stones (mass / 10), skip if undefined (0 or 63)
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
                 values = [item_id, item.name, "Ranged", "-", "-", "-", "Missile",
-                         weapon.durability, item.mass, item.value]
+                         weapon.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
                 row += 1
         self._auto_column_width(ws)
     
     def export_armor(self, item_types: Dict, objects_parser) -> None:
         """Export armor."""
-        headers = ["ID", "Name", "Category", "Protection", "Durability", "Mass", "Value"]
+        headers = ["ID", "Name", "Category", "Protection", "Durability", "Weight", "Value"]
         ws = self._create_sheet("Armor", headers)
         
         row = 2
@@ -162,7 +166,9 @@ class XlsxExporter:
             armor = objects_parser.get_armour(item_id)
             if item and armor:
                 cat = armor.category.name if hasattr(armor.category, 'name') else str(armor.category)
-                values = [item_id, item.name, cat, armor.protection, armor.durability, item.mass, item.value]
+                # Weight in stones (mass / 10), skip if undefined (0 or 63)
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
+                values = [item_id, item.name, cat, armor.protection, armor.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
                 row += 1
         self._auto_column_width(ws)
@@ -468,7 +474,7 @@ class XlsxExporter:
         """Export placed objects with actual locations, descriptions, and effects."""
         headers = [
             "Level", "Tile X", "Tile Y", "Item Name", "Item ID",
-            "Category", "Quantity", "Description", "Enchantment/Effect"
+            "Category", "Description", "Enchantment/Effect"
         ]
         ws = self._create_sheet("Placed Objects", headers)
         
@@ -498,20 +504,15 @@ class XlsxExporter:
             cat_raw = item.object_class if isinstance(item.object_class, str) else ""
             category = CATEGORY_DISPLAY_NAMES.get(cat_raw, cat_raw.title() if cat_raw else "Unknown")
             
-            # Get quantity for stackable items
-            quantity = ""
-            if item.object_id in STACKABLE_ITEMS and item.is_quantity:
-                quantity = item.quantity
-            
             # Get description based on item type
             description = self._get_item_description(item, block3, block5, spell_names, level_parser)
             
-            # Get effect/enchantment
+            # Get effect/enchantment with spell descriptions
             effect = self._get_item_effect(item, strings_parser, level_parser)
             
             values = [
                 item.level + 1, item.tile_x, item.tile_y, name, f"0x{item.object_id:03X}",
-                category, quantity, description, effect
+                category, description, effect
             ]
             self._add_row(ws, row, values, row % 2 == 0)
             row += 1
@@ -690,6 +691,8 @@ class XlsxExporter:
     
     def _get_item_effect(self, item, strings_parser, level_parser=None) -> str:
         """Get enchantment/effect description for an item."""
+        from ..constants import SPELL_DESCRIPTIONS
+        
         spell_names = {}
         if strings_parser:
             block6 = strings_parser.get_block(6) or []
@@ -699,6 +702,15 @@ class XlsxExporter:
         
         object_id = item.object_id
         link_value = item.quantity if item.is_quantity else item.special_link
+        
+        def format_spell_with_description(spell_name: str) -> str:
+            """Format spell name with description if available."""
+            if not spell_name:
+                return ""
+            desc = SPELL_DESCRIPTIONS.get(spell_name, "")
+            if desc:
+                return f"{spell_name} ({desc})"
+            return spell_name
         
         # Wands
         if 0x98 <= object_id <= 0x9B:
@@ -710,7 +722,8 @@ class XlsxExporter:
                         spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
                         spell = spell_names.get(spell_idx, "")
                         if spell:
-                            return f"{spell} ({item.quality} charges)"
+                            spell_with_desc = format_spell_with_description(spell)
+                            return f"{spell_with_desc} ({item.quality} charges)"
             return f"Unknown spell ({item.quality} charges)" if item.quality > 0 else "Empty"
         
         # Keys
@@ -731,10 +744,10 @@ class XlsxExporter:
                 raw_idx = link_value - 512
                 spell_256 = spell_names.get(raw_idx + 256, "")
                 if spell_256:
-                    return spell_256
+                    return format_spell_with_description(spell_256)
                 spell_raw = spell_names.get(raw_idx, "")
                 if spell_raw:
-                    return spell_raw
+                    return format_spell_with_description(spell_raw)
                 return f"Effect #{raw_idx}"
             if object_id == 0xBB:
                 return "Restores Mana"
@@ -758,32 +771,46 @@ class XlsxExporter:
         if object_id < 0x20:
             if 192 <= ench_property <= 199:
                 spell_idx = 448 + (ench_property - 192)
-                return spell_names.get(spell_idx, f"Accuracy +{ench_property - 191}")
+                spell = spell_names.get(spell_idx, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                return f"Accuracy +{ench_property - 191}"
             elif 200 <= ench_property <= 207:
                 spell_idx = 456 + (ench_property - 200)
-                return spell_names.get(spell_idx, f"Damage +{ench_property - 199}")
+                spell = spell_names.get(spell_idx, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                return f"Damage +{ench_property - 199}"
             elif ench_property < 64:
                 spell_idx = 256 + ench_property
-                return spell_names.get(spell_idx, "")
+                spell = spell_names.get(spell_idx, "")
+                return format_spell_with_description(spell)
         
         # Rings
         elif object_id in (0x36, 0x38, 0x39, 0x3A):
             spell = spell_names.get(ench_property, "")
             if spell:
-                return spell
+                return format_spell_with_description(spell)
             return f"Unknown enchantment ({ench_property})"
         
         # Armor
         elif 0x20 <= object_id < 0x40:
             if 192 <= ench_property <= 199:
                 spell_idx = 464 + (ench_property - 192)
-                return spell_names.get(spell_idx, f"Protection +{ench_property - 191}")
+                spell = spell_names.get(spell_idx, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                return f"Protection +{ench_property - 191}"
             elif 200 <= ench_property <= 207:
                 spell_idx = 472 + (ench_property - 200)
-                return spell_names.get(spell_idx, f"Toughness +{ench_property - 199}")
+                spell = spell_names.get(spell_idx, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                return f"Toughness +{ench_property - 199}"
             elif ench_property < 64:
                 spell_idx = 256 + ench_property
-                return spell_names.get(spell_idx, "")
+                spell = spell_names.get(spell_idx, "")
+                return format_spell_with_description(spell)
         
         return ""
     
