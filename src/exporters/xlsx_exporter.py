@@ -105,16 +105,15 @@ class XlsxExporter:
             # Determine if item can be carried based on category
             is_carryable = item.category in CARRYABLE_CATEGORIES
             
-            # Weight in stones (mass / 10)
-            # Note: mass=63 appears to be a placeholder for "undefined" in COMOBJ.DAT
-            # Only show weight if it's actually defined (< 63)
-            if is_carryable and item.mass > 0 and item.mass < 63:
+            # Weight in stones (mass is stored in 0.1 stone units)
+            # Only show weight if it's actually defined (> 0)
+            if is_carryable and item.mass > 0:
                 weight_str = f"{item.mass / 10:.1f}"
             else:
                 weight_str = ""
             
-            # Value in gold (value / 10)
-            value_str = f"{item.value / 10:.1f}" if item.value > 0 else ""
+            # Value in gold (value is already in whole gold pieces)
+            value_str = str(item.value) if item.value > 0 else ""
             
             values = [
                 item.item_id, f"0x{item.item_id:03X}", item.name, item.category,
@@ -136,8 +135,8 @@ class XlsxExporter:
             weapon = objects_parser.get_melee_weapon(item_id)
             if item and weapon:
                 skill = weapon.skill_type.name if hasattr(weapon.skill_type, 'name') else str(weapon.skill_type)
-                # Weight in stones (mass / 10), skip if undefined (0 or 63)
-                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
+                # Weight in stones (mass is in 0.1 stones)
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
                 values = [item_id, item.name, "Melee", weapon.slash_damage, weapon.bash_damage,
                          weapon.stab_damage, skill, weapon.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
@@ -147,8 +146,8 @@ class XlsxExporter:
             item = item_types.get(item_id)
             weapon = objects_parser.get_ranged_weapon(item_id)
             if item and weapon:
-                # Weight in stones (mass / 10), skip if undefined (0 or 63)
-                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
+                # Weight in stones (mass is in 0.1 stones)
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
                 values = [item_id, item.name, "Ranged", "-", "-", "-", "Missile",
                          weapon.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
@@ -166,8 +165,8 @@ class XlsxExporter:
             armor = objects_parser.get_armour(item_id)
             if item and armor:
                 cat = armor.category.name if hasattr(armor.category, 'name') else str(armor.category)
-                # Weight in stones (mass / 10), skip if undefined (0 or 63)
-                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
+                # Weight in stones (mass is in 0.1 stones)
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
                 values = [item_id, item.name, cat, armor.protection, armor.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
                 row += 1
@@ -872,7 +871,8 @@ class XlsxExporter:
             item = item_types.get(item_id)
             container = objects_parser.get_container(item_id)
             if item and container:
-                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
+                # Weight in stones (mass is in 0.1 stones)
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
                 
                 values = [
                     item_id, item.name, weight_str, container.capacity_stones,

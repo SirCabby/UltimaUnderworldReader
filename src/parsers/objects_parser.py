@@ -362,20 +362,23 @@ class CommonObjectProperties:
     """Common properties for any object type from COMOBJ.DAT.
     
     Format (11 bytes per object):
-    [0] bits 0-3: 3D height, bits 4-6: radius
-    [1] bits 0-5: mass in 0.1 stones, bits 6-7: value (low)
-    [2] value (high) - combined with byte 1 bits 6-7
-    [3] bits 0-3: quality class, bits 4-7: quality type
-    [4] bits 0-3: container flag, bit 4: can have owner, bit 6: can be owned by NPC
+    [0] bits 0-4: 3D height, bits 5-7: radius
+    [1] bits 0-3: unknown flags, bits 4-7: mass fractional part (in 0.1 stones)
+    [2] mass whole part (in 1.6 stone units, multiply by 16 to get 0.1 stones)
+    [3] quality/type flags (0x60 = 96 is common)
+    [4] value in gold pieces
     [5] bits 0-3: look description block, bit 4: can be picked up
     [6-10]: various flags
+    
+    Mass formula: mass_in_tenths = byte[2] * 16 + ((byte[1] >> 4) & 0x0F)
+    This gives mass in 0.1 stone units (divide by 10 for stones).
     """
     object_id: int
     raw_data: bytes  # Raw 11-byte entry
     
     # Parsed fields (based on format analysis)
     height: int      # 3D height
-    mass_value: int  # Combined mass/value field
+    mass_value: int  # Combined mass/value field (legacy, use mass property)
     flags: int
     
     @property
@@ -385,23 +388,28 @@ class CommonObjectProperties:
     
     @property
     def mass(self) -> int:
-        """Mass in 0.1 stones (raw value 0-63)."""
-        return self.raw_data[1] & 0x3F
+        """Mass in 0.1 stones (tenths of a stone).
+        
+        Formula: byte[2] * 16 + ((byte[1] >> 4) & 0x0F)
+        - byte[2] represents 1.6 stone units (16 tenths each)
+        - bits 4-7 of byte[1] represent the fractional part in 0.1 stones
+        """
+        return self.raw_data[2] * 16 + ((self.raw_data[1] >> 4) & 0x0F)
     
     @property
     def mass_stones(self) -> float:
-        """Mass in stones (0.0 to 6.3)."""
-        return (self.raw_data[1] & 0x3F) / 10.0
+        """Mass in stones (e.g., 2.4 stones)."""
+        return self.mass / 10.0
     
     @property
     def value(self) -> int:
-        """Value in 0.1 gold pieces (raw value)."""
-        return ((self.raw_data[1] >> 6) | (self.raw_data[2] << 2))
+        """Value in gold pieces (not tenths)."""
+        return self.raw_data[4]
     
     @property 
     def value_gold(self) -> float:
-        """Value in gold pieces."""
-        return self.value / 10.0
+        """Value in gold pieces (same as value, for API consistency)."""
+        return float(self.value)
     
     @property
     def can_be_picked_up(self) -> bool:
@@ -413,9 +421,12 @@ class CommonObjectsParser:
     """
     Parser for COMOBJ.DAT - common properties for all 512 object types.
     
-    Each entry is 11 bytes containing weight, value, and various flags.
+    File format:
+    - 2-byte header (skip)
+    - 512 x 11-byte entries containing weight, value, and various flags
     """
     
+    HEADER_SIZE = 2
     ENTRY_SIZE = 11
     NUM_OBJECTS = 512
     
@@ -430,15 +441,15 @@ class CommonObjectsParser:
         with open(self.filepath, 'rb') as f:
             self._data = f.read()
         
-        # Parse each object entry
+        # Parse each object entry (skip 2-byte header)
         for i in range(self.NUM_OBJECTS):
-            offset = i * self.ENTRY_SIZE
+            offset = self.HEADER_SIZE + i * self.ENTRY_SIZE
             if offset + self.ENTRY_SIZE > len(self._data):
                 break
             
             raw = self._data[offset:offset + self.ENTRY_SIZE]
             
-            # Parse basic fields (format needs more analysis)
+            # Parse basic fields
             height = raw[0] & 0x1F  # Lower 5 bits
             mass_value = struct.unpack_from('<H', raw, 1)[0]
             flags = struct.unpack_from('<H', raw, 3)[0]

@@ -90,8 +90,8 @@ class ItemExtractor:
                 category=category,
                 properties=properties,
                 height=common_props.height if common_props else 0,
-                mass=common_props.mass if common_props else 0,  # Mass in 0.1 stones
-                value=common_props.value if common_props else 0,  # Value in 0.1 gold
+                mass=common_props.mass if common_props else 0,  # Mass in 0.1 stones (tenths)
+                value=common_props.value if common_props else 0,  # Value in gold pieces (whole)
                 flags=common_props.flags if common_props else 0,
                 can_be_owned=bool(common_props.raw_data[4] & 0x10) if common_props else False,
                 is_enchantable=bool(common_props.flags & 0x02) if common_props else False,
