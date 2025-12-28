@@ -214,7 +214,7 @@ class JsonExporter:
 
     def export_web_map_data(self, placed_items: List, npcs: List, npc_names: Dict, 
                             item_types: Dict = None, levels: Dict = None,
-                            strings_parser = None) -> Path:
+                            strings_parser = None, secrets: List = None) -> Path:
         """Export optimized data for the interactive web map viewer.
         
         Creates a single JSON file with all placed objects and NPCs,
@@ -227,6 +227,7 @@ class JsonExporter:
             item_types: Dict of ItemInfo objects for looking up item names
             levels: Dict of Level objects for following container chains
             strings_parser: StringsParser for looking up text (books, scrolls, keys, spells)
+            secrets: List of Secret objects (illusory walls, secret doors, etc.)
         """
         from ..constants import SPELL_DESCRIPTIONS
         
@@ -576,6 +577,10 @@ class JsonExporter:
             obj_id = item_dict.get('object_id', 0)
             if 0x40 <= obj_id <= 0x7F:
                 continue
+            
+            # Skip secret doors - they are exported in the secrets array
+            if obj_id == 0x147:
+                continue
                 
             level = item_dict.get('level', 0)
             obj_class = item_dict.get('object_class', 'unknown')
@@ -706,6 +711,7 @@ class JsonExporter:
                 {'id': 'doors', 'name': 'Doors', 'color': '#adb5bd'},
                 {'id': 'traps', 'name': 'Traps', 'color': '#ff8787'},
                 {'id': 'triggers', 'name': 'Triggers', 'color': '#748ffc'},
+                {'id': 'secrets', 'name': 'Secrets', 'color': '#ff00ff'},
                 {'id': 'misc', 'name': 'Miscellaneous', 'color': '#868e96'},
             ],
             'levels': []
@@ -723,14 +729,101 @@ class JsonExporter:
             "Level 9 - The Chamber of Virtue",
         ]
         
+        # Process secrets into per-level lists
+        # First pass: collect all illusory walls (these take priority)
+        secrets_by_level = {i: [] for i in range(9)}
+        illusory_wall_coords = {i: set() for i in range(9)}  # Track coords with illusory walls
+        
+        if secrets:
+            # First pass: add illusory walls
+            for secret in secrets:
+                secret_dict = secret.to_dict()
+                level = secret_dict.get('level', 0)
+                pos = secret_dict.get('position', {})
+                secret_type = secret_dict.get('type', '')
+                
+                # Only process illusory walls in first pass
+                if secret_type != 'illusory_wall':
+                    continue
+                
+                # Skip secrets at origin (templates)
+                tile_x = pos.get('x', 0)
+                tile_y = pos.get('y', 0)
+                if tile_x == 0 and tile_y == 0:
+                    continue
+                
+                coord = (tile_x, tile_y)
+                if coord in illusory_wall_coords[level]:
+                    continue  # Skip duplicate
+                
+                illusory_wall_coords[level].add(coord)
+                
+                web_secret = {
+                    'id': f"secret_{level}_{tile_x}_{tile_y}",
+                    'type': secret_type,
+                    'tile_x': tile_x,
+                    'tile_y': tile_y,
+                    'description': secret_dict.get('description', ''),
+                    'category': 'secrets',
+                }
+                
+                details = secret_dict.get('details', {})
+                if details:
+                    web_secret['details'] = details
+                
+                secrets_by_level[level].append(web_secret)
+            
+            # Second pass: add secret doors only where there's no illusory wall
+            for secret in secrets:
+                secret_dict = secret.to_dict()
+                level = secret_dict.get('level', 0)
+                pos = secret_dict.get('position', {})
+                secret_type = secret_dict.get('type', '')
+                
+                # Only process secret doors in second pass
+                if secret_type != 'secret_door':
+                    continue
+                
+                tile_x = pos.get('x', 0)
+                tile_y = pos.get('y', 0)
+                if tile_x == 0 and tile_y == 0:
+                    continue
+                
+                coord = (tile_x, tile_y)
+                # Skip if there's already an illusory wall at this location
+                if coord in illusory_wall_coords[level]:
+                    continue
+                
+                # Also skip if we already have a secret door at this coord
+                existing_coords = {(s['tile_x'], s['tile_y']) for s in secrets_by_level[level]}
+                if coord in existing_coords:
+                    continue
+                
+                web_secret = {
+                    'id': f"secret_{level}_{tile_x}_{tile_y}",
+                    'type': secret_type,
+                    'tile_x': tile_x,
+                    'tile_y': tile_y,
+                    'description': secret_dict.get('description', ''),
+                    'category': 'secrets',
+                }
+                
+                details = secret_dict.get('details', {})
+                if details:
+                    web_secret['details'] = details
+                
+                secrets_by_level[level].append(web_secret)
+        
         for level_num in range(9):
             level_entry = {
                 'level': level_num,
                 'name': level_names[level_num] if level_num < len(level_names) else f"Level {level_num + 1}",
                 'objects': objects_by_level[level_num],
                 'npcs': npcs_by_level[level_num],
+                'secrets': secrets_by_level[level_num],
                 'object_count': len(objects_by_level[level_num]),
                 'npc_count': len(npcs_by_level[level_num]),
+                'secret_count': len(secrets_by_level[level_num]),
             }
             web_data['levels'].append(level_entry)
         

@@ -19,6 +19,7 @@ from PIL import Image, ImageDraw
 from src.parsers.level_parser import LevelParser, TileType
 from src.parsers.ark_parser import LevArkParser
 from src.parsers.terrain_parser import TerrainParser
+from src.extractors.secret_finder import SecretFinder
 
 # Configuration
 TILE_SIZE = 10  # Pixels per tile
@@ -49,6 +50,8 @@ COLORS = {
     'water': (60, 80, 140),              # Blue for water
     'lava': (180, 60, 40),               # Red/orange for lava
     'door': (100, 70, 50),               # Brown for doors
+    'illusory_wall': (180, 140, 255),    # Light purple for illusory walls (Reveal spell targets)
+    'secret_door': (255, 200, 100),      # Gold/yellow for secret doors
 }
 
 # Ethereal Void (Level 9) color scheme - for the final dimension
@@ -72,6 +75,8 @@ ETHEREAL_COLORS = {
     'lava': (200, 80, 180),              # Magenta/purple magic
     'door': (100, 80, 140),
     'edge': (50, 45, 70),                # Edge highlight color
+    'illusory_wall': (200, 160, 255),    # Light purple for illusory walls
+    'secret_door': (255, 220, 120),      # Gold/yellow for secret doors
     # Path colors for the three distinct paths
     'path_green': (50, 180, 80),         # Green path (victory)
     'path_red': (180, 60, 60),           # Red path (wrong way)
@@ -332,6 +337,57 @@ def add_ethereal_edges(draw, level, color_scheme):
                              fill=edge_color, width=2)
 
 
+def draw_secrets(draw, level_num: int, secrets: list, color_scheme: dict):
+    """
+    Draw secret locations on the map.
+    
+    Marks illusory walls (Reveal spell targets) and secret doors with 
+    distinctive colored markers.
+    """
+    for secret in secrets:
+        if secret.level != level_num:
+            continue
+        
+        game_x = secret.tile_x
+        game_y = secret.tile_y
+        image_y = MAP_SIZE - 1 - game_y  # Flip Y for image coordinates
+        
+        px = game_x * TILE_SIZE
+        py = image_y * TILE_SIZE
+        
+        if secret.secret_type == 'illusory_wall':
+            # Draw illusory wall marker - VERY BRIGHT colored tile with X pattern
+            # Use bright magenta/pink that stands out strongly
+            color = (255, 100, 255)  # Bright magenta
+            
+            # Fill the tile with a bright background to make it unmissable
+            bg_color = (200, 50, 200)  # Bright purple background
+            draw.rectangle([px, py, px + TILE_SIZE - 1, py + TILE_SIZE - 1], fill=bg_color)
+            
+            # Draw an X pattern on top with white for contrast
+            draw.line([(px + 1, py + 1), (px + TILE_SIZE - 2, py + TILE_SIZE - 2)], 
+                     fill=(255, 255, 255), width=2)
+            draw.line([(px + TILE_SIZE - 2, py + 1), (px + 1, py + TILE_SIZE - 2)], 
+                     fill=(255, 255, 255), width=2)
+            
+            # Add bright border to make it even more visible
+            draw.rectangle([px, py, px + TILE_SIZE - 1, py + TILE_SIZE - 1], 
+                          outline=(255, 255, 0), width=1)  # Yellow border
+        elif secret.secret_type == 'secret_door':
+            # Draw secret door marker - filled diamond shape with bright yellow
+            color = (255, 255, 0)  # Bright yellow
+            center_x = px + TILE_SIZE // 2
+            center_y = py + TILE_SIZE // 2
+            size = TILE_SIZE // 2 - 1  # Larger diamond
+            points = [
+                (center_x, center_y - size),      # Top
+                (center_x + size, center_y),      # Right
+                (center_x, center_y + size),      # Bottom
+                (center_x - size, center_y),      # Left
+            ]
+            draw.polygon(points, outline=(255, 255, 255), fill=color)
+
+
 def main():
     """Generate all level maps."""
     # Find the data path
@@ -364,6 +420,18 @@ def main():
     print(f"  Water textures: {sorted(terrain_classifier.water_textures)}")
     print(f"  Lava textures: {sorted(terrain_classifier.lava_textures)}")
     
+    # Find secrets (illusory walls, secret doors, etc.)
+    print(f"Finding secrets and illusory walls...")
+    secret_finder = SecretFinder(data_dir)
+    secret_finder.analyze()
+    secrets = secret_finder.get_all_secrets()
+    
+    # Count secrets by type for logging
+    illusory_count = len([s for s in secrets if s.secret_type == 'illusory_wall'])
+    secret_door_count = len([s for s in secrets if s.secret_type == 'secret_door'])
+    print(f"  Found {illusory_count} illusory walls (Reveal spell targets)")
+    print(f"  Found {secret_door_count} secret doors")
+    
     # Parse level data
     print(f"Parsing level data from {lev_ark_path}...")
     level_parser = LevelParser(lev_ark_path)
@@ -393,6 +461,10 @@ def main():
             
             img = generate_level_map(level, texture_mapping, terrain_classifier, is_ethereal)
             
+            # Draw secrets (illusory walls, secret doors) on top
+            # Note: Secrets are NOT drawn on the map images
+            # They are rendered as interactive SVG markers in the web viewer
+            
             # Save as PNG for better quality
             output_path = output_dir / f"level{level_num + 1}.png"
             img.save(output_path, 'PNG')
@@ -405,6 +477,7 @@ def main():
     print("  - Blue: Water")
     print("  - Red/orange: Lava")
     print("  - Level 9 (Ethereal Void) uses a special ethereal blue theme")
+    print("  - Secrets (illusory walls, secret doors) are shown as interactive markers in the web viewer")
 
 
 if __name__ == '__main__':

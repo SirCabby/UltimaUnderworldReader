@@ -413,6 +413,12 @@ function updateCategoryCounts() {
         npcCountEl.textContent = level.npcs.length;
     }
     
+    // Update secrets count
+    const secretsCountEl = document.querySelector('.category-count[data-category-id="secrets"]');
+    if (secretsCountEl) {
+        secretsCountEl.textContent = level.secrets ? level.secrets.length : 0;
+    }
+    
     // Update object category counts - including items inside containers and NPC inventories
     const categoryCounts = {};
     
@@ -433,8 +439,8 @@ function updateCategoryCounts() {
     });
     
     state.data.categories.forEach(cat => {
-        // Skip npcs category - it's handled separately above
-        if (cat.id === 'npcs') return;
+        // Skip npcs and secrets categories - they're handled separately above
+        if (cat.id === 'npcs' || cat.id === 'secrets') return;
         
         const countEl = document.querySelector(`.category-count[data-category-id="${cat.id}"]`);
         if (countEl) {
@@ -571,15 +577,38 @@ function renderMarkers() {
         }
     });
     
+    // Collect secrets - show if 'secrets' category is selected
+    if (level.secrets && state.filters.categories.has('secrets')) {
+        level.secrets.forEach(secret => {
+            const key = `${secret.tile_x},${secret.tile_y}`;
+            if (!tileGroups.has(key)) {
+                tileGroups.set(key, []);
+            }
+            // Use bright magenta for secrets to match the map markers
+            tileGroups.get(key).push({ 
+                item: secret, 
+                color: '#ff00ff', 
+                isNpc: false, 
+                isSecret: true 
+            });
+            visibleCount++;
+        });
+    }
+    
     // Render markers for each tile group
     tileGroups.forEach((items, key) => {
         const [tileX, tileY] = key.split(',').map(Number);
         
         if (items.length === 1) {
             // Single item - render normally
-            const { item, color, isNpc } = items[0];
-            const marker = createMarker(item, color, pxPerTileX, pxPerTileY, isNpc);
-            elements.markersLayer.appendChild(marker);
+            const { item, color, isNpc, isSecret } = items[0];
+            if (isSecret) {
+                const marker = createSecretMarker(item, color, pxPerTileX, pxPerTileY);
+                elements.markersLayer.appendChild(marker);
+            } else {
+                const marker = createMarker(item, color, pxPerTileX, pxPerTileY, isNpc);
+                elements.markersLayer.appendChild(marker);
+            }
         } else {
             // Multiple items - render with stacking and count indicator
             renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY);
@@ -644,7 +673,11 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
         hideTooltip();
         // Select the first item when clicking the tile
         const firstItem = items[0];
-        selectStackedItem(firstItem.item, firstItem.isNpc, tileX, tileY);
+        if (firstItem.isSecret) {
+            selectSecret(firstItem.item);
+        } else {
+            selectStackedItem(firstItem.item, firstItem.isNpc, tileX, tileY);
+        }
     });
     
     group.appendChild(hoverArea);
@@ -767,7 +800,7 @@ function showStackedTooltip(e, items, tileX, tileY) {
     const itemList = document.createElement('div');
     itemList.className = 'tooltip-item-list';
     
-    items.forEach(({ item, color, isNpc }, index) => {
+    items.forEach(({ item, color, isNpc, isSecret }, index) => {
         const itemEl = document.createElement('div');
         itemEl.className = 'tooltip-item-entry';
         itemEl.style.cssText = `
@@ -779,10 +812,20 @@ function showStackedTooltip(e, items, tileX, tileY) {
             transition: background 0.1s ease;
         `;
         
-        // Build item display with icons
-        const icon = isNpc ? '👤' : '•';
-        const enchantIcon = isEnchanted(item) ? ' ✨' : '';
-        itemEl.textContent = `${icon} ${item.name || 'Unknown'}${enchantIcon}`;
+        // Build item display with icons based on type
+        let icon, displayName;
+        if (isSecret) {
+            icon = item.type === 'illusory_wall' ? '🔮' : '🚪';
+            displayName = item.type === 'illusory_wall' ? 'Illusory Wall' : 'Secret Door';
+        } else if (isNpc) {
+            icon = '👤';
+            displayName = item.name || 'Unknown';
+        } else {
+            icon = '•';
+            displayName = item.name || 'Unknown';
+        }
+        const enchantIcon = (!isSecret && isEnchanted(item)) ? ' ✨' : '';
+        itemEl.textContent = `${icon} ${displayName}${enchantIcon}`;
         
         // Hover effect
         itemEl.addEventListener('mouseenter', () => {
@@ -797,8 +840,12 @@ function showStackedTooltip(e, items, tileX, tileY) {
             clickEvent.stopPropagation();
             hideTooltip();
             
-            // Select this item - create a virtual marker selection
-            selectStackedItem(item, isNpc, tileX, tileY);
+            // Select this item based on type
+            if (isSecret) {
+                selectSecret(item);
+            } else {
+                selectStackedItem(item, isNpc, tileX, tileY);
+            }
         });
         
         itemList.appendChild(itemEl);
@@ -1027,6 +1074,214 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     group.appendChild(marker);
     
     return group;
+}
+
+/**
+ * Create a special marker for secrets (illusory walls, secret doors)
+ * Uses distinct shapes: X for illusory walls, diamond for secret doors
+ */
+function createSecretMarker(secret, color, pxPerTileX, pxPerTileY) {
+    // Tile boundaries
+    const tileLeft = CONFIG.mapArea.offsetX + secret.tile_x * pxPerTileX;
+    const tileTop = CONFIG.mapArea.offsetY + (CONFIG.mapArea.gridSize - secret.tile_y - 1) * pxPerTileY;
+    
+    // Center of tile
+    const px = tileLeft + pxPerTileX / 2;
+    const py = tileTop + pxPerTileY / 2;
+    
+    // Create a group to hold the marker
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.classList.add('marker-group', 'secret-marker');
+    group.dataset.id = secret.id;
+    group.dataset.isSecret = true;
+    group.dataset.secretType = secret.type;
+    group.dataset.tileX = secret.tile_x;
+    group.dataset.tileY = secret.tile_y;
+    
+    // Create invisible tile-sized hover area
+    const hoverArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    hoverArea.setAttribute('x', tileLeft);
+    hoverArea.setAttribute('y', tileTop);
+    hoverArea.setAttribute('width', pxPerTileX);
+    hoverArea.setAttribute('height', pxPerTileY);
+    hoverArea.setAttribute('fill', 'transparent');
+    hoverArea.classList.add('tile-hover-area');
+    
+    // Create visual marker based on secret type
+    const size = 4;
+    
+    if (secret.type === 'illusory_wall') {
+        // Draw an X for illusory walls (bright magenta)
+        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line1.setAttribute('x1', px - size);
+        line1.setAttribute('y1', py - size);
+        line1.setAttribute('x2', px + size);
+        line1.setAttribute('y2', py + size);
+        line1.setAttribute('stroke', '#ff00ff');
+        line1.setAttribute('stroke-width', '2');
+        line1.classList.add('marker', 'secret-x');
+        line1.style.pointerEvents = 'none';
+        
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', px + size);
+        line2.setAttribute('y1', py - size);
+        line2.setAttribute('x2', px - size);
+        line2.setAttribute('y2', py + size);
+        line2.setAttribute('stroke', '#ff00ff');
+        line2.setAttribute('stroke-width', '2');
+        line2.classList.add('marker', 'secret-x');
+        line2.style.pointerEvents = 'none';
+        
+        group.appendChild(hoverArea);
+        group.appendChild(line1);
+        group.appendChild(line2);
+    } else if (secret.type === 'secret_door') {
+        // Draw a diamond for secret doors (bright yellow)
+        const diamond = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        const points = `${px},${py - size} ${px + size},${py} ${px},${py + size} ${px - size},${py}`;
+        diamond.setAttribute('points', points);
+        diamond.setAttribute('fill', '#ffff00');
+        diamond.setAttribute('stroke', '#ffffff');
+        diamond.setAttribute('stroke-width', '1');
+        diamond.classList.add('marker', 'secret-diamond');
+        diamond.style.pointerEvents = 'none';
+        
+        group.appendChild(hoverArea);
+        group.appendChild(diamond);
+    } else {
+        // Default: circle marker
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', px);
+        circle.setAttribute('cy', py);
+        circle.setAttribute('r', size);
+        circle.setAttribute('fill', color);
+        circle.setAttribute('stroke', '#ffffff');
+        circle.setAttribute('stroke-width', '1');
+        circle.classList.add('marker');
+        circle.style.pointerEvents = 'none';
+        
+        group.appendChild(hoverArea);
+        group.appendChild(circle);
+    }
+    
+    // Event listeners
+    hoverArea.addEventListener('mouseenter', (e) => {
+        showSecretTooltip(e, secret);
+    });
+    hoverArea.addEventListener('mouseleave', () => {
+        hideTooltip();
+    });
+    hoverArea.addEventListener('mousemove', (e) => {
+        updateTooltipPosition(e);
+    });
+    hoverArea.addEventListener('click', () => selectSecret(secret));
+    
+    return group;
+}
+
+/**
+ * Show tooltip for a secret
+ */
+function showSecretTooltip(e, secret) {
+    const tooltip = elements.tooltip;
+    
+    const typeLabel = secret.type === 'illusory_wall' ? '🔮 Illusory Wall' : '🚪 Secret Door';
+    const typeColor = secret.type === 'illusory_wall' ? '#ff00ff' : '#ffff00';
+    
+    let html = `<div class="tooltip-name" style="color: ${typeColor};">${typeLabel}</div>`;
+    html += `<div class="tooltip-info">${secret.description || 'Hidden passage'}</div>`;
+    
+    if (secret.details) {
+        if (secret.details.new_tile_type) {
+            html += `<div class="tooltip-info" style="font-size: 0.8rem; color: var(--text-muted);">Reveals: ${secret.details.new_tile_type}</div>`;
+        }
+    }
+    
+    html += `<div class="tooltip-position">Tile: (${secret.tile_x}, ${secret.tile_y})</div>`;
+    
+    tooltip.innerHTML = html;
+    tooltip.classList.add('visible');
+    
+    updateTooltipPosition(e);
+}
+
+/**
+ * Select a secret and show its details
+ */
+function selectSecret(secret) {
+    // Clear previous selection
+    document.querySelectorAll('.marker.selected').forEach(m => {
+        m.classList.remove('selected');
+    });
+    state.selectedMarker = null;
+    
+    // Update details panel
+    renderSecretDetails(secret);
+    
+    // Show location info
+    renderLocationObjects(secret.tile_x, secret.tile_y, secret.id);
+}
+
+/**
+ * Render secret details in the details panel
+ */
+function renderSecretDetails(secret) {
+    const typeLabel = secret.type === 'illusory_wall' ? '🔮 Illusory Wall' : '🚪 Secret Door';
+    const typeColor = secret.type === 'illusory_wall' ? '#ff00ff' : '#ffff00';
+    
+    let html = '<div class="detail-card">';
+    html += `<div class="detail-name" style="color: ${typeColor};">${typeLabel}</div>`;
+    
+    html += `
+        <div class="detail-row">
+            <span class="detail-label">Type</span>
+            <span class="detail-category" style="background: ${typeColor}22; color: ${typeColor};">Secret</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Description</span>
+            <span class="detail-value">${secret.description || 'Hidden passage'}</span>
+        </div>
+    `;
+    
+    if (secret.details) {
+        if (secret.details.new_tile_type) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Reveals</span>
+                    <span class="detail-value">${secret.details.new_tile_type}</span>
+                </div>
+            `;
+        }
+        if (secret.details.new_floor_height !== undefined) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Floor Height</span>
+                    <span class="detail-value">${secret.details.new_floor_height}</span>
+                </div>
+            `;
+        }
+    }
+    
+    html += `
+        <div class="detail-row">
+            <span class="detail-label">Position</span>
+            <span class="detail-value">(${secret.tile_x}, ${secret.tile_y})</span>
+        </div>
+    `;
+    
+    // Add hint about how to reveal
+    if (secret.type === 'illusory_wall') {
+        html += `
+            <div class="detail-description" style="margin-top: 12px;">
+                <div class="detail-label" style="margin-bottom: 4px;">How to Reveal</div>
+                <div class="description-text" style="color: var(--text-accent);">Cast the <strong>Reveal</strong> spell (ORT LOR) or walk through it.</div>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    
+    elements.objectDetails.innerHTML = html;
 }
 
 function getCategoryColor(categoryId) {
@@ -1766,8 +2021,11 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
     // Find all items at this tile
     const npcsAtTile = level.npcs.filter(n => n.tile_x === tileX && n.tile_y === tileY);
     const objectsAtTile = level.objects.filter(o => o.tile_x === tileX && o.tile_y === tileY);
+    const secretsAtTile = level.secrets ? level.secrets.filter(s => s.tile_x === tileX && s.tile_y === tileY) : [];
     
-    if (npcsAtTile.length === 0 && objectsAtTile.length === 0) {
+    const totalItems = npcsAtTile.length + objectsAtTile.length + secretsAtTile.length;
+    
+    if (totalItems === 0) {
         elements.locationObjects.innerHTML = '<p class="no-selection">No objects at this location</p>';
         return;
     }
@@ -1777,7 +2035,7 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
     
     const header = document.createElement('p');
     header.style.cssText = 'color: var(--text-muted); margin-bottom: 8px;';
-    header.textContent = `Tile (${tileX}, ${tileY}) - ${npcsAtTile.length + objectsAtTile.length} items`;
+    header.textContent = `Tile (${tileX}, ${tileY}) - ${totalItems} items`;
     elements.locationObjects.appendChild(header);
     
     // Render NPCs
@@ -1825,6 +2083,27 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         `;
         
         card.addEventListener('click', () => selectLocationItem(obj, false, tileX, tileY));
+        elements.locationObjects.appendChild(card);
+    });
+    
+    // Render secrets
+    secretsAtTile.forEach(secret => {
+        const typeLabel = secret.type === 'illusory_wall' ? '🔮 Illusory Wall' : '🚪 Secret Door';
+        const typeColor = secret.type === 'illusory_wall' ? '#ff00ff' : '#ffff00';
+        
+        const card = document.createElement('div');
+        card.className = 'detail-card location-item';
+        card.style.cssText = `border-left: 3px solid ${typeColor}; cursor: pointer;`;
+        if (selectedItemId === secret.id) {
+            card.classList.add('selected-location-item');
+        }
+        
+        card.innerHTML = `
+            <div class="detail-name" style="font-size: 0.9rem; color: ${typeColor};">${typeLabel}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">${secret.description || 'Hidden passage'}</div>
+        `;
+        
+        card.addEventListener('click', () => selectSecret(secret));
         elements.locationObjects.appendChild(card);
     });
 }

@@ -58,6 +58,9 @@ class SecretFinder:
     # Secret door ID
     SECRET_DOOR_ID = 0x147
     
+    # Change terrain trap ID (used for illusory walls)
+    CHANGE_TERRAIN_TRAP_ID = 0x185
+    
     def __init__(self, data_path: str | Path):
         self.data_path = Path(data_path)
         
@@ -83,6 +86,7 @@ class SecretFinder:
             self._find_triggers(level_num, level)
             self._find_traps(level_num, level)
             self._find_secret_doors(level_num, level)
+            self._find_illusory_walls(level_num, level)
             self._find_invisible_objects(level_num, level)
             self._find_interesting_tiles(level_num, level)
         
@@ -160,6 +164,110 @@ class SecretFinder:
                         'is_locked': obj.quantity_or_link != 0 if not obj.is_quantity else False
                     }
                 ))
+    
+    def _find_illusory_walls(self, level_num: int, level) -> None:
+        """
+        Find illusory walls - solid tiles that can be revealed.
+        
+        These are implemented as change_terrain_trap (0x185) objects placed on
+        SOLID tiles. When triggered (by Reveal spell or triggers), the tile
+        changes from SOLID to OPEN (or another passable type), allowing passage.
+        
+        The trap's quality field encodes the new tile properties:
+        - bits 0-3: new floor height
+        - bits 4-7: new tile type (1 = OPEN, etc.)
+        
+        The trap's owner field typically contains the new wall texture (63 = unchanged).
+        
+        Note: Traps that keep tiles as SOLID (new_type=0) are included as
+        "terrain_modifier" since they modify wall height/texture, not reveal passages.
+        """
+        tile_type_names = {
+            0: "SOLID",
+            1: "OPEN",
+            2: "DIAG_SE",
+            3: "DIAG_SW",
+            4: "DIAG_NE",
+            5: "DIAG_NW",
+            6: "SLOPE_N",
+            7: "SLOPE_S",
+            8: "SLOPE_E",
+            9: "SLOPE_W",
+        }
+        
+        for idx, obj in level.objects.items():
+            if obj.item_id == self.CHANGE_TERRAIN_TRAP_ID:
+                # Skip placeholder objects at (0, 0)
+                if obj.tile_x == 0 and obj.tile_y == 0:
+                    continue
+                    
+                # Check if the trap is on a SOLID tile
+                tile = level.get_tile(obj.tile_x, obj.tile_y)
+                if tile and tile.tile_type == TileType.SOLID:
+                    new_tile_type = (obj.quality >> 4) & 0xF
+                    new_floor_height = obj.quality & 0xF
+                    new_type_name = tile_type_names.get(new_tile_type, f"type_{new_tile_type}")
+                    
+                    # Determine what triggers this wall
+                    trigger_info = self._find_trigger_for_trap(level, idx)
+                    
+                    # Classify based on whether it reveals a passage or just modifies terrain
+                    if new_tile_type == 0:
+                        # SOLID -> SOLID: terrain modifier (changes height/texture)
+                        secret_type = "terrain_modifier"
+                        description = f"Terrain modifier (height {tile.floor_height}->{new_floor_height})"
+                    else:
+                        # SOLID -> passable type: illusory wall
+                        secret_type = "illusory_wall"
+                        description = f"Illusory wall -> {new_type_name}"
+                    
+                    if trigger_info:
+                        description += f" ({trigger_info})"
+                    
+                    self.secrets.append(Secret(
+                        secret_type=secret_type,
+                        level=level_num,
+                        tile_x=obj.tile_x,
+                        tile_y=obj.tile_y,
+                        description=description,
+                        object_id=obj.item_id,
+                        details={
+                            'current_type': 'SOLID',
+                            'current_height': tile.floor_height,
+                            'new_type': new_type_name,
+                            'new_floor_height': new_floor_height,
+                            'new_wall_texture': obj.owner,
+                            'trap_index': idx,
+                            'trigger': trigger_info,
+                            'z_pos': obj.z_pos,
+                            'special_link': obj.quantity_or_link if not obj.is_quantity else 0
+                        }
+                    ))
+    
+    def _find_trigger_for_trap(self, level, trap_index: int) -> str:
+        """Find what trigger activates a trap and return a description."""
+        trigger_types = {
+            0x1A0: "move",
+            0x1A1: "pick_up",
+            0x1A2: "use",
+            0x1A3: "look",
+            0x1A4: "step_on",
+            0x1A5: "open",
+            0x1A6: "unlock",
+            0x1A7: "timer",
+            0x1A8: "scheduled",
+        }
+        
+        # Look for triggers that link to this trap
+        for idx, obj in level.objects.items():
+            if obj.item_id in self.TRIGGER_IDS:
+                # Check if this trigger links to our trap
+                if not obj.is_quantity and obj.quantity_or_link == trap_index:
+                    trigger_name = trigger_types.get(obj.item_id, f"trigger_0x{obj.item_id:03X}")
+                    return f"{trigger_name} trigger at ({obj.tile_x}, {obj.tile_y})"
+        
+        # No direct trigger found - wall can likely be revealed by Reveal spell
+        return "Reveal spell"
     
     def _find_invisible_objects(self, level_num: int, level) -> None:
         """Find all invisible objects."""
@@ -257,6 +365,16 @@ class SecretFinder:
             self.analyze()
         return [s for s in self.secrets if s.secret_type == secret_type]
     
+    def get_illusory_walls(self) -> List[Secret]:
+        """
+        Get all illusory walls that can be revealed.
+        
+        Returns:
+            List of Secret objects representing walls that can be removed
+            with the Reveal spell or other triggers.
+        """
+        return self.get_secrets_by_type("illusory_wall")
+    
     def get_summary(self) -> Dict[str, Any]:
         """Get a summary of found secrets."""
         if not self._analyzed:
@@ -313,6 +431,12 @@ def main():
                  if 'teleport' in s.description.lower()]
     for secret in teleports[:10]:
         print(f"  Level {secret.level} @ ({secret.tile_x},{secret.tile_y})")
+    
+    print("\nIllusory Walls (Reveal spell targets):")
+    illusory_walls = finder.get_illusory_walls()
+    for secret in illusory_walls:
+        # Display as 1-indexed level for user friendliness
+        print(f"  Level {secret.level + 1} @ ({secret.tile_x},{secret.tile_y}): {secret.description}")
 
 
 if __name__ == '__main__':
