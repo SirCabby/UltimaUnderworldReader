@@ -703,56 +703,201 @@ function renderObjectDetails(item, isNpc) {
     
     html += '</div>';
     
-    // Add container contents if this is a container
-    if (item.contents && item.contents.length > 0) {
-        html += renderContainerContents(item.contents);
-    }
-    
+    // Set the HTML first
     elements.objectDetails.innerHTML = html;
+    
+    // Add container contents if this is a container (using DOM elements for click handling)
+    if (item.contents && item.contents.length > 0) {
+        const contentsEl = renderContainerContents(item.contents, 0, item);
+        if (contentsEl) {
+            elements.objectDetails.appendChild(contentsEl);
+        }
+    }
 }
 
 /**
- * Render container contents as a nested list
+ * Render container contents as a nested list with clickable items
+ * Returns a DOM element instead of HTML string for click handling
  */
-function renderContainerContents(contents, depth = 0) {
-    if (!contents || contents.length === 0) return '';
+function renderContainerContents(contents, depth = 0, parentContainer = null) {
+    if (!contents || contents.length === 0) return null;
     
     const indent = depth * 12;
-    let html = `<div class="container-contents" style="margin-left: ${indent}px; margin-top: 8px;">`;
-    html += `<div class="contents-header" style="color: var(--text-accent); font-size: 0.85rem; margin-bottom: 6px;">
-        ${depth === 0 ? '📦 Contains:' : '↳ Contains:'}
-    </div>`;
+    const container = document.createElement('div');
+    container.className = 'container-contents';
+    container.style.marginLeft = `${indent}px`;
+    container.style.marginTop = '8px';
+    
+    const header = document.createElement('div');
+    header.className = 'contents-header';
+    header.style.cssText = 'color: var(--text-accent); font-size: 0.85rem; margin-bottom: 6px;';
+    header.textContent = depth === 0 ? '📦 Contains:' : '↳ Contains:';
+    container.appendChild(header);
     
     contents.forEach(item => {
         const catColor = getCategoryColor(item.category);
         const qty = item.quantity > 1 ? ` (×${item.quantity})` : '';
         const enchanted = item.is_enchanted ? ' ✨' : '';
+        const hasContents = item.contents && item.contents.length > 0;
         
-        html += `
-            <div class="content-item" style="
-                background: var(--bg-tertiary); 
-                border-left: 3px solid ${catColor};
-                padding: 6px 8px;
-                margin-bottom: 4px;
-                border-radius: 0 4px 4px 0;
-                font-size: 0.85rem;
-            ">
-                <div style="color: var(--text-primary);">${item.name || 'Unknown'}${qty}${enchanted}</div>
-                <div style="color: var(--text-muted); font-size: 0.75rem;">
-                    ${formatCategory(item.category)}
-                    ${item.quality > 0 ? ` • Quality: ${item.quality}` : ''}
-                </div>
-            </div>
+        const contentItem = document.createElement('div');
+        contentItem.className = 'content-item selectable-content';
+        contentItem.dataset.itemId = item.id || '';
+        contentItem.style.cssText = `
+            background: var(--bg-tertiary); 
+            border-left: 3px solid ${catColor};
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
         `;
         
+        const nameDiv = document.createElement('div');
+        nameDiv.style.color = 'var(--text-primary)';
+        nameDiv.textContent = `${item.name || 'Unknown'}${qty}${enchanted}${hasContents ? ' 📦' : ''}`;
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.style.cssText = 'color: var(--text-muted); font-size: 0.75rem;';
+        infoDiv.textContent = `${formatCategory(item.category)}${item.quality > 0 ? ` • Quality: ${item.quality}` : ''}`;
+        
+        contentItem.appendChild(nameDiv);
+        contentItem.appendChild(infoDiv);
+        
+        // Add hover effects
+        contentItem.addEventListener('mouseenter', () => {
+            contentItem.style.background = 'var(--bg-elevated)';
+            contentItem.style.transform = 'translateX(2px)';
+        });
+        contentItem.addEventListener('mouseleave', () => {
+            if (!contentItem.classList.contains('selected-content')) {
+                contentItem.style.background = 'var(--bg-tertiary)';
+            }
+            contentItem.style.transform = 'translateX(0)';
+        });
+        
+        // Add click handler to select this item
+        contentItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectContainerItem(item, parentContainer);
+        });
+        
+        container.appendChild(contentItem);
+        
         // Recursively render nested container contents
-        if (item.contents && item.contents.length > 0) {
-            html += renderContainerContents(item.contents, depth + 1);
+        if (hasContents) {
+            const nestedContents = renderContainerContents(item.contents, depth + 1, item);
+            if (nestedContents) {
+                container.appendChild(nestedContents);
+            }
         }
     });
     
+    return container;
+}
+
+/**
+ * Select an item from within a container
+ */
+function selectContainerItem(item, parentContainer = null) {
+    // Clear any previous content selection highlighting
+    document.querySelectorAll('.selectable-content.selected-content').forEach(el => {
+        el.classList.remove('selected-content');
+        el.style.background = 'var(--bg-tertiary)';
+        el.style.borderColor = '';
+    });
+    
+    // Build details for the selected container item
+    let html = '<div class="detail-card">';
+    html += `<div class="detail-name">${item.name || 'Unknown Object'}</div>`;
+    
+    const catColor = getCategoryColor(item.category);
+    html += `
+        <div class="detail-row">
+            <span class="detail-label">Category</span>
+            <span class="detail-category" style="background: ${catColor}22; color: ${catColor};">${formatCategory(item.category)}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Object ID</span>
+            <span class="detail-value">0x${item.object_id.toString(16).toUpperCase().padStart(3, '0')}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Quality</span>
+            <span class="detail-value">${item.quality}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Quantity</span>
+            <span class="detail-value">${item.quantity || 1}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Enchanted</span>
+            <span class="detail-value">${item.is_enchanted ? '✨ Yes' : 'No'}</span>
+        </div>
+    `;
+    
+    // Show parent container info
+    if (parentContainer) {
+        html += `
+            <div class="detail-row">
+                <span class="detail-label">Inside</span>
+                <span class="detail-value" style="color: var(--text-accent);">${parentContainer.name || 'Container'}</span>
+            </div>
+        `;
+    }
+    
     html += '</div>';
-    return html;
+    
+    // Add nested container contents if this item is also a container
+    elements.objectDetails.innerHTML = html;
+    
+    if (item.contents && item.contents.length > 0) {
+        const contentsEl = renderContainerContents(item.contents, 0, item);
+        if (contentsEl) {
+            elements.objectDetails.appendChild(contentsEl);
+        }
+    }
+    
+    // Add a "back to parent" button if there's a parent
+    if (parentContainer) {
+        const backBtn = document.createElement('button');
+        backBtn.className = 'back-to-parent-btn';
+        backBtn.innerHTML = '← Back to ' + (parentContainer.name || 'Container');
+        backBtn.style.cssText = `
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.15s ease;
+        `;
+        backBtn.addEventListener('mouseenter', () => {
+            backBtn.style.background = 'var(--bg-elevated)';
+            backBtn.style.borderColor = 'var(--text-accent)';
+            backBtn.style.color = 'var(--text-accent)';
+        });
+        backBtn.addEventListener('mouseleave', () => {
+            backBtn.style.background = 'var(--bg-tertiary)';
+            backBtn.style.borderColor = 'var(--border-color)';
+            backBtn.style.color = 'var(--text-secondary)';
+        });
+        backBtn.addEventListener('click', () => {
+            renderObjectDetails(parentContainer, false);
+        });
+        elements.objectDetails.appendChild(backBtn);
+    }
+    
+    // Highlight the selected content item
+    const selectedEl = document.querySelector(`.selectable-content[data-item-id="${item.id}"]`);
+    if (selectedEl) {
+        selectedEl.classList.add('selected-content');
+        selectedEl.style.background = 'var(--bg-elevated)';
+    }
 }
 
 function renderLocationObjects(tileX, tileY, selectedItemId = null) {
