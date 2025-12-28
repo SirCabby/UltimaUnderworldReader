@@ -571,6 +571,27 @@ body {
     margin-bottom: 0;
 }
 
+/* Clickable location items */
+.detail-card.location-item {
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.detail-card.location-item:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-accent);
+    transform: translateX(2px);
+}
+
+.detail-card.location-item.selected-location-item {
+    background: var(--bg-elevated);
+    border-color: var(--text-accent);
+    box-shadow: 0 0 8px rgba(212, 168, 85, 0.2);
+}
+
+.detail-card.location-item.selected-location-item .detail-name {
+    color: var(--text-accent);
+}
+
 .detail-name {
     font-family: var(--font-display);
     font-size: 1rem;

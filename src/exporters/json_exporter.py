@@ -248,18 +248,34 @@ class JsonExporter:
         
         # Build index lookup for items by level and index
         items_by_level_index = {}
+        # Also build an index of creature type names for NPCs (object_id 0x40-0x7F)
+        creature_type_by_level_index = {}
+        
         for item in placed_items:
             level = item.level
             index = item.index
             if level not in items_by_level_index:
                 items_by_level_index[level] = {}
+                creature_type_by_level_index[level] = {}
             items_by_level_index[level][index] = item
+            
+            # Store creature type name for NPCs
+            if 0x40 <= item.object_id <= 0x7F:
+                creature_type_by_level_index[level][index] = item.name or ""
         
         def get_item_name(obj_id: int) -> str:
             """Get item name from item_types if available."""
             if item_types and obj_id in item_types:
                 return item_types[obj_id].name
             return ""
+        
+        def is_valid_npc_name(name: str) -> bool:
+            """Check if an NPC name is valid (not a bug artifact)."""
+            if not name:
+                return False
+            # Filter out known buggy names that come from wrong string lookups
+            invalid_names = {'an excellent deal...', 'excellent deal'}
+            return name.lower() not in invalid_names and not name.lower().startswith('an excellent deal')
         
         def get_container_contents(level_num: int, container_link: int, 
                                    visited: set = None) -> List[Dict]:
@@ -306,7 +322,7 @@ class JsonExporter:
             
             return contents
         
-        # Process placed objects - filter out templates at (0,0)
+        # Process placed objects - filter out templates at (0,0) and NPCs
         objects_by_level = {i: [] for i in range(9)}
         
         for item in placed_items:
@@ -319,6 +335,11 @@ class JsonExporter:
             if tile_x == 0 and tile_y == 0:
                 continue
             if item_dict.get('is_invisible', False):
+                continue
+            
+            # Skip NPCs - they are exported separately in the npcs array with merged data
+            obj_id = item_dict.get('object_id', 0)
+            if 0x40 <= obj_id <= 0x7F:
                 continue
                 
             level = item_dict.get('level', 0)
@@ -349,7 +370,7 @@ class JsonExporter:
             
             objects_by_level[level].append(web_obj)
         
-        # Process NPCs - filter out templates at (0,0)
+        # Process NPCs - merge with creature type data, filter out templates at (0,0)
         npcs_by_level = {i: [] for i in range(9)}
         
         for npc in npcs:
@@ -363,18 +384,38 @@ class JsonExporter:
                 continue
                 
             level = npc_dict.get('level', 0)
+            npc_index = npc_dict.get('index', 0)
             
-            # Get NPC name from names dict
+            # Get creature type name from the placed items data
+            creature_type = ""
+            if level in creature_type_by_level_index:
+                creature_type = creature_type_by_level_index[level].get(npc_index, "")
+            
+            # If no creature type found, try to get from item_types
+            if not creature_type:
+                obj_id = npc_dict.get('object_id', 0)
+                creature_type = get_item_name(obj_id)
+            
+            # Get NPC proper name - only use if valid (not a bug artifact)
             conv_slot = npc_dict.get('conversation', {}).get('slot', 0)
-            name = npc_dict.get('name', '')
-            if not name and conv_slot in npc_names:
-                name = npc_names.get(str(conv_slot), '')
+            npc_name = npc_dict.get('name', '')
             
-            # Create simplified NPC for web
+            # Also check npc_names dict
+            if not is_valid_npc_name(npc_name) and conv_slot > 0 and conv_slot in npc_names:
+                npc_name = npc_names.get(conv_slot, '')
+            
+            # Determine display name: use NPC name if valid, otherwise creature type
+            if is_valid_npc_name(npc_name):
+                display_name = npc_name
+            else:
+                display_name = creature_type
+            
+            # Create simplified NPC for web with merged data
             web_npc = {
-                'id': npc_dict.get('index', 0),
+                'id': npc_index,
                 'object_id': npc_dict.get('object_id', 0),
-                'name': name,
+                'name': display_name,
+                'creature_type': creature_type,
                 'tile_x': tile_x,
                 'tile_y': tile_y,
                 'z': pos.get('z', 0),

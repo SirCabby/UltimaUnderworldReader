@@ -554,6 +554,10 @@ function showTooltip(e, item, isNpc) {
     let html = `<div class="tooltip-name">${item.name || (isNpc ? 'Unknown NPC' : 'Unknown Object')}</div>`;
     
     if (isNpc) {
+        // Show creature type if different from name
+        if (item.creature_type && item.creature_type !== item.name) {
+            html += `<div class="tooltip-info" style="color: var(--text-muted); font-style: italic;">${item.creature_type}</div>`;
+        }
         html += `<div class="tooltip-info">HP: ${item.hp} | Level: ${item.level}</div>`;
         if (item.attitude) {
             html += `<div class="tooltip-info">Attitude: ${item.attitude}</div>`;
@@ -618,8 +622,8 @@ function selectItem(item, isNpc, markerElement) {
     // Update details panel
     renderObjectDetails(item, isNpc);
     
-    // Find all items at same tile
-    renderLocationObjects(item.tile_x, item.tile_y);
+    // Find all items at same tile, passing the selected item id
+    renderLocationObjects(item.tile_x, item.tile_y, item.id);
 }
 
 function clearSelection() {
@@ -642,6 +646,10 @@ function renderObjectDetails(item, isNpc) {
             <div class="detail-row">
                 <span class="detail-label">Type</span>
                 <span class="detail-category" style="background: rgba(255,107,107,0.2); color: #ff6b6b;">NPC</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Creature</span>
+                <span class="detail-value">${item.creature_type || 'Unknown'}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">HP</span>
@@ -747,7 +755,7 @@ function renderContainerContents(contents, depth = 0) {
     return html;
 }
 
-function renderLocationObjects(tileX, tileY) {
+function renderLocationObjects(tileX, tileY, selectedItemId = null) {
     const level = state.data.levels[state.currentLevel];
     if (!level) return;
     
@@ -760,30 +768,98 @@ function renderLocationObjects(tileX, tileY) {
         return;
     }
     
-    let html = `<p style="color: var(--text-muted); margin-bottom: 8px;">Tile (${tileX}, ${tileY}) - ${npcsAtTile.length + objectsAtTile.length} items</p>`;
+    // Clear container and build with DOM elements for click handlers
+    elements.locationObjects.innerHTML = '';
     
+    const header = document.createElement('p');
+    header.style.cssText = 'color: var(--text-muted); margin-bottom: 8px;';
+    header.textContent = `Tile (${tileX}, ${tileY}) - ${npcsAtTile.length + objectsAtTile.length} items`;
+    elements.locationObjects.appendChild(header);
+    
+    // Render NPCs
     npcsAtTile.forEach(npc => {
-        html += `
-            <div class="detail-card" style="border-left: 3px solid #ff6b6b;">
-                <div class="detail-name" style="font-size: 0.9rem;">${npc.name || 'Unknown NPC'}</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">NPC - HP: ${npc.hp}</div>
-            </div>
+        const card = document.createElement('div');
+        card.className = 'detail-card location-item';
+        card.style.cssText = `border-left: 3px solid #ff6b6b; cursor: pointer;`;
+        if (selectedItemId === npc.id) {
+            card.classList.add('selected-location-item');
+        }
+        
+        // Show creature type if different from name
+        const creatureInfo = (npc.creature_type && npc.creature_type !== npc.name) 
+            ? ` (${npc.creature_type})` 
+            : '';
+        
+        card.innerHTML = `
+            <div class="detail-name" style="font-size: 0.9rem;">${npc.name || 'Unknown NPC'}${creatureInfo}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">NPC - HP: ${npc.hp}</div>
         `;
+        
+        card.addEventListener('click', () => selectLocationItem(npc, true, tileX, tileY));
+        elements.locationObjects.appendChild(card);
     });
     
+    // Render objects
     objectsAtTile.forEach(obj => {
         const color = getCategoryColor(obj.category);
         const hasContents = obj.contents && obj.contents.length > 0;
-        html += `
-            <div class="detail-card" style="border-left: 3px solid ${color};">
-                <div class="detail-name" style="font-size: 0.9rem;">${obj.name || 'Unknown'}${hasContents ? ' 📦' : ''}</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
-                ${hasContents ? `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>` : ''}
-            </div>
+        
+        const card = document.createElement('div');
+        card.className = 'detail-card location-item';
+        card.style.cssText = `border-left: 3px solid ${color}; cursor: pointer;`;
+        if (selectedItemId === obj.id) {
+            card.classList.add('selected-location-item');
+        }
+        
+        card.innerHTML = `
+            <div class="detail-name" style="font-size: 0.9rem;">${obj.name || 'Unknown'}${hasContents ? ' 📦' : ''}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
+            ${hasContents ? `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>` : ''}
         `;
+        
+        card.addEventListener('click', () => selectLocationItem(obj, false, tileX, tileY));
+        elements.locationObjects.appendChild(card);
+    });
+}
+
+/**
+ * Select an item from the location list
+ */
+function selectLocationItem(item, isNpc, tileX, tileY) {
+    // Find the marker for this item if it exists
+    const markers = document.querySelectorAll('.marker');
+    let markerElement = null;
+    
+    for (const marker of markers) {
+        if (marker.dataset.id === String(item.id) && 
+            marker.dataset.isNpc === String(isNpc)) {
+            markerElement = marker;
+            break;
+        }
+    }
+    
+    // Clear previous marker selection
+    document.querySelectorAll('.marker.selected').forEach(m => {
+        m.classList.remove('selected');
+        const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
+        m.setAttribute('r', origR);
     });
     
-    elements.locationObjects.innerHTML = html;
+    // If marker exists, select it visually
+    if (markerElement) {
+        markerElement.classList.add('selected');
+        const origR = parseFloat(markerElement.dataset.originalRadius) || CONFIG.marker.radius;
+        markerElement.setAttribute('r', origR * 1.8);
+        state.selectedMarker = markerElement;
+    } else {
+        state.selectedMarker = null;
+    }
+    
+    // Update details panel
+    renderObjectDetails(item, isNpc);
+    
+    // Re-render location objects to show selection
+    renderLocationObjects(tileX, tileY, item.id);
 }
 
 // ============================================================================
