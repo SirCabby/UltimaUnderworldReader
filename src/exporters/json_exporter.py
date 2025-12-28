@@ -6,11 +6,8 @@ Exports all extracted game data to JSON files.
 
 import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime
-
-from ..constants import SPELL_DESCRIPTIONS
-from ..utils import parse_item_name
 
 
 class JsonExporter:
@@ -231,6 +228,8 @@ class JsonExporter:
             levels: Dict of Level objects for following container chains
             strings_parser: StringsParser for looking up text (books, scrolls, keys, spells)
         """
+        from ..constants import SPELL_DESCRIPTIONS
+        
         # Get string blocks for rich descriptions
         block3 = strings_parser.get_block(3) or [] if strings_parser else []  # Book/scroll text
         block5 = strings_parser.get_block(5) or [] if strings_parser else []  # Quality descriptions
@@ -404,8 +403,6 @@ class JsonExporter:
                     spell = spell_names.get(spell_idx, "")
                     return format_spell(spell)
                 else:
-                    # Values 64-191: Look up directly in spell names
-                    # This includes Cursed (144-159), various spell effects, etc.
                     spell = spell_names.get(ench_property, "")
                     if spell:
                         return format_spell(spell)
@@ -437,8 +434,6 @@ class JsonExporter:
                     spell = spell_names.get(spell_idx, "")
                     return format_spell(spell)
                 else:
-                    # Values 64-191: Look up directly in spell names
-                    # This includes Cursed (144-159), various spell effects, etc.
                     spell = spell_names.get(ench_property, "")
                     if spell:
                         return format_spell(spell)
@@ -468,7 +463,6 @@ class JsonExporter:
         
         # Build index lookup for items by level and index
         items_by_level_index = {}
-        # Also build an index of creature type names for NPCs (object_id 0x40-0x7F)
         creature_type_by_level_index = {}
         
         for item in placed_items:
@@ -493,7 +487,6 @@ class JsonExporter:
             """Check if an NPC name is valid (not a bug artifact)."""
             if not name:
                 return False
-            # Filter out known buggy names that come from wrong string lookups
             invalid_names = {'an excellent deal...', 'excellent deal'}
             return name.lower() not in invalid_names and not name.lower().startswith('an excellent deal')
         
@@ -509,7 +502,6 @@ class JsonExporter:
             while current_idx > 0 and current_idx not in visited:
                 visited.add(current_idx)
                 
-                # Try to find this object in our items
                 if level_num in items_by_level_index:
                     item = items_by_level_index[level_num].get(current_idx)
                     if item:
@@ -532,12 +524,13 @@ class JsonExporter:
                             'object_id': item.object_id,
                             'name': item.name or get_item_name(item.object_id),
                             'category': category_map.get(obj_class, 'misc'),
-                            'quality': item.quality,
                             'quantity': item.quantity if item.is_quantity else 1,
-                            'is_enchanted': item.is_enchanted,
-                            'description': item_desc,
-                            'effect': item_effect,
                         }
+                        # Only include description and effect if they have meaningful values
+                        if item_desc:
+                            content_item['description'] = item_desc
+                        if item_effect:
+                            content_item['effect'] = item_effect
                         
                         # If this item is also a container, get its contents recursively
                         if 0x80 <= item.object_id <= 0x8F and item.special_link > 0:
@@ -571,7 +564,7 @@ class JsonExporter:
             if item_dict.get('is_invisible', False):
                 continue
             
-            # Skip NPCs - they are exported separately in the npcs array with merged data
+            # Skip NPCs - they are exported separately
             obj_id = item_dict.get('object_id', 0)
             if 0x40 <= obj_id <= 0x7F:
                 continue
@@ -581,7 +574,6 @@ class JsonExporter:
             category = category_map.get(obj_class, 'misc')
             
             # Get rich description and effect for this item
-            # Use the item object directly for is_quantity since to_dict() doesn't include it
             obj_id = item.object_id
             is_quantity = item.is_quantity
             quantity = item.quantity
@@ -607,11 +599,12 @@ class JsonExporter:
                 'z': pos.get('z', 0),
                 'category': category,
                 'object_class': obj_class,
-                'quality': quality,
-                'is_enchanted': is_enchanted,
-                'description': item_desc,
-                'effect': item_effect,
             }
+            # Only include description and effect if they have meaningful values
+            if item_desc:
+                web_obj['description'] = item_desc
+            if item_effect:
+                web_obj['effect'] = item_effect
             
             # For containers, add their contents
             special_link = item_dict.get('special_link', 0)
@@ -622,7 +615,7 @@ class JsonExporter:
             
             objects_by_level[level].append(web_obj)
         
-        # Process NPCs - merge with creature type data, filter out templates at (0,0)
+        # Process NPCs - merge with creature type data
         npcs_by_level = {i: [] for i in range(9)}
         
         for npc in npcs:
@@ -643,26 +636,21 @@ class JsonExporter:
             if level in creature_type_by_level_index:
                 creature_type = creature_type_by_level_index[level].get(npc_index, "")
             
-            # If no creature type found, try to get from item_types
             if not creature_type:
                 obj_id = npc_dict.get('object_id', 0)
                 creature_type = get_item_name(obj_id)
             
-            # Get NPC proper name - only use if valid (not a bug artifact)
             conv_slot = npc_dict.get('conversation', {}).get('slot', 0)
             npc_name = npc_dict.get('name', '')
             
-            # Also check npc_names dict
             if not is_valid_npc_name(npc_name) and conv_slot > 0 and conv_slot in npc_names:
                 npc_name = npc_names.get(conv_slot, '')
             
-            # Determine display name: use NPC name if valid, otherwise creature type
             if is_valid_npc_name(npc_name):
                 display_name = npc_name
             else:
                 display_name = creature_type
             
-            # Create simplified NPC for web with merged data
             web_npc = {
                 'id': npc_index,
                 'object_id': npc_dict.get('object_id', 0),
@@ -708,7 +696,6 @@ class JsonExporter:
             'levels': []
         }
         
-        # Level names for reference
         level_names = [
             "Level 1 - The Abyss Entrance",
             "Level 2 - The Mountainfolk",
@@ -733,6 +720,3 @@ class JsonExporter:
             web_data['levels'].append(level_entry)
         
         return self._write_json('web_map_data.json', web_data)
-
-
-

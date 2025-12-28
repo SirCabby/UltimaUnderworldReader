@@ -96,8 +96,8 @@ class ItemInfo:
     
     # Common properties from COMOBJ.DAT
     height: int = 0
-    mass: int = 0               # Mass in 0.1 stones (tenths)
-    value: int = 0              # Value in gold pieces (whole)
+    mass: int = 0               # Mass in 0.1 stones
+    value: int = 0              # Value in 0.1 gold pieces
     flags: int = 0
     
     # Flags
@@ -112,8 +112,8 @@ class ItemInfo:
     
     @property
     def value_gold(self) -> float:
-        """Value in gold pieces (same as value, for API consistency)."""
-        return float(self.value)
+        """Value in gold pieces (for display)."""
+        return self.value / 10.0
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON export."""

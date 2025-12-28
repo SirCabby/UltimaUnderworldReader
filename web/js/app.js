@@ -590,12 +590,9 @@ function showTooltip(e, item, isNpc) {
         }
     } else {
         html += `<div class="tooltip-info">${formatCategory(item.category)}</div>`;
-        if (item.is_enchanted) {
-            html += `<div class="tooltip-info" style="color: #9775fa;">✨ Enchanted</div>`;
-        }
-        // Show effect preview in tooltip (truncated)
+        // Show effect preview in tooltip (truncated) - this IS the enchantment info
         if (item.effect) {
-            html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">${escapeHtml(truncateText(item.effect, 50))}</div>`;
+            html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">✨ ${escapeHtml(truncateText(item.effect, 50))}</div>`;
         }
         // Show description preview (truncated) for books/scrolls/keys
         if (item.description && item.description.length > 0) {
@@ -713,19 +710,10 @@ function renderObjectDetails(item, isNpc) {
                 <span class="detail-label">Category</span>
                 <span class="detail-category" style="background: ${catColor}22; color: ${catColor};">${formatCategory(item.category)}</span>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">Object ID</span>
-                <span class="detail-value">0x${item.object_id.toString(16).toUpperCase().padStart(3, '0')}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Quality</span>
-                <span class="detail-value">${item.quality}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Enchanted</span>
-                <span class="detail-value">${item.is_enchanted ? '✨ Yes' : 'No'}</span>
-            </div>
         `;
+        
+        // Show type-specific details based on category/object_id
+        html += getTypeSpecificDetails(item);
         
         // Show description if available (books, scrolls, keys, potions, etc.)
         if (item.description) {
@@ -795,7 +783,7 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
     contents.forEach(item => {
         const catColor = getCategoryColor(item.category);
         const qty = item.quantity > 1 ? ` (×${item.quantity})` : '';
-        const enchanted = item.is_enchanted ? ' ✨' : '';
+        const hasEffect = item.effect ? ' ✨' : '';
         const hasContents = item.contents && item.contents.length > 0;
         
         const contentItem = document.createElement('div');
@@ -814,13 +802,10 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
         
         const nameDiv = document.createElement('div');
         nameDiv.style.color = 'var(--text-primary)';
-        nameDiv.textContent = `${item.name || 'Unknown'}${qty}${enchanted}${hasContents ? ' 📦' : ''}`;
+        nameDiv.textContent = `${item.name || 'Unknown'}${qty}${hasEffect}${hasContents ? ' 📦' : ''}`;
         
         // Build info line with category and optional effect preview
         let infoText = formatCategory(item.category);
-        if (item.quality > 0) {
-            infoText += ` • Quality: ${item.quality}`;
-        }
         if (item.effect) {
             infoText += ` • ${truncateText(item.effect, 30)}`;
         }
@@ -893,23 +878,20 @@ function selectContainerItem(item, parentContainer = null) {
             <span class="detail-label">Category</span>
             <span class="detail-category" style="background: ${catColor}22; color: ${catColor};">${formatCategory(item.category)}</span>
         </div>
-        <div class="detail-row">
-            <span class="detail-label">Object ID</span>
-            <span class="detail-value">0x${item.object_id.toString(16).toUpperCase().padStart(3, '0')}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Quality</span>
-            <span class="detail-value">${item.quality}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Quantity</span>
-            <span class="detail-value">${item.quantity || 1}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Enchanted</span>
-            <span class="detail-value">${item.is_enchanted ? '✨ Yes' : 'No'}</span>
-        </div>
     `;
+    
+    // Show quantity only if > 1 (stackable items)
+    if (item.quantity && item.quantity > 1) {
+        html += `
+            <div class="detail-row">
+                <span class="detail-label">Quantity</span>
+                <span class="detail-value">${item.quantity}</span>
+            </div>
+        `;
+    }
+    
+    // Show type-specific details
+    html += getTypeSpecificDetails(item);
     
     // Show description if available (books, scrolls, keys, potions, etc.)
     if (item.description) {
@@ -1142,6 +1124,87 @@ function updateStats() {
 function formatCategory(categoryId) {
     const cat = state.data.categories.find(c => c.id === categoryId);
     return cat ? cat.name : categoryId;
+}
+
+/**
+ * Get type-specific detail rows based on item category and object_id
+ * Only shows relevant information for each type
+ */
+function getTypeSpecificDetails(item) {
+    let html = '';
+    const objId = item.object_id;
+    
+    // Weapons (0x00-0x1F) - show effect if enchanted, otherwise minimal info
+    if (objId <= 0x1F) {
+        // Only show enchantment info if there's an actual effect
+        // The effect field already contains the meaningful enchantment text
+        return html;
+    }
+    
+    // Armor (0x20-0x3F) - show effect if enchanted
+    if (objId >= 0x20 && objId <= 0x3F) {
+        // Only show enchantment info if there's an actual effect
+        return html;
+    }
+    
+    // Containers (0x80-0x8F) - no special fields needed
+    if (objId >= 0x80 && objId <= 0x8F) {
+        return html;
+    }
+    
+    // Light sources (0x90-0x97) - no special fields
+    if (objId >= 0x90 && objId <= 0x97) {
+        return html;
+    }
+    
+    // Wands (0x98-0x9B) - effect shows spell and charges
+    if (objId >= 0x98 && objId <= 0x9B) {
+        // Effect field already contains "Spell Name (X charges)"
+        return html;
+    }
+    
+    // Treasure/coins (0xA0-0xAF) - quantity shown in description
+    if (objId >= 0xA0 && objId <= 0xAF) {
+        return html;
+    }
+    
+    // Food and Potions (0xB0-0xBF) - effect shows potion type
+    if (objId >= 0xB0 && objId <= 0xBF) {
+        return html;
+    }
+    
+    // Scenery (0xC0-0xDF) - no fields needed
+    if (objId >= 0xC0 && objId <= 0xDF) {
+        return html;
+    }
+    
+    // Runes (0xE0-0xFF) - no special fields
+    if (objId >= 0xE0 && objId <= 0xFF) {
+        return html;
+    }
+    
+    // Keys (0x100-0x10E) - description shows what lock it opens
+    if (objId >= 0x100 && objId <= 0x10E) {
+        return html;
+    }
+    
+    // Books and Scrolls (0x130-0x13F) - description shows content
+    if (objId >= 0x130 && objId <= 0x13F) {
+        return html;
+    }
+    
+    // Doors (0x140-0x17F) - no special fields for now
+    if (objId >= 0x140 && objId <= 0x17F) {
+        return html;
+    }
+    
+    // Traps/Triggers (0x180-0x1BF) - minimal info
+    if (objId >= 0x180 && objId <= 0x1BF) {
+        return html;
+    }
+    
+    // Default - show nothing extra (description and effect cover it)
+    return html;
 }
 
 /**
