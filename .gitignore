@@ -105,8 +105,15 @@ desktop.ini
 # =============================================================================
 
 # Game data files - proprietary Ultima Underworld assets (not for distribution)
-/Input/
+# Ignore contents but keep the README for new users
+/Input/*
+!/Input/README.md
 
 # Generated output files - users can regenerate with: python main.py
 /Output/
+
+# Generated web viewer files - derived from game data
+# Regenerate with: python main.py (for data) and python web/generate_maps.py (for maps)
+/web/data/
+/web/maps/
 

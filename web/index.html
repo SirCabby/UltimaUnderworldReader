@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultima Underworld - Interactive Map</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="title">
+                <span class="title-main">Ultima Underworld</span>
+                <span class="title-sub">The Stygian Abyss</span>
+            </h1>
+            <div class="header-controls">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search objects...">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar - Filters -->
+            <aside class="sidebar filters-sidebar">
+                <div class="sidebar-section">
+                    <h3 class="section-title">Level</h3>
+                    <div class="level-tabs" id="level-tabs">
+                        <!-- Level tabs will be populated by JS -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="section-title">Categories</h3>
+                    <div class="category-filters" id="category-filters">
+                        <!-- Category checkboxes will be populated by JS -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="section-title">Statistics</h3>
+                    <div class="stats-display" id="stats-display">
+                        <div class="stat-item">
+                            <span class="stat-label">Objects:</span>
+                            <span class="stat-value" id="stat-objects">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">NPCs:</span>
+                            <span class="stat-value" id="stat-npcs">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Visible:</span>
+                            <span class="stat-value" id="stat-visible">-</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Map Container -->
+            <div class="map-container" id="map-container">
+                <div class="map-wrapper" id="map-wrapper">
+                    <img id="map-image" class="map-image" src="" alt="Level Map">
+                    <svg id="markers-layer" class="markers-layer"></svg>
+                </div>
+                
+                <!-- Zoom Controls -->
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoom-in" title="Zoom In">+</button>
+                    <span class="zoom-level" id="zoom-level">100%</span>
+                    <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
+                    <button class="zoom-btn" id="zoom-reset" title="Reset">⟲</button>
+                </div>
+
+                <!-- Loading Overlay -->
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <p>Loading map data...</p>
+                </div>
+            </div>
+
+            <!-- Sidebar - Details -->
+            <aside class="sidebar details-sidebar">
+                <div class="sidebar-section">
+                    <h3 class="section-title">Selected Object</h3>
+                    <div class="object-details" id="object-details">
+                        <p class="no-selection">Hover over a marker to see details</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="section-title">Objects at Location</h3>
+                    <div class="location-objects" id="location-objects">
+                        <p class="no-selection">Click a marker to see all objects at that tile</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Tooltip -->
+        <div class="tooltip" id="tooltip"></div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Data extracted from Ultima Underworld: The Stygian Abyss (1992) by Looking Glass Technologies</p>
+            <p>Maps courtesy of <a href="https://wiki.ultimacodex.com" target="_blank">Ultima Codex</a></p>
+        </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
+

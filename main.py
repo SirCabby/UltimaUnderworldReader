@@ -74,7 +74,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     extracted_data = {}
     
     # 1. Extract strings
-    print("[1/7] Extracting game strings...")
+    print("[1/8] Extracting game strings...")
     strings = StringsParser(data_path / "STRINGS.PAK")
     strings.parse()
     exporter.export_all_strings(strings)
@@ -82,7 +82,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     print(f"       Extracted {len(strings.blocks)} string blocks")
     
     # 2. Extract items
-    print("[2/7] Extracting items...")
+    print("[2/8] Extracting items...")
     items = ItemExtractor(data_path)
     items.extract()
     exporter.export_items(items.item_types, items.placed_items)
@@ -91,7 +91,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     print(f"       Found {len(items.placed_items)} placed objects")
     
     # 3. Extract NPCs
-    print("[3/7] Extracting NPCs...")
+    print("[3/8] Extracting NPCs...")
     npcs = NPCExtractor(data_path)
     npcs.extract()
     exporter.export_npcs(npcs.npcs, npcs.npc_names)
@@ -99,7 +99,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     print(f"       Found {len(npcs.npcs)} NPCs")
     
     # 4. Extract spells and mantras
-    print("[4/7] Extracting spells and mantras...")
+    print("[4/8] Extracting spells and mantras...")
     spells = SpellExtractor(data_path)
     spells.extract()
     exporter.export_spells(
@@ -113,7 +113,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     print(f"       Found {len(spells.mantras)} mantras")
     
     # 5. Extract conversations
-    print("[5/7] Extracting conversations...")
+    print("[5/8] Extracting conversations...")
     convs = ConversationParser(data_path / "CNV.ARK")
     convs.parse()
     exporter.export_conversations(convs.conversations, strings)
@@ -121,7 +121,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     print(f"       Found {len(convs.conversations)} conversations")
     
     # 6. Extract secrets
-    print("[6/7] Finding secrets and traps...")
+    print("[6/8] Finding secrets and traps...")
     secrets = SecretFinder(data_path)
     secrets.analyze()
     exporter.export_secrets(secrets.secrets)
@@ -130,12 +130,23 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     print(f"       Found {summary['total']} secrets/traps")
     
     # 7. Export map data
-    print("[7/7] Exporting map data...")
+    print("[7/8] Exporting map data...")
     levels = LevelParser(data_path / "LEV.ARK")
     levels.parse()
     exporter.export_map_data(levels.levels)
     extracted_data['levels'] = levels
     print(f"       Exported data for {len(levels.levels)} levels")
+    
+    # 8. Export web map viewer data
+    print("[8/8] Exporting web map viewer data...")
+    web_map_path = exporter.export_web_map_data(
+        items.placed_items, 
+        npcs.npcs, 
+        npcs.npc_names,
+        items.item_types,
+        levels.levels  # Pass levels for container content extraction
+    )
+    print(f"       Exported web map data to {web_map_path.name}")
     
     # Export to xlsx if requested
     if export_xlsx:

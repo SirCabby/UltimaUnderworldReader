@@ -212,5 +212,234 @@ class JsonExporter:
         
         self._write_json('strings.json', strings_data)
 
+    def export_web_map_data(self, placed_items: List, npcs: List, npc_names: Dict, 
+                            item_types: Dict = None, levels: Dict = None) -> Path:
+        """Export optimized data for the interactive web map viewer.
+        
+        Creates a single JSON file with all placed objects and NPCs,
+        filtered to exclude template objects (those at tile 0,0).
+        
+        Args:
+            placed_items: List of placed GameObjectInfo objects
+            npcs: List of NPCInfo objects
+            npc_names: Dict mapping conversation slots to NPC names
+            item_types: Dict of ItemInfo objects for looking up item names
+            levels: Dict of Level objects for following container chains
+        """
+        # Category mapping for objects
+        category_map = {
+            'melee_weapon': 'weapons',
+            'ranged_weapon': 'weapons',
+            'armor': 'armor',
+            'container': 'containers',
+            'key': 'keys',
+            'food': 'consumables',
+            'potion': 'consumables',
+            'scroll': 'readable',
+            'book': 'readable',
+            'light_source': 'light',
+            'rune': 'magic',
+            'wand': 'magic',
+            'treasure': 'treasure',
+            'door': 'doors',
+            'trap': 'traps',
+            'trigger': 'triggers',
+        }
+        
+        # Build index lookup for items by level and index
+        items_by_level_index = {}
+        for item in placed_items:
+            level = item.level
+            index = item.index
+            if level not in items_by_level_index:
+                items_by_level_index[level] = {}
+            items_by_level_index[level][index] = item
+        
+        def get_item_name(obj_id: int) -> str:
+            """Get item name from item_types if available."""
+            if item_types and obj_id in item_types:
+                return item_types[obj_id].name
+            return ""
+        
+        def get_container_contents(level_num: int, container_link: int, 
+                                   visited: set = None) -> List[Dict]:
+            """Follow the object chain to get container contents."""
+            if visited is None:
+                visited = set()
+            
+            contents = []
+            current_idx = container_link
+            
+            while current_idx > 0 and current_idx not in visited:
+                visited.add(current_idx)
+                
+                # Try to find this object in our items
+                if level_num in items_by_level_index:
+                    item = items_by_level_index[level_num].get(current_idx)
+                    if item:
+                        item_dict = item.to_dict()
+                        obj_class = item_dict.get('object_class', 'unknown')
+                        
+                        content_item = {
+                            'object_id': item.object_id,
+                            'name': item.name or get_item_name(item.object_id),
+                            'category': category_map.get(obj_class, 'misc'),
+                            'quality': item.quality,
+                            'quantity': item.quantity if item.is_quantity else 1,
+                            'is_enchanted': item.is_enchanted,
+                        }
+                        
+                        # If this item is also a container, get its contents recursively
+                        if 0x80 <= item.object_id <= 0x8F and item.special_link > 0:
+                            nested_contents = get_container_contents(
+                                level_num, item.special_link, visited.copy()
+                            )
+                            if nested_contents:
+                                content_item['contents'] = nested_contents
+                        
+                        contents.append(content_item)
+                        current_idx = item.next_index
+                    else:
+                        break
+                else:
+                    break
+            
+            return contents
+        
+        # Process placed objects - filter out templates at (0,0)
+        objects_by_level = {i: [] for i in range(9)}
+        
+        for item in placed_items:
+            item_dict = item.to_dict()
+            pos = item_dict.get('position', {})
+            tile_x = pos.get('tile_x', 0)
+            tile_y = pos.get('tile_y', 0)
+            
+            # Skip objects at origin (templates) and invisible objects
+            if tile_x == 0 and tile_y == 0:
+                continue
+            if item_dict.get('is_invisible', False):
+                continue
+                
+            level = item_dict.get('level', 0)
+            obj_class = item_dict.get('object_class', 'unknown')
+            category = category_map.get(obj_class, 'misc')
+            
+            # Create simplified object for web
+            web_obj = {
+                'id': item_dict.get('index', 0),
+                'object_id': item_dict.get('object_id', 0),
+                'name': item_dict.get('name', ''),
+                'tile_x': tile_x,
+                'tile_y': tile_y,
+                'z': pos.get('z', 0),
+                'category': category,
+                'object_class': obj_class,
+                'quality': item_dict.get('quality', 0),
+                'is_enchanted': item_dict.get('is_enchanted', False),
+                'description': item_dict.get('description', ''),
+            }
+            
+            # For containers, add their contents
+            special_link = item_dict.get('special_link', 0)
+            if category == 'containers' and special_link > 0:
+                contents = get_container_contents(level, special_link)
+                if contents:
+                    web_obj['contents'] = contents
+            
+            objects_by_level[level].append(web_obj)
+        
+        # Process NPCs - filter out templates at (0,0)
+        npcs_by_level = {i: [] for i in range(9)}
+        
+        for npc in npcs:
+            npc_dict = npc.to_dict()
+            pos = npc_dict.get('position', {})
+            tile_x = pos.get('tile_x', 0)
+            tile_y = pos.get('tile_y', 0)
+            
+            # Skip NPCs at origin (templates)
+            if tile_x == 0 and tile_y == 0:
+                continue
+                
+            level = npc_dict.get('level', 0)
+            
+            # Get NPC name from names dict
+            conv_slot = npc_dict.get('conversation', {}).get('slot', 0)
+            name = npc_dict.get('name', '')
+            if not name and conv_slot in npc_names:
+                name = npc_names.get(str(conv_slot), '')
+            
+            # Create simplified NPC for web
+            web_npc = {
+                'id': npc_dict.get('index', 0),
+                'object_id': npc_dict.get('object_id', 0),
+                'name': name,
+                'tile_x': tile_x,
+                'tile_y': tile_y,
+                'z': pos.get('z', 0),
+                'hp': npc_dict.get('stats', {}).get('hp', 0),
+                'level': npc_dict.get('stats', {}).get('level', 0),
+                'attitude': npc_dict.get('behavior', {}).get('attitude_name', 'unknown'),
+                'has_conversation': conv_slot > 0,
+                'conversation_slot': conv_slot,
+            }
+            
+            npcs_by_level[level].append(web_npc)
+        
+        # Build final data structure
+        web_data = {
+            'metadata': {
+                'type': 'web_map_data',
+                'game': 'Ultima Underworld I',
+                'generated': datetime.now().isoformat(),
+                'grid_size': 64,
+                'num_levels': 9,
+            },
+            'categories': [
+                {'id': 'npcs', 'name': 'NPCs', 'color': '#ff6b6b'},
+                {'id': 'weapons', 'name': 'Weapons', 'color': '#4dabf7'},
+                {'id': 'armor', 'name': 'Armor', 'color': '#69db7c'},
+                {'id': 'keys', 'name': 'Keys', 'color': '#ffd43b'},
+                {'id': 'containers', 'name': 'Containers', 'color': '#da77f2'},
+                {'id': 'consumables', 'name': 'Food & Potions', 'color': '#f783ac'},
+                {'id': 'readable', 'name': 'Books & Scrolls', 'color': '#e8d4b8'},
+                {'id': 'magic', 'name': 'Magic Items', 'color': '#9775fa'},
+                {'id': 'treasure', 'name': 'Treasure', 'color': '#fcc419'},
+                {'id': 'light', 'name': 'Light Sources', 'color': '#ffe066'},
+                {'id': 'doors', 'name': 'Doors', 'color': '#adb5bd'},
+                {'id': 'traps', 'name': 'Traps', 'color': '#ff8787'},
+                {'id': 'triggers', 'name': 'Triggers', 'color': '#748ffc'},
+                {'id': 'misc', 'name': 'Miscellaneous', 'color': '#868e96'},
+            ],
+            'levels': []
+        }
+        
+        # Level names for reference
+        level_names = [
+            "Level 1 - The Abyss Entrance",
+            "Level 2 - The Mountainfolk",
+            "Level 3 - The Lizardmen",
+            "Level 4 - The Knights",
+            "Level 5 - The Ghouls",
+            "Level 6 - The Seers",
+            "Level 7 - The Pits",
+            "Level 8 - The Tyball's Domain",
+            "Level 9 - The Chamber of Virtue",
+        ]
+        
+        for level_num in range(9):
+            level_entry = {
+                'level': level_num,
+                'name': level_names[level_num] if level_num < len(level_names) else f"Level {level_num + 1}",
+                'objects': objects_by_level[level_num],
+                'npcs': npcs_by_level[level_num],
+                'object_count': len(objects_by_level[level_num]),
+                'npc_count': len(npcs_by_level[level_num]),
+            }
+            web_data['levels'].append(level_entry)
+        
+        return self._write_json('web_map_data.json', web_data)
+
 
 
