@@ -6,8 +6,11 @@ Exports all extracted game data to JSON files.
 
 import json
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from datetime import datetime
+
+from ..constants import SPELL_DESCRIPTIONS
+from ..utils import parse_item_name
 
 
 class JsonExporter:
@@ -213,7 +216,8 @@ class JsonExporter:
         self._write_json('strings.json', strings_data)
 
     def export_web_map_data(self, placed_items: List, npcs: List, npc_names: Dict, 
-                            item_types: Dict = None, levels: Dict = None) -> Path:
+                            item_types: Dict = None, levels: Dict = None,
+                            strings_parser = None) -> Path:
         """Export optimized data for the interactive web map viewer.
         
         Creates a single JSON file with all placed objects and NPCs,
@@ -225,7 +229,223 @@ class JsonExporter:
             npc_names: Dict mapping conversation slots to NPC names
             item_types: Dict of ItemInfo objects for looking up item names
             levels: Dict of Level objects for following container chains
+            strings_parser: StringsParser for looking up text (books, scrolls, keys, spells)
         """
+        # Get string blocks for rich descriptions
+        block3 = strings_parser.get_block(3) or [] if strings_parser else []  # Book/scroll text
+        block5 = strings_parser.get_block(5) or [] if strings_parser else []  # Quality descriptions
+        spell_names_list = strings_parser.get_block(6) or [] if strings_parser else []
+        
+        # Build spell names dict for lookups
+        spell_names = {}
+        for i, name in enumerate(spell_names_list):
+            if name and name.strip():
+                spell_names[i] = name.strip()
+        
+        def get_item_description(item, object_id: int, is_quantity: bool, 
+                                 quantity: int, quality: int, owner: int,
+                                 special_link: int, level_num: int) -> str:
+            """Get item description based on type (books, scrolls, keys, wands, etc.)."""
+            link_value = quantity if is_quantity else special_link
+            
+            # Keys (0x100-0x10E)
+            if 0x100 <= object_id <= 0x10E:
+                if owner > 0:
+                    desc_idx = 100 + owner
+                    if desc_idx < len(block5) and block5[desc_idx]:
+                        return block5[desc_idx]
+                if object_id == 0x101:
+                    return "A lockpick"
+                return ""
+            
+            # Books (0x130-0x137)
+            if 0x130 <= object_id <= 0x137:
+                if is_quantity and link_value >= 512:
+                    text_idx = link_value - 512
+                    if text_idx < len(block3) and block3[text_idx]:
+                        return block3[text_idx].strip()
+                return ""
+            
+            # Scrolls (0x138-0x13F, except 0x13B map)
+            if 0x138 <= object_id <= 0x13F and object_id != 0x13B:
+                if is_quantity and link_value >= 512:
+                    text_idx = link_value - 512
+                    if text_idx < len(block3) and block3[text_idx]:
+                        return block3[text_idx].strip()
+                return ""
+            
+            # Wands (0x98-0x9B)
+            if 0x98 <= object_id <= 0x9B:
+                if levels and not is_quantity:
+                    level = levels.get(level_num)
+                    if level and special_link in level.objects:
+                        spell_obj = level.objects[special_link]
+                        if spell_obj.item_id == 0x120:
+                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                            if spell_idx in spell_names:
+                                return f"Wand of {spell_names[spell_idx]}"
+                return f"Wand ({quality} charges)"
+            
+            # Map (0x13B)
+            if object_id == 0x13B:
+                return "Shows explored areas"
+            
+            # Potions (0xBB = red mana, 0xBC = green heal)
+            if object_id in (0xBB, 0xBC):
+                if is_quantity and link_value >= 512:
+                    raw_idx = link_value - 512
+                    spell_256 = spell_names.get(raw_idx + 256, "")
+                    if spell_256:
+                        return f"Potion of {spell_256}"
+                    spell_raw = spell_names.get(raw_idx, "")
+                    if spell_raw:
+                        return f"Potion of {spell_raw}"
+                    return f"Potion (effect #{raw_idx})"
+                if object_id == 0xBB:
+                    return "Restores Mana"
+                else:
+                    return "Heals Wounds"
+            
+            # Coins
+            if object_id == 0xA0:
+                if is_quantity:
+                    return f"{quantity} gold pieces"
+                return "Gold coin"
+            
+            # Arrows/bolts - show stack count
+            if object_id in (0x10, 0x11, 0x12):
+                if is_quantity and quantity > 1:
+                    return f"Stack of {quantity}"
+                return ""
+            
+            return ""
+        
+        def get_item_effect(item, object_id: int, is_enchanted: bool, is_quantity: bool,
+                           quantity: int, quality: int, special_link: int, level_num: int) -> str:
+            """Get enchantment/effect description for an item."""
+            link_value = quantity if is_quantity else special_link
+            
+            def format_spell(spell_name: str) -> str:
+                """Format spell name with description if available."""
+                if not spell_name:
+                    return ""
+                desc = SPELL_DESCRIPTIONS.get(spell_name, "")
+                if desc:
+                    return f"{spell_name} ({desc})"
+                return spell_name
+            
+            # Wands - show charges and spell
+            if 0x98 <= object_id <= 0x9B:
+                if levels and not is_quantity:
+                    level = levels.get(level_num)
+                    if level and special_link in level.objects:
+                        spell_obj = level.objects[special_link]
+                        if spell_obj.item_id == 0x120:
+                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                            spell = spell_names.get(spell_idx, "")
+                            if spell:
+                                return f"{format_spell(spell)} ({quality} charges)"
+                return f"Unknown spell ({quality} charges)" if quality > 0 else "Empty"
+            
+            # Keys
+            if 0x100 <= object_id <= 0x10E:
+                if hasattr(item, 'owner') and item.owner > 0:
+                    return f"Opens lock #{item.owner}"
+                return ""
+            
+            # Books/Scrolls - text index reference
+            if 0x130 <= object_id <= 0x13F and object_id != 0x13B:
+                if is_quantity and link_value >= 512:
+                    return f"Text #{link_value - 512}"
+                return ""
+            
+            # Potions - show spell effect
+            if object_id in (0xBB, 0xBC):
+                if is_quantity and link_value >= 512:
+                    raw_idx = link_value - 512
+                    spell_256 = spell_names.get(raw_idx + 256, "")
+                    if spell_256:
+                        return format_spell(spell_256)
+                    spell_raw = spell_names.get(raw_idx, "")
+                    if spell_raw:
+                        return format_spell(spell_raw)
+                    return f"Effect #{raw_idx}"
+                if object_id == 0xBB:
+                    return "Restores Mana"
+                else:
+                    return "Heals Wounds"
+            
+            # Check if enchanted
+            if not is_enchanted:
+                return ""
+            
+            link = quantity if is_quantity else special_link
+            if link >= 512:
+                ench_property = link - 512
+            else:
+                return ""
+            
+            # Weapons enchantments
+            if object_id < 0x20:
+                if 192 <= ench_property <= 199:
+                    spell_idx = 448 + (ench_property - 192)
+                    spell = spell_names.get(spell_idx, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Accuracy +{ench_property - 191}"
+                elif 200 <= ench_property <= 207:
+                    spell_idx = 456 + (ench_property - 200)
+                    spell = spell_names.get(spell_idx, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Damage +{ench_property - 199}"
+                elif ench_property < 64:
+                    spell_idx = 256 + ench_property
+                    spell = spell_names.get(spell_idx, "")
+                    return format_spell(spell)
+                else:
+                    # Values 64-191: Look up directly in spell names
+                    # This includes Cursed (144-159), various spell effects, etc.
+                    spell = spell_names.get(ench_property, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Enchantment #{ench_property}"
+            
+            # Rings enchantments
+            elif object_id in (0x36, 0x38, 0x39, 0x3A):
+                spell = spell_names.get(ench_property, "")
+                if spell:
+                    return format_spell(spell)
+                return f"Unknown enchantment ({ench_property})"
+            
+            # Armor enchantments
+            elif 0x20 <= object_id < 0x40:
+                if 192 <= ench_property <= 199:
+                    spell_idx = 464 + (ench_property - 192)
+                    spell = spell_names.get(spell_idx, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Protection +{ench_property - 191}"
+                elif 200 <= ench_property <= 207:
+                    spell_idx = 472 + (ench_property - 200)
+                    spell = spell_names.get(spell_idx, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Toughness +{ench_property - 199}"
+                elif ench_property < 64:
+                    spell_idx = 256 + ench_property
+                    spell = spell_names.get(spell_idx, "")
+                    return format_spell(spell)
+                else:
+                    # Values 64-191: Look up directly in spell names
+                    # This includes Cursed (144-159), various spell effects, etc.
+                    spell = spell_names.get(ench_property, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Enchantment #{ench_property}"
+            
+            return ""
+        
         # Category mapping for objects
         category_map = {
             'melee_weapon': 'weapons',
@@ -296,6 +516,18 @@ class JsonExporter:
                         item_dict = item.to_dict()
                         obj_class = item_dict.get('object_class', 'unknown')
                         
+                        # Get rich description and effect for this item
+                        item_desc = get_item_description(
+                            item, item.object_id, item.is_quantity,
+                            item.quantity, item.quality, 
+                            getattr(item, 'owner', 0),
+                            item.special_link, level_num
+                        )
+                        item_effect = get_item_effect(
+                            item, item.object_id, item.is_enchanted, item.is_quantity,
+                            item.quantity, item.quality, item.special_link, level_num
+                        )
+                        
                         content_item = {
                             'object_id': item.object_id,
                             'name': item.name or get_item_name(item.object_id),
@@ -303,6 +535,8 @@ class JsonExporter:
                             'quality': item.quality,
                             'quantity': item.quantity if item.is_quantity else 1,
                             'is_enchanted': item.is_enchanted,
+                            'description': item_desc,
+                            'effect': item_effect,
                         }
                         
                         # If this item is also a container, get its contents recursively
@@ -346,19 +580,37 @@ class JsonExporter:
             obj_class = item_dict.get('object_class', 'unknown')
             category = category_map.get(obj_class, 'misc')
             
+            # Get rich description and effect for this item
+            # Use the item object directly for is_quantity since to_dict() doesn't include it
+            obj_id = item.object_id
+            is_quantity = item.is_quantity
+            quantity = item.quantity
+            quality = item.quality
+            owner = item.owner
+            special_link = item.special_link
+            is_enchanted = item.is_enchanted
+            
+            item_desc = get_item_description(
+                item, obj_id, is_quantity, quantity, quality, owner, special_link, level
+            )
+            item_effect = get_item_effect(
+                item, obj_id, is_enchanted, is_quantity, quantity, quality, special_link, level
+            )
+            
             # Create simplified object for web
             web_obj = {
                 'id': item_dict.get('index', 0),
-                'object_id': item_dict.get('object_id', 0),
+                'object_id': obj_id,
                 'name': item_dict.get('name', ''),
                 'tile_x': tile_x,
                 'tile_y': tile_y,
                 'z': pos.get('z', 0),
                 'category': category,
                 'object_class': obj_class,
-                'quality': item_dict.get('quality', 0),
-                'is_enchanted': item_dict.get('is_enchanted', False),
-                'description': item_dict.get('description', ''),
+                'quality': quality,
+                'is_enchanted': is_enchanted,
+                'description': item_desc,
+                'effect': item_effect,
             }
             
             # For containers, add their contents

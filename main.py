@@ -144,7 +144,8 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
         npcs.npcs, 
         npcs.npc_names,
         items.item_types,
-        levels.levels  # Pass levels for container content extraction
+        levels.levels,  # Pass levels for container content extraction
+        strings  # Pass strings for rich descriptions (books, scrolls, keys, spells)
     )
     print(f"       Exported web map data to {web_map_path.name}")
     

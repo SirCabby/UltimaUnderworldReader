@@ -784,6 +784,13 @@ class XlsxExporter:
                 spell_idx = 256 + ench_property
                 spell = spell_names.get(spell_idx, "")
                 return format_spell_with_description(spell)
+            else:
+                # Values 64-191: Look up directly in spell names
+                # This includes Cursed (144-159), various spell effects, etc.
+                spell = spell_names.get(ench_property, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                return f"Enchantment #{ench_property}"
         
         # Rings
         elif object_id in (0x36, 0x38, 0x39, 0x3A):
@@ -810,6 +817,13 @@ class XlsxExporter:
                 spell_idx = 256 + ench_property
                 spell = spell_names.get(spell_idx, "")
                 return format_spell_with_description(spell)
+            else:
+                # Values 64-191: Look up directly in spell names
+                # This includes Cursed (144-159), various spell effects, etc.
+                spell = spell_names.get(ench_property, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                return f"Enchantment #{ench_property}"
         
         return ""
     

@@ -491,8 +491,34 @@ function renderMarkers() {
 
 function shouldShowItem(item) {
     if (!state.filters.search) return true;
+    const searchTerm = state.filters.search;
+    
+    // Check the item's own name
     const name = (item.name || '').toLowerCase();
-    return name.includes(state.filters.search);
+    if (name.includes(searchTerm)) return true;
+    
+    // Check contents recursively (for containers)
+    if (item.contents && item.contents.length > 0) {
+        if (hasMatchingContent(item.contents, searchTerm)) return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Recursively search container contents for matching item names
+ */
+function hasMatchingContent(contents, searchTerm) {
+    for (const contentItem of contents) {
+        const name = (contentItem.name || '').toLowerCase();
+        if (name.includes(searchTerm)) return true;
+        
+        // Check nested containers
+        if (contentItem.contents && contentItem.contents.length > 0) {
+            if (hasMatchingContent(contentItem.contents, searchTerm)) return true;
+        }
+    }
+    return false;
 }
 
 function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
@@ -566,6 +592,18 @@ function showTooltip(e, item, isNpc) {
         html += `<div class="tooltip-info">${formatCategory(item.category)}</div>`;
         if (item.is_enchanted) {
             html += `<div class="tooltip-info" style="color: #9775fa;">✨ Enchanted</div>`;
+        }
+        // Show effect preview in tooltip (truncated)
+        if (item.effect) {
+            html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">${escapeHtml(truncateText(item.effect, 50))}</div>`;
+        }
+        // Show description preview (truncated) for books/scrolls/keys
+        if (item.description && item.description.length > 0) {
+            html += `<div class="tooltip-info" style="color: var(--text-accent); font-size: 0.8rem;">${escapeHtml(truncateText(item.description, 60))}</div>`;
+        }
+        // Show container count
+        if (item.contents && item.contents.length > 0) {
+            html += `<div class="tooltip-info" style="color: var(--text-accent);">📦 ${item.contents.length} item${item.contents.length > 1 ? 's' : ''} inside</div>`;
         }
     }
     
@@ -688,6 +726,26 @@ function renderObjectDetails(item, isNpc) {
                 <span class="detail-value">${item.is_enchanted ? '✨ Yes' : 'No'}</span>
             </div>
         `;
+        
+        // Show description if available (books, scrolls, keys, potions, etc.)
+        if (item.description) {
+            html += `
+                <div class="detail-description">
+                    <div class="detail-label" style="margin-bottom: 4px;">Description</div>
+                    <div class="description-text">${escapeHtml(item.description)}</div>
+                </div>
+            `;
+        }
+        
+        // Show effect/enchantment if available
+        if (item.effect) {
+            html += `
+                <div class="detail-effect">
+                    <div class="detail-label" style="margin-bottom: 4px;">✨ Effect</div>
+                    <div class="effect-text">${escapeHtml(item.effect)}</div>
+                </div>
+            `;
+        }
     }
     
     html += `
@@ -758,12 +816,29 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
         nameDiv.style.color = 'var(--text-primary)';
         nameDiv.textContent = `${item.name || 'Unknown'}${qty}${enchanted}${hasContents ? ' 📦' : ''}`;
         
+        // Build info line with category and optional effect preview
+        let infoText = formatCategory(item.category);
+        if (item.quality > 0) {
+            infoText += ` • Quality: ${item.quality}`;
+        }
+        if (item.effect) {
+            infoText += ` • ${truncateText(item.effect, 30)}`;
+        }
+        
         const infoDiv = document.createElement('div');
         infoDiv.style.cssText = 'color: var(--text-muted); font-size: 0.75rem;';
-        infoDiv.textContent = `${formatCategory(item.category)}${item.quality > 0 ? ` • Quality: ${item.quality}` : ''}`;
+        infoDiv.textContent = infoText;
         
         contentItem.appendChild(nameDiv);
         contentItem.appendChild(infoDiv);
+        
+        // Show description preview for readable items (books, scrolls)
+        if (item.description && item.description.length > 0) {
+            const descDiv = document.createElement('div');
+            descDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px; font-style: italic;';
+            descDiv.textContent = truncateText(item.description, 50);
+            contentItem.appendChild(descDiv);
+        }
         
         // Add hover effects
         contentItem.addEventListener('mouseenter', () => {
@@ -835,6 +910,26 @@ function selectContainerItem(item, parentContainer = null) {
             <span class="detail-value">${item.is_enchanted ? '✨ Yes' : 'No'}</span>
         </div>
     `;
+    
+    // Show description if available (books, scrolls, keys, potions, etc.)
+    if (item.description) {
+        html += `
+            <div class="detail-description">
+                <div class="detail-label" style="margin-bottom: 4px;">Description</div>
+                <div class="description-text">${escapeHtml(item.description)}</div>
+            </div>
+        `;
+    }
+    
+    // Show effect/enchantment if available
+    if (item.effect) {
+        html += `
+            <div class="detail-effect">
+                <div class="detail-label" style="margin-bottom: 4px;">✨ Effect</div>
+                <div class="effect-text">${escapeHtml(item.effect)}</div>
+            </div>
+        `;
+    }
     
     // Show parent container info
     if (parentContainer) {
@@ -1047,6 +1142,24 @@ function updateStats() {
 function formatCategory(categoryId) {
     const cat = state.data.categories.find(c => c.id === categoryId);
     return cat ? cat.name : categoryId;
+}
+
+/**
+ * Escape HTML special characters to prevent XSS
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Truncate text to a maximum length with ellipsis
+ */
+function truncateText(text, maxLength = 100) {
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
 }
 
 function debounce(fn, delay) {
