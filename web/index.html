@@ -37,7 +37,13 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <h3 class="section-title">Categories</h3>
+                    <div class="section-header">
+                        <h3 class="section-title">Categories</h3>
+                        <div class="category-toggle-btns">
+                            <button class="toggle-btn" id="select-all-categories" title="Select All">All</button>
+                            <button class="toggle-btn" id="deselect-all-categories" title="Deselect All">None</button>
+                        </div>
+                    </div>
                     <div class="category-filters" id="category-filters">
                         <!-- Category checkboxes will be populated by JS -->
                     </div>
@@ -67,6 +73,7 @@
                 <div class="map-wrapper" id="map-wrapper">
                     <img id="map-image" class="map-image" src="" alt="Level Map">
                     <svg id="markers-layer" class="markers-layer"></svg>
+                    <div id="tile-highlight" class="tile-highlight"></div>
                 </div>
                 
                 <!-- Zoom Controls -->
@@ -75,6 +82,12 @@
                     <span class="zoom-level" id="zoom-level">100%</span>
                     <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
                     <button class="zoom-btn" id="zoom-reset" title="Reset">⟲</button>
+                </div>
+
+                <!-- Coordinate Display -->
+                <div class="coord-display" id="coord-display">
+                    <span class="coord-label">Tile:</span>
+                    <span class="coord-value" id="coord-value">—</span>
                 </div>
 
                 <!-- Loading Overlay -->

@@ -201,6 +201,40 @@ body {
     margin-bottom: 12px;
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.section-header .section-title {
+    margin-bottom: 0;
+}
+
+.category-toggle-btns {
+    display: flex;
+    gap: 4px;
+}
+
+.toggle-btn {
+    padding: 3px 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.toggle-btn:hover {
+    background: var(--bg-elevated);
+    color: var(--text-accent);
+    border-color: var(--text-accent);
+}
+
 /* Level Tabs */
 .level-tabs {
     display: grid;
@@ -364,6 +398,23 @@ body {
     pointer-events: none;
 }
 
+/* Tile Highlight */
+.tile-highlight {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--text-accent);
+    box-shadow: 0 0 8px rgba(212, 168, 85, 0.6), inset 0 0 4px rgba(212, 168, 85, 0.2);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    box-sizing: border-box;
+}
+
+.tile-highlight.visible {
+    opacity: 1;
+}
+
 .markers-layer .marker {
     pointer-events: all;
     cursor: pointer;
@@ -423,6 +474,40 @@ body {
     color: var(--text-secondary);
     min-width: 50px;
     text-align: center;
+}
+
+/* Coordinate Display */
+.coord-display {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-elevated);
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    font-family: var(--font-mono);
+    transition: opacity 0.15s ease;
+}
+
+.coord-display.hidden {
+    opacity: 0.4;
+}
+
+.coord-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.coord-value {
+    font-size: 1rem;
+    color: var(--text-accent);
+    min-width: 80px;
 }
 
 /* Loading Overlay */

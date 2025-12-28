@@ -66,6 +66,7 @@ const elements = {
     mapWrapper: null,
     mapImage: null,
     markersLayer: null,
+    tileHighlight: null,
     levelTabs: null,
     categoryFilters: null,
     searchInput: null,
@@ -77,6 +78,8 @@ const elements = {
     statObjects: null,
     statNpcs: null,
     statVisible: null,
+    coordDisplay: null,
+    coordValue: null,
 };
 
 // ============================================================================
@@ -120,6 +123,7 @@ function cacheElements() {
     elements.mapWrapper = document.getElementById('map-wrapper');
     elements.mapImage = document.getElementById('map-image');
     elements.markersLayer = document.getElementById('markers-layer');
+    elements.tileHighlight = document.getElementById('tile-highlight');
     elements.levelTabs = document.getElementById('level-tabs');
     elements.categoryFilters = document.getElementById('category-filters');
     elements.searchInput = document.getElementById('search-input');
@@ -131,6 +135,8 @@ function cacheElements() {
     elements.statObjects = document.getElementById('stat-objects');
     elements.statNpcs = document.getElementById('stat-npcs');
     elements.statVisible = document.getElementById('stat-visible');
+    elements.coordDisplay = document.getElementById('coord-display');
+    elements.coordValue = document.getElementById('coord-value');
 }
 
 async function loadData() {
@@ -166,8 +172,16 @@ function setupEventListeners() {
     document.addEventListener('mousemove', handlePanMove);
     document.addEventListener('mouseup', handlePanEnd);
     
+    // Coordinate tracking
+    elements.mapContainer.addEventListener('mousemove', handleCoordinateTracking);
+    elements.mapContainer.addEventListener('mouseleave', handleCoordinateLeave);
+    
     // Search
     elements.searchInput.addEventListener('input', debounce(handleSearch, 200));
+    
+    // Category toggle buttons
+    document.getElementById('select-all-categories').addEventListener('click', selectAllCategories);
+    document.getElementById('deselect-all-categories').addEventListener('click', deselectAllCategories);
     
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboard);
@@ -196,6 +210,50 @@ function handlePanMove(e) {
 function handlePanEnd() {
     state.isDragging = false;
     elements.mapWrapper.style.cursor = 'grab';
+}
+
+function handleCoordinateTracking(e) {
+    // Get the map wrapper's bounding rect and current transform
+    const wrapperRect = elements.mapWrapper.getBoundingClientRect();
+    
+    // Calculate mouse position relative to the map wrapper (accounting for zoom and pan)
+    const mouseX = (e.clientX - wrapperRect.left) / state.zoom;
+    const mouseY = (e.clientY - wrapperRect.top) / state.zoom;
+    
+    // Convert pixel position to tile coordinates
+    const pxPerTile = CONFIG.mapArea.width / CONFIG.mapArea.gridSize;
+    const tileX = Math.floor((mouseX - CONFIG.mapArea.offsetX) / pxPerTile);
+    // Y is flipped: image Y=0 is top, but game Y=0 is south (bottom)
+    const tileY = CONFIG.mapArea.gridSize - 1 - Math.floor((mouseY - CONFIG.mapArea.offsetY) / pxPerTile);
+    
+    // Check if coordinates are within valid range
+    if (tileX >= 0 && tileX < CONFIG.mapArea.gridSize && 
+        tileY >= 0 && tileY < CONFIG.mapArea.gridSize) {
+        elements.coordValue.textContent = `(${tileX}, ${tileY})`;
+        elements.coordDisplay.classList.remove('hidden');
+        
+        // Position the tile highlight
+        // Convert tile coordinates back to pixel position for the highlight
+        const highlightX = CONFIG.mapArea.offsetX + tileX * pxPerTile;
+        // Flip Y back: convert game Y to image Y
+        const highlightY = CONFIG.mapArea.offsetY + (CONFIG.mapArea.gridSize - 1 - tileY) * pxPerTile;
+        
+        elements.tileHighlight.style.left = `${highlightX}px`;
+        elements.tileHighlight.style.top = `${highlightY}px`;
+        elements.tileHighlight.style.width = `${pxPerTile}px`;
+        elements.tileHighlight.style.height = `${pxPerTile}px`;
+        elements.tileHighlight.classList.add('visible');
+    } else {
+        elements.coordValue.textContent = '—';
+        elements.coordDisplay.classList.add('hidden');
+        elements.tileHighlight.classList.remove('visible');
+    }
+}
+
+function handleCoordinateLeave() {
+    elements.coordValue.textContent = '—';
+    elements.coordDisplay.classList.add('hidden');
+    elements.tileHighlight.classList.remove('visible');
 }
 
 function handleSearch(e) {
@@ -351,6 +409,35 @@ function updateCategoryCounts() {
             countEl.textContent = categoryCounts[cat.id] || 0;
         }
     });
+}
+
+function selectAllCategories() {
+    // Add all categories to the filter set
+    state.filters.categories.add('npcs');
+    state.data.categories.forEach(cat => {
+        state.filters.categories.add(cat.id);
+    });
+    
+    // Update all checkboxes
+    document.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+    });
+    
+    renderMarkers();
+    updateStats();
+}
+
+function deselectAllCategories() {
+    // Clear all categories from the filter set
+    state.filters.categories.clear();
+    
+    // Update all checkboxes
+    document.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+    
+    renderMarkers();
+    updateStats();
 }
 
 
