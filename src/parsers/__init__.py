@@ -28,6 +28,11 @@ from .conversation_parser import (
     Import,
     Opcode,
 )
+from .terrain_parser import (
+    TerrainParser,
+    TerrainData,
+    TerrainType,
+)
 
 __all__ = [
     # Strings
@@ -65,4 +70,8 @@ __all__ = [
     'Instruction',
     'Import',
     'Opcode',
+    # Terrain
+    'TerrainParser',
+    'TerrainData',
+    'TerrainType',
 ]
