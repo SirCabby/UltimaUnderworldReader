@@ -523,6 +523,56 @@ body {
     filter: brightness(1.4) drop-shadow(0 0 8px currentColor);
 }
 
+/* Stacked markers (multiple items at same tile) */
+.markers-layer .marker-stack {
+    pointer-events: none;
+}
+
+.markers-layer .marker-stack .marker {
+    pointer-events: all;
+}
+
+.markers-layer .stacked-marker {
+    opacity: 0.85;
+}
+
+.markers-layer .stacked-marker:hover {
+    opacity: 1;
+}
+
+/* Tile hover area for all markers (single and stacked) */
+.markers-layer .tile-hover-area {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+/* Marker group for single items */
+.markers-layer .marker-group .marker {
+    pointer-events: none;
+    transition: r 0.15s ease, filter 0.15s ease;
+}
+
+/* Highlight marker when hovering the tile area */
+.markers-layer .marker-group:hover .marker {
+    filter: brightness(1.3) drop-shadow(0 0 4px currentColor);
+}
+
+/* Count badge for stacked markers (visual only, no pointer events) */
+.markers-layer .count-badge {
+    pointer-events: none;
+}
+
+.markers-layer .count-badge circle {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    transition: filter 0.15s ease, fill 0.15s ease;
+}
+
+/* Highlight badge when hovering the tile area */
+.markers-layer .marker-stack:hover .count-badge circle {
+    fill: #f0c060;
+    filter: drop-shadow(0 0 4px rgba(212, 168, 85, 0.8));
+}
+
 /* Zoom Controls */
 .zoom-controls {
     position: absolute;
@@ -808,6 +858,20 @@ body {
 .tooltip.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Interactive tooltip (for stacked item badges) */
+.tooltip.interactive {
+    pointer-events: auto;
+}
+
+.tooltip.interactive .tooltip-item-entry:hover {
+    background: var(--bg-tertiary);
+}
+
+.tooltip-item-list {
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .tooltip-name {

@@ -26,10 +26,10 @@ const CONFIG = {
         default: 1.0,     // Start at 100% since maps are now clean
     },
     
-    // Marker settings
+    // Marker settings - sized to fit within 10px tiles
     marker: {
-        radius: 4,
-        strokeWidth: 1.5,
+        radius: 3,
+        strokeWidth: 1,
     },
     
     // Paths
@@ -56,6 +56,8 @@ const state = {
         enchantedOnly: false,   // Show only enchanted items
     },
     selectedMarker: null,
+    tooltipHideTimeout: null,  // For delayed tooltip hiding
+    isTooltipHovered: false,   // Track if tooltip is being hovered
 };
 
 // ============================================================================
@@ -97,6 +99,9 @@ async function init() {
     
     // Set up event listeners
     setupEventListeners();
+    
+    // Set up tooltip hover tracking for interactive tooltips
+    setupTooltipHoverTracking();
     
     // Load data
     try {
@@ -408,10 +413,23 @@ function updateCategoryCounts() {
         npcCountEl.textContent = level.npcs.length;
     }
     
-    // Update object category counts
+    // Update object category counts - including items inside containers and NPC inventories
     const categoryCounts = {};
+    
+    // Count top-level objects and their contents recursively
     level.objects.forEach(obj => {
         categoryCounts[obj.category] = (categoryCounts[obj.category] || 0) + 1;
+        // Count items inside containers
+        if (obj.contents && obj.contents.length > 0) {
+            countItemsByCategory(obj.contents, categoryCounts);
+        }
+    });
+    
+    // Count items in NPC inventories
+    level.npcs.forEach(npc => {
+        if (npc.inventory && npc.inventory.length > 0) {
+            countItemsByCategory(npc.inventory, categoryCounts);
+        }
     });
     
     state.data.categories.forEach(cat => {
@@ -426,6 +444,22 @@ function updateCategoryCounts() {
     
     // Update enchanted item count
     updateEnchantedCount();
+}
+
+/**
+ * Recursively count items by category, including nested container contents
+ */
+function countItemsByCategory(items, categoryCounts) {
+    if (!items || items.length === 0) return;
+    
+    items.forEach(item => {
+        categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
+        
+        // Recursively count nested container contents
+        if (item.contents && item.contents.length > 0) {
+            countItemsByCategory(item.contents, categoryCounts);
+        }
+    });
 }
 
 /**
@@ -504,28 +538,327 @@ function renderMarkers() {
     
     let visibleCount = 0;
     
-    // Render NPCs
-    if (state.filters.categories.has('npcs')) {
-        level.npcs.forEach(npc => {
-            if (shouldShowItem(npc)) {
-                const marker = createMarker(npc, '#ff6b6b', pxPerTileX, pxPerTileY, true);
-                elements.markersLayer.appendChild(marker);
-                visibleCount++;
-            }
-        });
-    }
+    // Collect all visible items grouped by tile
+    const tileGroups = new Map(); // key: "x,y" -> array of {item, color, isNpc}
     
-    // Render objects
-    level.objects.forEach(obj => {
-        if (state.filters.categories.has(obj.category) && shouldShowItem(obj)) {
-            const color = getCategoryColor(obj.category);
-            const marker = createMarker(obj, color, pxPerTileX, pxPerTileY, false);
-            elements.markersLayer.appendChild(marker);
+    // Collect NPCs - show if 'npcs' category is selected OR if they carry items matching selected categories
+    level.npcs.forEach(npc => {
+        const npcCategoryMatch = state.filters.categories.has('npcs');
+        const hasMatchingInventory = hasContentMatchingCategory(npc.inventory);
+        
+        if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc)) {
+            const key = `${npc.tile_x},${npc.tile_y}`;
+            if (!tileGroups.has(key)) {
+                tileGroups.set(key, []);
+            }
+            tileGroups.get(key).push({ item: npc, color: '#ff6b6b', isNpc: true });
             visibleCount++;
         }
     });
     
+    // Collect objects - show if category matches OR if container holds items matching selected categories
+    level.objects.forEach(obj => {
+        const objCategoryMatch = state.filters.categories.has(obj.category);
+        const hasMatchingContents = hasContentMatchingCategory(obj.contents);
+        
+        if ((objCategoryMatch || hasMatchingContents) && shouldShowItem(obj)) {
+            const key = `${obj.tile_x},${obj.tile_y}`;
+            if (!tileGroups.has(key)) {
+                tileGroups.set(key, []);
+            }
+            tileGroups.get(key).push({ item: obj, color: getCategoryColor(obj.category), isNpc: false });
+            visibleCount++;
+        }
+    });
+    
+    // Render markers for each tile group
+    tileGroups.forEach((items, key) => {
+        const [tileX, tileY] = key.split(',').map(Number);
+        
+        if (items.length === 1) {
+            // Single item - render normally
+            const { item, color, isNpc } = items[0];
+            const marker = createMarker(item, color, pxPerTileX, pxPerTileY, isNpc);
+            elements.markersLayer.appendChild(marker);
+        } else {
+            // Multiple items - render with stacking and count indicator
+            renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY);
+        }
+    });
+    
     elements.statVisible.textContent = visibleCount;
+}
+
+/**
+ * Render stacked markers for tiles with multiple items
+ * Shows a single count badge that replaces individual markers
+ * The entire tile area is hoverable for better UX
+ */
+function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
+    // Tile boundaries (top-left corner of tile in pixel coordinates)
+    const tileLeft = CONFIG.mapArea.offsetX + tileX * pxPerTileX;
+    const tileTop = CONFIG.mapArea.offsetY + (CONFIG.mapArea.gridSize - tileY - 1) * pxPerTileY;
+    
+    // Center of tile
+    const centerX = tileLeft + pxPerTileX / 2;
+    const centerY = tileTop + pxPerTileY / 2;
+    
+    // Create a group for the stacked marker
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.classList.add('marker-stack');
+    group.dataset.tileX = tileX;
+    group.dataset.tileY = tileY;
+    group.dataset.count = items.length;
+    
+    // Sort items: NPCs first, then by category for consistent ordering
+    items.sort((a, b) => {
+        if (a.isNpc !== b.isNpc) return a.isNpc ? -1 : 1;
+        return 0;
+    });
+    
+    // Create invisible tile-sized hover area (added first so badge renders on top)
+    const hoverArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    hoverArea.setAttribute('x', tileLeft);
+    hoverArea.setAttribute('y', tileTop);
+    hoverArea.setAttribute('width', pxPerTileX);
+    hoverArea.setAttribute('height', pxPerTileY);
+    hoverArea.setAttribute('fill', 'transparent');
+    hoverArea.classList.add('tile-hover-area');
+    
+    // Add hover events to the tile area
+    hoverArea.addEventListener('mouseenter', (e) => {
+        // Cancel any pending hide
+        if (state.tooltipHideTimeout) {
+            clearTimeout(state.tooltipHideTimeout);
+            state.tooltipHideTimeout = null;
+        }
+        showStackedTooltip(e, items, tileX, tileY);
+    });
+    hoverArea.addEventListener('mouseleave', () => {
+        scheduleHideTooltip();
+    });
+    hoverArea.addEventListener('mousemove', (e) => {
+        updateTooltipPosition(e);
+    });
+    hoverArea.addEventListener('click', () => {
+        hideTooltip();
+        // Select the first item when clicking the tile
+        const firstItem = items[0];
+        selectStackedItem(firstItem.item, firstItem.isNpc, tileX, tileY);
+    });
+    
+    group.appendChild(hoverArea);
+    
+    // Show a single count badge centered in the tile (visual only, no events)
+    const badge = createCountBadge(centerX, centerY, items.length, tileX, tileY, items);
+    group.appendChild(badge);
+    
+    elements.markersLayer.appendChild(group);
+}
+
+/**
+ * Create a single marker for stacked display
+ */
+function createStackedMarker(item, color, px, py, isNpc, isPrimary) {
+    const baseRadius = isNpc ? CONFIG.marker.radius + 0.5 : CONFIG.marker.radius;
+    // Make non-primary markers slightly smaller
+    const radius = isPrimary ? baseRadius : baseRadius * 0.8;
+    
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    marker.setAttribute('cx', px);
+    marker.setAttribute('cy', py);
+    marker.setAttribute('r', radius);
+    marker.setAttribute('fill', color);
+    marker.setAttribute('stroke', isNpc ? '#fff' : 'rgba(0,0,0,0.5)');
+    marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
+    marker.classList.add('marker');
+    if (!isPrimary) {
+        marker.classList.add('stacked-marker');
+    }
+    
+    // Store item data
+    marker.dataset.id = item.id;
+    marker.dataset.isNpc = isNpc;
+    marker.dataset.tileX = item.tile_x;
+    marker.dataset.tileY = item.tile_y;
+    marker.dataset.originalRadius = radius;
+    
+    // Event listeners - limit hover expansion to stay within tile
+    const hoverRadius = Math.min(radius * 1.3, 4);
+    marker.addEventListener('mouseenter', (e) => {
+        marker.setAttribute('r', hoverRadius);
+        showTooltip(e, item, isNpc);
+    });
+    marker.addEventListener('mouseleave', () => {
+        if (!marker.classList.contains('selected')) {
+            marker.setAttribute('r', radius);
+        }
+        hideTooltip();
+    });
+    marker.addEventListener('click', () => selectItem(item, isNpc, marker));
+    
+    return marker;
+}
+
+/**
+ * Create a count badge showing number of items at a tile
+ * Badge is centered in the tile and replaces individual markers
+ */
+function createCountBadge(centerX, centerY, count, tileX, tileY, items) {
+    const badgeGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    badgeGroup.classList.add('count-badge');
+    
+    // Badge is centered in the tile
+    const badgeRadius = 4;
+    
+    const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    bgCircle.setAttribute('cx', centerX);
+    bgCircle.setAttribute('cy', centerY);
+    bgCircle.setAttribute('r', badgeRadius);
+    bgCircle.setAttribute('fill', '#d4a855');
+    bgCircle.setAttribute('stroke', '#0d0d0f');
+    bgCircle.setAttribute('stroke-width', '0.5');
+    
+    // Badge text
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', centerX);
+    text.setAttribute('y', centerY);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('fill', '#0d0d0f');
+    text.setAttribute('font-family', 'var(--font-mono), monospace');
+    text.setAttribute('font-size', '6');
+    text.setAttribute('font-weight', 'bold');
+    text.textContent = count > 9 ? '+' : count;
+    
+    badgeGroup.appendChild(bgCircle);
+    badgeGroup.appendChild(text);
+    
+    // Badge is visual only - the tile hover area handles all events
+    badgeGroup.style.pointerEvents = 'none';
+    
+    return badgeGroup;
+}
+
+/**
+ * Show interactive tooltip for stacked items badge
+ * Items are clickable to select them
+ */
+function showStackedTooltip(e, items, tileX, tileY) {
+    const tooltip = elements.tooltip;
+    
+    // Clear previous content
+    tooltip.innerHTML = '';
+    
+    // Header
+    const header = document.createElement('div');
+    header.className = 'tooltip-name';
+    header.style.color = 'var(--text-accent)';
+    header.textContent = `📍 ${items.length} items at this tile`;
+    tooltip.appendChild(header);
+    
+    const position = document.createElement('div');
+    position.className = 'tooltip-position';
+    position.style.marginBottom = '6px';
+    position.textContent = `Tile: (${tileX}, ${tileY})`;
+    tooltip.appendChild(position);
+    
+    // Clickable item list
+    const itemList = document.createElement('div');
+    itemList.className = 'tooltip-item-list';
+    
+    items.forEach(({ item, color, isNpc }, index) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'tooltip-item-entry';
+        itemEl.style.cssText = `
+            padding: 4px 8px;
+            margin: 2px 0;
+            border-left: 3px solid ${color};
+            cursor: pointer;
+            border-radius: 0 3px 3px 0;
+            transition: background 0.1s ease;
+        `;
+        
+        // Build item display with icons
+        const icon = isNpc ? '👤' : '•';
+        const enchantIcon = isEnchanted(item) ? ' ✨' : '';
+        itemEl.textContent = `${icon} ${item.name || 'Unknown'}${enchantIcon}`;
+        
+        // Hover effect
+        itemEl.addEventListener('mouseenter', () => {
+            itemEl.style.background = 'var(--bg-elevated)';
+        });
+        itemEl.addEventListener('mouseleave', () => {
+            itemEl.style.background = 'transparent';
+        });
+        
+        // Click to select this item
+        itemEl.addEventListener('click', (clickEvent) => {
+            clickEvent.stopPropagation();
+            hideTooltip();
+            
+            // Select this item - create a virtual marker selection
+            selectStackedItem(item, isNpc, tileX, tileY);
+        });
+        
+        itemList.appendChild(itemEl);
+    });
+    
+    tooltip.appendChild(itemList);
+    
+    // Footer hint
+    const hint = document.createElement('div');
+    hint.className = 'tooltip-info';
+    hint.style.cssText = 'margin-top: 6px; color: var(--text-muted); font-size: 0.75rem; text-align: center;';
+    hint.textContent = 'Click an item to select it';
+    tooltip.appendChild(hint);
+    
+    // Mark tooltip as interactive
+    tooltip.classList.add('visible', 'interactive');
+    
+    updateTooltipPosition(e);
+}
+
+/**
+ * Select an item from a stacked badge (no visible marker)
+ */
+function selectStackedItem(item, isNpc, tileX, tileY) {
+    // Clear previous selection
+    document.querySelectorAll('.marker.selected').forEach(m => {
+        m.classList.remove('selected');
+        const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
+        m.setAttribute('r', origR);
+    });
+    state.selectedMarker = null;
+    
+    // Update details panel
+    renderObjectDetails(item, isNpc);
+    
+    // Show all items at this location
+    renderLocationObjects(tileX, tileY, item.id);
+}
+
+/**
+ * Check if any item in contents (recursively) matches the currently selected category filters
+ */
+function hasContentMatchingCategory(contents) {
+    if (!contents || contents.length === 0) return false;
+    
+    for (const item of contents) {
+        // Check if this item's category matches any selected filter
+        if (state.filters.categories.has(item.category)) {
+            return true;
+        }
+        
+        // Recursively check nested containers
+        if (item.contents && item.contents.length > 0) {
+            if (hasContentMatchingCategory(item.contents)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
 }
 
 function shouldShowItem(item) {
@@ -625,47 +958,75 @@ function hasMatchingContent(contents, searchTerm) {
 }
 
 function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
-    // Convert tile coordinates to pixel position
-    // Note: Y is flipped because game coords have Y=0 at south (bottom)
-    // but image has Y=0 at top
-    const px = CONFIG.mapArea.offsetX + (item.tile_x + 0.5) * pxPerTileX;
-    const py = CONFIG.mapArea.offsetY + (CONFIG.mapArea.gridSize - item.tile_y - 0.5) * pxPerTileY;
+    // Tile boundaries (top-left corner of tile in pixel coordinates)
+    const tileLeft = CONFIG.mapArea.offsetX + item.tile_x * pxPerTileX;
+    const tileTop = CONFIG.mapArea.offsetY + (CONFIG.mapArea.gridSize - item.tile_y - 1) * pxPerTileY;
     
+    // Center of tile
+    const px = tileLeft + pxPerTileX / 2;
+    const py = tileTop + pxPerTileY / 2;
+    
+    // Use smaller radius for NPCs to fit within tile
+    const radius = isNpc ? CONFIG.marker.radius + 0.5 : CONFIG.marker.radius;
+    
+    // Create a group to hold both hover area and marker
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.classList.add('marker-group');
+    group.dataset.id = item.id;
+    group.dataset.isNpc = isNpc;
+    group.dataset.tileX = item.tile_x;
+    group.dataset.tileY = item.tile_y;
+    
+    // Create invisible tile-sized hover area (added first so marker renders on top)
+    const hoverArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    hoverArea.setAttribute('x', tileLeft);
+    hoverArea.setAttribute('y', tileTop);
+    hoverArea.setAttribute('width', pxPerTileX);
+    hoverArea.setAttribute('height', pxPerTileY);
+    hoverArea.setAttribute('fill', 'transparent');
+    hoverArea.classList.add('tile-hover-area');
+    
+    // Create the visual marker circle
     const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     marker.setAttribute('cx', px);
     marker.setAttribute('cy', py);
-    marker.setAttribute('r', isNpc ? CONFIG.marker.radius + 1 : CONFIG.marker.radius);
+    marker.setAttribute('r', radius);
     marker.setAttribute('fill', color);
     marker.setAttribute('stroke', isNpc ? '#fff' : 'rgba(0,0,0,0.5)');
     marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
     marker.classList.add('marker');
+    marker.style.pointerEvents = 'none'; // Visual only
     
-    // Store item data
+    // Store item data on marker for selection
     marker.dataset.id = item.id;
     marker.dataset.isNpc = isNpc;
     marker.dataset.tileX = item.tile_x;
     marker.dataset.tileY = item.tile_y;
+    marker.dataset.originalRadius = radius;
     
-    // Store original radius for hover effect
-    const originalRadius = isNpc ? CONFIG.marker.radius + 1 : CONFIG.marker.radius;
-    marker.dataset.originalRadius = originalRadius;
+    // Hover radius for visual feedback
+    const hoverRadius = Math.min(radius * 1.3, 4);
     
-    // Event listeners
-    marker.addEventListener('mouseenter', (e) => {
-        // Increase radius on hover (instead of transform which causes flickering)
-        marker.setAttribute('r', originalRadius * 1.5);
+    // Event listeners on the tile hover area
+    hoverArea.addEventListener('mouseenter', (e) => {
+        marker.setAttribute('r', hoverRadius);
         showTooltip(e, item, isNpc);
     });
-    marker.addEventListener('mouseleave', () => {
-        // Restore original radius unless selected
+    hoverArea.addEventListener('mouseleave', () => {
         if (!marker.classList.contains('selected')) {
-            marker.setAttribute('r', originalRadius);
+            marker.setAttribute('r', radius);
         }
         hideTooltip();
     });
-    marker.addEventListener('click', () => selectItem(item, isNpc, marker));
+    hoverArea.addEventListener('mousemove', (e) => {
+        updateTooltipPosition(e);
+    });
+    hoverArea.addEventListener('click', () => selectItem(item, isNpc, marker));
     
-    return marker;
+    group.appendChild(hoverArea);
+    group.appendChild(marker);
+    
+    return group;
 }
 
 function getCategoryColor(categoryId) {
@@ -711,6 +1072,12 @@ function showTooltip(e, item, isNpc) {
         }
     }
     
+    // Check if there are multiple items at this tile
+    const otherItemsAtTile = countOtherItemsAtTile(item.tile_x, item.tile_y, item.id);
+    if (otherItemsAtTile > 0) {
+        html += `<div class="tooltip-stacked" style="color: var(--text-accent); font-size: 0.8rem; margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--border-color);">📍 +${otherItemsAtTile} more item${otherItemsAtTile > 1 ? 's' : ''} here</div>`;
+    }
+    
     html += `<div class="tooltip-position">Tile: (${item.tile_x}, ${item.tile_y})</div>`;
     
     tooltip.innerHTML = html;
@@ -718,6 +1085,40 @@ function showTooltip(e, item, isNpc) {
     
     // Position tooltip
     updateTooltipPosition(e);
+}
+
+/**
+ * Count how many other visible items are at the same tile (excluding the current item)
+ */
+function countOtherItemsAtTile(tileX, tileY, excludeId) {
+    const level = state.data.levels[state.currentLevel];
+    if (!level) return 0;
+    
+    let count = 0;
+    
+    // Count NPCs at this tile
+    level.npcs.forEach(npc => {
+        if (npc.tile_x === tileX && npc.tile_y === tileY && npc.id !== excludeId) {
+            const npcCategoryMatch = state.filters.categories.has('npcs');
+            const hasMatchingInventory = hasContentMatchingCategory(npc.inventory);
+            if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc)) {
+                count++;
+            }
+        }
+    });
+    
+    // Count objects at this tile
+    level.objects.forEach(obj => {
+        if (obj.tile_x === tileX && obj.tile_y === tileY && obj.id !== excludeId) {
+            const objCategoryMatch = state.filters.categories.has(obj.category);
+            const hasMatchingContents = hasContentMatchingCategory(obj.contents);
+            if ((objCategoryMatch || hasMatchingContents) && shouldShowItem(obj)) {
+                count++;
+            }
+        }
+    });
+    
+    return count;
 }
 
 function updateTooltipPosition(e) {
@@ -740,7 +1141,49 @@ function updateTooltipPosition(e) {
 }
 
 function hideTooltip() {
+    // Clear any pending hide timeout
+    if (state.tooltipHideTimeout) {
+        clearTimeout(state.tooltipHideTimeout);
+        state.tooltipHideTimeout = null;
+    }
     elements.tooltip.classList.remove('visible');
+    elements.tooltip.classList.remove('interactive');
+}
+
+/**
+ * Schedule tooltip to hide after a delay (allows moving mouse to tooltip)
+ */
+function scheduleHideTooltip() {
+    // Clear any existing timeout
+    if (state.tooltipHideTimeout) {
+        clearTimeout(state.tooltipHideTimeout);
+    }
+    
+    // Delay hiding to allow mouse to move to tooltip
+    state.tooltipHideTimeout = setTimeout(() => {
+        if (!state.isTooltipHovered) {
+            hideTooltip();
+        }
+    }, 150);
+}
+
+/**
+ * Set up tooltip hover tracking (called once during init)
+ */
+function setupTooltipHoverTracking() {
+    elements.tooltip.addEventListener('mouseenter', () => {
+        state.isTooltipHovered = true;
+        // Cancel any pending hide
+        if (state.tooltipHideTimeout) {
+            clearTimeout(state.tooltipHideTimeout);
+            state.tooltipHideTimeout = null;
+        }
+    });
+    
+    elements.tooltip.addEventListener('mouseleave', () => {
+        state.isTooltipHovered = false;
+        hideTooltip();
+    });
 }
 
 // ============================================================================
@@ -1455,8 +1898,41 @@ function updateStats() {
     const level = state.data.levels[state.currentLevel];
     if (!level) return;
     
-    elements.statObjects.textContent = level.object_count;
+    // Count total objects including items inside containers and NPC inventories
+    let totalObjects = 0;
+    
+    // Count top-level objects and their contents
+    level.objects.forEach(obj => {
+        totalObjects++;
+        if (obj.contents && obj.contents.length > 0) {
+            totalObjects += countNestedItems(obj.contents);
+        }
+    });
+    
+    // Count items in NPC inventories
+    level.npcs.forEach(npc => {
+        if (npc.inventory && npc.inventory.length > 0) {
+            totalObjects += countNestedItems(npc.inventory);
+        }
+    });
+    
+    elements.statObjects.textContent = totalObjects;
     elements.statNpcs.textContent = level.npc_count;
+}
+
+/**
+ * Recursively count all items including nested container contents
+ */
+function countNestedItems(items) {
+    if (!items || items.length === 0) return 0;
+    
+    let count = items.length;
+    items.forEach(item => {
+        if (item.contents && item.contents.length > 0) {
+            count += countNestedItems(item.contents);
+        }
+    });
+    return count;
 }
 
 // ============================================================================
