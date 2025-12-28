@@ -1,0 +1,6 @@
+# Ultima Underworld Data Extraction Toolkit
+# Python 3.8+
+
+# Excel export
+openpyxl>=3.1.0
+

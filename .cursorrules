@@ -1,0 +1,172 @@
+# Ultima Underworld Data Extraction Toolkit - Cursor Rules
+
+## Project Overview
+
+This is a Python toolkit for extracting game data from Ultima Underworld I: The Stygian Abyss (1992 DOS game). The project parses proprietary binary file formats and exports structured data.
+
+## Key File Formats
+
+### STRINGS.PAK (Huffman-compressed text)
+- Header: 2 bytes = node count, then N×4 byte nodes
+- Block directory: 2 bytes = block count, then N×6 byte entries (block_num:2, offset:4)
+- String terminator: `|` character (0x7C)
+- Block 4 = object names (format: `article_name&plural`)
+- Block 6 = spell names
+- Block 7 = NPC names (index = conversation_slot + 16)
+
+### LEV.ARK (Level data container)
+- ARK format: 2 bytes = block count, then N×4 byte offsets
+- 9 levels × 15 block types = 135 blocks
+- Blocks 0-8 = main level data (31752 bytes each):
+  - 0x0000-0x3FFF: Tilemap (64×64 × 4 bytes)
+  - 0x4000-0x5AFF: Mobile objects (256 × 27 bytes)
+  - 0x5B00-0x72FF: Static objects (768 × 8 bytes)
+
+### Object Data Layout (8 bytes base)
+```
+Word 0: bits 0-8 = item_id, bit 12 = enchanted, bit 14 = invisible, bit 15 = is_quantity
+Word 1: bits 0-6 = z_pos, bits 7-9 = heading, bits 10-12 = y_pos, bits 13-15 = x_pos
+Word 2: bits 0-5 = quality, bits 6-15 = next_index
+Word 3: bits 0-5 = owner, bits 6-15 = quantity_or_link
+```
+
+### CNV.ARK (Conversation bytecode)
+- 29+ opcodes in a stack-based VM
+- SAY_OP (0x27) = NPC speech
+- CALLI 0 = babl_menu() for player responses
+- String indices pushed with PUSHI (0x16)
+
+## Object ID Ranges (0x000-0x1FF = 512 types)
+
+| Range | Category | Notes |
+|-------|----------|-------|
+| 0x00-0x0F | Melee weapons | Damage in OBJECTS.DAT |
+| 0x10-0x1F | Ranged weapons | Ammo in link field |
+| 0x20-0x3F | Armor | Protection in OBJECTS.DAT |
+| 0x40-0x7F | NPCs | 64 creature types, mobile objects only |
+| 0x80-0x8F | Containers | Odd IDs = open state |
+| 0x90-0x97 | Light sources | |
+| 0x98-0x9B | Wands | Link → spell object |
+| 0xA0 | Coins | quantity = gold amount |
+| 0xBB | Red potion | Mana |
+| 0xBC | Green potion | Health |
+| 0xE0-0xFF | Runes | 24 runestones |
+| 0x100-0x10E | Keys | owner = lock ID |
+| 0x130-0x137 | Books | link-512 = text index in block 3 |
+| 0x138-0x13F | Scrolls | Same as books |
+| 0x147 | Secret door | |
+| 0x180-0x19F | Traps | |
+| 0x1A0-0x1BF | Triggers | |
+
+## Important Encodings
+
+### Enchantment System
+- `is_enchanted` flag must be set
+- `is_quantity` determines if link field is quantity or enchantment link
+- If `is_quantity=True` and `quantity >= 512`: enchantment = quantity - 512
+- Weapons 192-199 = accuracy, 200-207 = damage bonus
+- Armor 192-199 = protection, 200-207 = toughness
+- 0-63 maps to spell indices 256-319
+
+### Quality Descriptions (Block 5)
+Quality 0-63 maps to offset 0-5 within description groups:
+- 0-5: Weapons (condition)
+- 6-11: Armor
+- 18-23: Food (freshness)
+- 60-65: Light sources (burn state)
+
+### NPC Data (Mobile objects only, 19 extra bytes)
+```
+Offset 0: HP
+Offset 3-4: goal (bits 0-3), gtarg (bits 4-11)
+Offset 5-6: level (bits 0-3), talkedto (bit 13), attitude (bits 14-15)
+Offset 14-15: yhome (bits 4-9), xhome (bits 10-15)
+Offset 17: hunger (bits 0-6)
+Offset 18: npc_whoami (conversation slot)
+```
+
+## Architecture Notes
+
+### Module Organization
+- `src/parsers/` - Binary format parsers (don't put game logic here)
+- `src/extractors/` - High-level extraction using parsers
+- `src/constants/` - All game constants (runes, spells, NPCs, etc.)
+- `src/models/` - Data classes for extracted data
+- `src/output/` - Export formats (JSON, XLSX)
+- `src/utils.py` - Shared utilities
+
+### Coding Conventions
+- Use relative imports within src package
+- All game constants in `src/constants/` (not scattered in extractors)
+- Use `parse_item_name()` from utils for consistent name parsing
+- Parsers should be stateless after `.parse()` is called
+- Extractors use dependency injection (pass data_path, not file handles)
+
+### Common Patterns
+
+```python
+# Parser pattern
+parser = SomeParser(filepath)
+parser.parse()
+data = parser.get_something()
+
+# Extractor pattern
+extractor = SomeExtractor(data_path)
+extractor.extract()
+results = extractor.get_all_items()
+```
+
+## Testing Changes
+
+**IMPORTANT: Always regenerate the XLSX after making any code changes so the user can test it.**
+
+Run extraction to verify changes work:
+```bash
+python main.py Input/UW1/DATA Output --xlsx
+```
+
+This command:
+- Extracts all game data to JSON files
+- Generates `Output/ultima_underworld_data.xlsx` with formatted sheets
+- Must be run after ANY changes to extractors, constants, or output formatting
+
+The game data files are in `Input/UW1/DATA/`. Required files:
+- STRINGS.PAK
+- LEV.ARK
+- CNV.ARK
+- OBJECTS.DAT
+- COMOBJ.DAT
+
+## Known Quirks
+
+1. **Quality 63** in COMOBJ.DAT usually means "undefined" (placeholder)
+2. **NPCs at tile (0,0)** are often templates, not actually placed
+3. **Block 7 indices 0-16** are system strings, not NPC names
+4. **Conversation slot 0** means no conversation (monster)
+5. **Wands** store spell in linked object (item_id 0x120), not directly
+6. **Container odd IDs** (0x81, 0x83, etc.) are "open" versions
+
+## Adding New Features
+
+### To add a new extractor:
+1. Create `src/extractors/new_extractor.py`
+2. Use relative imports from `..parsers`, `..constants`, `..utils`
+3. Add to `src/extractors/__init__.py`
+4. Add export method to JsonExporter and XlsxExporter
+
+### To add new constants:
+1. Add to appropriate file in `src/constants/`
+2. Export from `src/constants/__init__.py`
+3. Import where needed: `from ..constants import NEW_CONSTANT`
+
+### To add new output format:
+1. Create `src/output/new_exporter.py`
+2. Add to `src/output/__init__.py` (with optional import handling)
+3. Add to main.py extraction flow
+
+## Reference Documentation
+
+- Original format docs: Underworld Adventures project (uwadv.sourceforge.net)
+- String format: Huffman tree in file header, `|` terminated strings
+- Level coordinate system: (0,0) is SW corner, Y increases north, X increases east
+

@@ -1,0 +1,922 @@
+"""
+Excel (XLSX) Exporter for Ultima Underworld extracted data.
+
+Exports all extracted game data to a multi-sheet Excel workbook.
+"""
+
+from pathlib import Path
+from typing import Dict, List, Any, Optional, Set
+from datetime import datetime
+
+try:
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    OPENPYXL_AVAILABLE = True
+except ImportError:
+    OPENPYXL_AVAILABLE = False
+
+from ..constants import (
+    COMPLETE_MANTRAS,
+    NPC_GOALS,
+    NPC_ONLY_SPELLS,
+    PLAYER_SPELLS,
+    STACKABLE_ITEMS,
+    CARRYABLE_CATEGORIES,
+    CATEGORY_DISPLAY_NAMES,
+    CARRYABLE_CONTAINERS,
+    NPC_ATTITUDES,
+    RUNE_MEANINGS,
+)
+from ..utils import parse_item_name
+from ..parsers.conversation_parser import Opcode
+
+
+class XlsxExporter:
+    """Exports game data to Excel xlsx format."""
+    
+    # Styles
+    HEADER_FONT = Font(bold=True, color="FFFFFF")
+    HEADER_FILL = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    HEADER_ALIGNMENT = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    ALT_ROW_FILL = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+    THIN_BORDER = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'), bottom=Side(style='thin')
+    )
+    
+    def __init__(self, output_path: str | Path):
+        if not OPENPYXL_AVAILABLE:
+            raise ImportError("openpyxl is required. Install with: pip install openpyxl")
+        self.output_path = Path(output_path)
+        self.output_path.mkdir(parents=True, exist_ok=True)
+        self.wb = Workbook()
+        self.wb.remove(self.wb.active)
+    
+    def _create_sheet(self, name: str, headers: List[str]) -> Any:
+        ws = self.wb.create_sheet(name)
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = self.HEADER_FONT
+            cell.fill = self.HEADER_FILL
+            cell.alignment = self.HEADER_ALIGNMENT
+            cell.border = self.THIN_BORDER
+        ws.freeze_panes = 'A2'
+        return ws
+    
+    def _auto_column_width(self, ws, min_width: int = 8, max_width: int = 80):
+        for column_cells in ws.columns:
+            max_length = 0
+            column = column_cells[0].column_letter
+            for cell in column_cells:
+                try:
+                    if cell.value:
+                        cell_len = len(str(cell.value))
+                        if '\n' in str(cell.value):
+                            cell_len = max(len(line) for line in str(cell.value).split('\n'))
+                        max_length = max(max_length, cell_len)
+                except:
+                    pass
+            adjusted_width = min(max(max_length + 2, min_width), max_width)
+            ws.column_dimensions[column].width = adjusted_width
+    
+    def _add_row(self, ws, row_num: int, values: List[Any], alternate: bool = False):
+        for col, value in enumerate(values, 1):
+            cell = ws.cell(row=row_num, column=col, value=value)
+            cell.border = self.THIN_BORDER
+            if alternate:
+                cell.fill = self.ALT_ROW_FILL
+    
+    def export_items(self, item_types: Dict, placed_items: List) -> None:
+        """Export all item types."""
+        headers = [
+            "ID", "ID (Hex)", "Name", "Category",
+            "Weight", "Value", 
+            "Property 1", "Property 2", "Property 3", "Property 4"
+        ]
+        ws = self._create_sheet("Items", headers)
+        
+        row = 2
+        for item_id in sorted(item_types.keys()):
+            item = item_types[item_id]
+            props = item.properties
+            prop_strs = [f"{k}: {v}" for k, v in list(props.items())[:4]]
+            prop_strs.extend([""] * (4 - len(prop_strs)))
+            
+            # Determine if item can be carried based on category
+            is_carryable = item.category in CARRYABLE_CATEGORIES
+            
+            # Weight in stones (mass / 10)
+            # Note: mass=63 appears to be a placeholder for "undefined" in COMOBJ.DAT
+            # Only show weight if it's actually defined (< 63)
+            if is_carryable and item.mass > 0 and item.mass < 63:
+                weight_str = f"{item.mass / 10:.1f}"
+            else:
+                weight_str = ""
+            
+            # Value in gold (value / 10)
+            value_str = f"{item.value / 10:.1f}" if item.value > 0 else ""
+            
+            values = [
+                item.item_id, f"0x{item.item_id:03X}", item.name, item.category,
+                weight_str, value_str,
+                prop_strs[0], prop_strs[1], prop_strs[2], prop_strs[3]
+            ]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def export_weapons(self, item_types: Dict, objects_parser) -> None:
+        """Export weapons."""
+        headers = ["ID", "Name", "Type", "Slash", "Bash", "Stab", "Skill", "Durability", "Mass", "Value"]
+        ws = self._create_sheet("Weapons", headers)
+        
+        row = 2
+        for item_id in range(0x10):
+            item = item_types.get(item_id)
+            weapon = objects_parser.get_melee_weapon(item_id)
+            if item and weapon:
+                skill = weapon.skill_type.name if hasattr(weapon.skill_type, 'name') else str(weapon.skill_type)
+                values = [item_id, item.name, "Melee", weapon.slash_damage, weapon.bash_damage,
+                         weapon.stab_damage, skill, weapon.durability, item.mass, item.value]
+                self._add_row(ws, row, values, row % 2 == 0)
+                row += 1
+        
+        for item_id in range(0x10, 0x20):
+            item = item_types.get(item_id)
+            weapon = objects_parser.get_ranged_weapon(item_id)
+            if item and weapon:
+                values = [item_id, item.name, "Ranged", "-", "-", "-", "Missile",
+                         weapon.durability, item.mass, item.value]
+                self._add_row(ws, row, values, row % 2 == 0)
+                row += 1
+        self._auto_column_width(ws)
+    
+    def export_armor(self, item_types: Dict, objects_parser) -> None:
+        """Export armor."""
+        headers = ["ID", "Name", "Category", "Protection", "Durability", "Mass", "Value"]
+        ws = self._create_sheet("Armor", headers)
+        
+        row = 2
+        for item_id in range(0x20, 0x40):
+            item = item_types.get(item_id)
+            armor = objects_parser.get_armour(item_id)
+            if item and armor:
+                cat = armor.category.name if hasattr(armor.category, 'name') else str(armor.category)
+                values = [item_id, item.name, cat, armor.protection, armor.durability, item.mass, item.value]
+                self._add_row(ws, row, values, row % 2 == 0)
+                row += 1
+        self._auto_column_width(ws)
+    
+    def export_npcs(self, npcs: List, npc_names: Dict, strings_parser, level_parser=None) -> None:
+        """Export NPCs with correct name mapping, goal descriptions, and inventory."""
+        headers = [
+            "Level", "Tile X", "Tile Y", "Creature Type", "Creature ID",
+            "Named NPC", "Conv Slot", "HP",
+            "Attitude", "Goal", "Goal Description", "Inventory", "Home X", "Home Y"
+        ]
+        ws = self._create_sheet("NPCs", headers)
+        
+        obj_names = strings_parser.get_block(4) or []
+        block7 = strings_parser.get_block(7) or []
+        
+        # Filter to only NPCs that are actually placed (have valid tile coords)
+        placed_npcs = [n for n in npcs if n.tile_x > 0 or n.tile_y > 0]
+        sorted_npcs = sorted(placed_npcs, key=lambda n: (n.level, n.tile_x, n.tile_y))
+        
+        row = 2
+        for npc in sorted_npcs:
+            # Get creature type from object names
+            creature_type = ""
+            if npc.object_id < len(obj_names):
+                raw = obj_names[npc.object_id]
+                if raw:
+                    creature_type, _, _ = parse_item_name(raw)
+            
+            # Get named NPC from conversation slot (whoami + 16 indexes into block 7)
+            # IMPORTANT: Only use this for NPCs with conversation_slot > 0
+            named_npc = ""
+            if npc.conversation_slot > 0:
+                name_idx = npc.conversation_slot + 16
+                if name_idx < len(block7) and block7[name_idx]:
+                    named_npc = block7[name_idx]
+            
+            # Get goal description
+            goal_desc = NPC_GOALS.get(npc.goal, f"Unknown ({npc.goal})")
+            attitude_name = NPC_ATTITUDES.get(npc.attitude, str(npc.attitude))
+            
+            # Get NPC inventory if level_parser available
+            inventory_str = ""
+            if level_parser and hasattr(npc, 'special_link') and npc.special_link > 0:
+                level = level_parser.get_level(npc.level)
+                if level:
+                    spell_names = strings_parser.get_block(6) or []
+                    block5 = strings_parser.get_block(5) or []
+                    inv_items = []
+                    current = npc.special_link
+                    seen = set()
+                    while current > 0 and current not in seen and len(inv_items) < 20:
+                        seen.add(current)
+                        if current in level.objects:
+                            obj = level.objects[current]
+                            item_name, _, _ = parse_item_name(obj_names[obj.item_id] if obj.item_id < len(obj_names) else "")
+                            
+                            # Add metadata for special items
+                            if item_name:
+                                item_desc = item_name
+                                
+                                # Keys - show description from block5[100 + owner]
+                                if 0x100 <= obj.item_id <= 0x10E:
+                                    if obj.owner > 0:
+                                        desc_idx = 100 + obj.owner
+                                        if desc_idx < len(block5) and block5[desc_idx]:
+                                            key_desc = block5[desc_idx]
+                                            item_desc = f"key ({key_desc[:40]}...)" if len(key_desc) > 40 else f"key ({key_desc})"
+                                        else:
+                                            item_desc = f"key (lock #{obj.owner})"
+                                
+                                # Scrolls - readable text
+                                elif 0x138 <= obj.item_id <= 0x13F and obj.item_id != 0x13B:
+                                    link = obj.quantity_or_link
+                                    if obj.is_quantity and link >= 512:
+                                        item_desc = f"scroll (text #{link-512})"
+                                    else:
+                                        item_desc = "scroll"
+                                
+                                # Books
+                                elif 0x130 <= obj.item_id <= 0x137:
+                                    link = obj.quantity_or_link
+                                    if obj.is_quantity and link >= 512:
+                                        item_desc = f"book (text #{link-512})"
+                                    else:
+                                        item_desc = "book"
+                                
+                                # Potions
+                                elif obj.item_id == 0xBB:
+                                    item_desc = "red potion (mana)"
+                                elif obj.item_id == 0xBC:
+                                    item_desc = "green potion (heal)"
+                                
+                                # Wands - show spell from linked object
+                                elif 0x98 <= obj.item_id <= 0x9B:
+                                    if not obj.is_quantity:
+                                        link = obj.quantity_or_link
+                                        if link in level.objects:
+                                            spell_obj = level.objects[link]
+                                            if spell_obj.item_id == 0x120:
+                                                spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                                                spell = spell_names[spell_idx] if spell_idx < len(spell_names) else ""
+                                                if spell:
+                                                    item_desc = f"wand of {spell} ({obj.quality} charges)"
+                                                else:
+                                                    item_desc = f"wand ({obj.quality} charges)"
+                                            else:
+                                                item_desc = f"wand ({obj.quality} charges)"
+                                        else:
+                                            item_desc = f"wand ({obj.quality} charges)"
+                                    else:
+                                        item_desc = f"wand ({obj.quality} charges)"
+                                
+                                inv_items.append(item_desc)
+                            current = obj.next_index
+                        else:
+                            break
+                    inventory_str = ", ".join(inv_items) if inv_items else ""
+            
+            values = [
+                npc.level + 1, npc.tile_x, npc.tile_y, creature_type, f"0x{npc.object_id:02X}",
+                named_npc, npc.conversation_slot if npc.conversation_slot > 0 else "",
+                npc.hp,
+                attitude_name, npc.goal, goal_desc, inventory_str,
+                npc.home_x, npc.home_y
+            ]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def export_spells(self, spells: List, spell_runes: Dict) -> None:
+        """Export spells with descriptions and caster info."""
+        from ..constants import SPELL_DESCRIPTIONS
+        
+        headers = ["ID", "Name", "Circle", "Rune Combination", "Description", "Caster"]
+        ws = self._create_sheet("Spells", headers)
+        
+        row = 2
+        for spell in spells:
+            runes = spell_runes.get(spell.name, [])
+            rune_str = " ".join(runes) if runes else ""
+            
+            # Get description
+            description = SPELL_DESCRIPTIONS.get(spell.name, "")
+            
+            # Only show circle for player spells that have rune combinations
+            circle_str = spell.circle if rune_str else ""
+            
+            if spell.name in NPC_ONLY_SPELLS:
+                caster = "NPC Only"
+            elif spell.name in PLAYER_SPELLS or rune_str:
+                caster = "Player"
+            else:
+                caster = ""
+            
+            values = [spell.spell_id, spell.name, circle_str, rune_str, description, caster]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def export_runes(self, runes: Dict) -> None:
+        """Export runes."""
+        headers = ["ID", "Rune Name", "Meaning"]
+        ws = self._create_sheet("Runes", headers)
+        
+        row = 2
+        for rune_id in sorted(runes.keys()):
+            name = runes[rune_id]
+            meaning = RUNE_MEANINGS.get(name, "")
+            self._add_row(ws, row, [rune_id, name, meaning], row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def export_mantras(self) -> None:
+        """Export complete mantra list from game data with point increases."""
+        headers = ["Mantra", "Skill(s) Affected", "Effect/Notes", "Point Increase"]
+        ws = self._create_sheet("Mantras", headers)
+        
+        row = 2
+        for mantra, skills, notes, points in COMPLETE_MANTRAS:
+            self._add_row(ws, row, [mantra, skills, notes, points], row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def export_conversations_structured(self, conversations: Dict, strings_parser, npc_names: Dict) -> None:
+        """Export conversation structure with NPC dialogue and player response options."""
+        headers = ["NPC Name", "Conv Slot", "String #", "Type", "Text"]
+        ws = self._create_sheet("Conversations", headers)
+        
+        block7 = strings_parser.get_block(7) or []
+        
+        row = 2
+        for slot in sorted(conversations.keys()):
+            conv = conversations[slot]
+            
+            name_idx = slot + 16
+            npc_name = block7[name_idx] if name_idx < len(block7) else f"NPC #{slot}"
+            
+            dialogue_strings = strings_parser.get_block(conv.string_block) or []
+            
+            # Analyze bytecode to find which strings are NPC dialogue (SAY_OP)
+            # and which are player responses (pushed before babl_menu/CALLI 0)
+            npc_says: set = set()
+            player_responses: set = set()
+            
+            for i, instr in enumerate(conv.code):
+                # SAY_OP preceded by PUSHI = NPC dialogue
+                if instr.opcode == Opcode.SAY_OP:
+                    # Look back for the PUSHI with the string index
+                    for j in range(i-1, max(0, i-5), -1):
+                        prev = conv.code[j]
+                        if prev.opcode == Opcode.PUSHI and prev.operand is not None:
+                            npc_says.add(prev.operand)
+                            break
+                
+                # CALLI 0 (babl_menu) - strings pushed before it are player responses
+                elif instr.opcode == Opcode.CALLI and instr.operand == 0:
+                    # Look back for PUSHI instructions
+                    for j in range(i-1, max(0, i-40), -1):
+                        prev = conv.code[j]
+                        if prev.opcode == Opcode.PUSHI and prev.operand is not None:
+                            if prev.operand < len(dialogue_strings):
+                                player_responses.add(prev.operand)
+                        # Stop at certain opcodes that indicate end of menu setup
+                        if prev.opcode in (Opcode.SAY_OP, Opcode.CALLI, Opcode.ADDSP):
+                            break
+            
+            # Output strings with their types
+            for idx, text in enumerate(dialogue_strings):
+                text = text.strip()
+                if not text or text.startswith('@'):
+                    continue
+                
+                # Determine type based on bytecode analysis
+                if idx in npc_says and idx not in player_responses:
+                    line_type = "NPC"
+                elif idx in player_responses and idx not in npc_says:
+                    line_type = "Player"
+                elif idx in npc_says and idx in player_responses:
+                    line_type = "Both"  # Used in both contexts
+                else:
+                    line_type = "Unknown"
+                
+                values = [npc_name, slot, idx, line_type, text]
+                self._add_row(ws, row, values, row % 2 == 0)
+                row += 1
+            
+            # Add separator row between NPCs
+            if slot != max(conversations.keys()):
+                self._add_row(ws, row, ["", "", "", "", ""], False)
+                row += 1
+        
+        self._auto_column_width(ws)
+    
+    def export_conversations_full(self, conversations: Dict, strings_parser, npc_names: Dict) -> None:
+        """Export COMPLETE conversation blocks for each NPC (all text combined)."""
+        headers = ["NPC Name", "Conv Slot", "String Block", "Full Dialogue"]
+        ws = self._create_sheet("Full Dialogues", headers)
+        
+        block7 = strings_parser.get_block(7) or []
+        
+        row = 2
+        for slot in sorted(conversations.keys()):
+            conv = conversations[slot]
+            
+            # Get NPC name
+            name_idx = slot + 16
+            npc_name = block7[name_idx] if name_idx < len(block7) else f"NPC #{slot}"
+            
+            # Get ALL dialogue strings
+            dialogue_strings = strings_parser.get_block(conv.string_block) or []
+            
+            # Build complete dialogue, filtering out code markers
+            lines = []
+            for s in dialogue_strings:
+                s = s.strip()
+                if s and not s.startswith('@'):
+                    lines.append(s)
+            
+            full_dialogue = "\n".join(lines)
+            
+            values = [npc_name, slot, f"0x{conv.string_block:04X}", full_dialogue]
+            self._add_row(ws, row, values, row % 2 == 0)
+            
+            # Set row height for long text
+            ws.row_dimensions[row].height = min(400, max(15, len(lines) * 12))
+            
+            row += 1
+        
+        # Wrap text in dialogue column
+        for cell in ws['D']:
+            cell.alignment = Alignment(wrap_text=True, vertical='top')
+        
+        self._auto_column_width(ws)
+    
+    def export_dialogue_responses(self, conversations: Dict, strings_parser, npc_names: Dict) -> None:
+        """Legacy method - now redirects to structured export."""
+        # This is now handled by export_conversations_structured
+        pass
+    
+    def export_placed_objects(self, placed_items: List, item_types: Dict, 
+                             strings_parser, level_parser=None) -> None:
+        """Export placed objects with actual locations, descriptions, and effects."""
+        headers = [
+            "Level", "Tile X", "Tile Y", "Item Name", "Item ID",
+            "Category", "Quantity", "Description", "Enchantment/Effect"
+        ]
+        ws = self._create_sheet("Placed Objects", headers)
+        
+        obj_names = strings_parser.get_block(4) or []
+        block3 = strings_parser.get_block(3) or []  # Book/scroll text
+        block5 = strings_parser.get_block(5) or []  # Quality state descriptions
+        spell_names = strings_parser.get_block(6) or []
+        
+        # Filter to objects that have actual tile positions
+        placed_with_coords = [i for i in placed_items if i.tile_x > 0 or i.tile_y > 0]
+        sorted_items = sorted(placed_with_coords, key=lambda x: (x.level, x.tile_x, x.tile_y))
+        
+        row = 2
+        for item in sorted_items:
+            # Skip NPCs, doors, triggers, traps
+            if 0x40 <= item.object_id <= 0x7F:  # NPCs
+                continue
+            if 0x140 <= item.object_id <= 0x17F:  # Doors
+                continue
+            if 0x180 <= item.object_id <= 0x1BF:  # Traps/triggers
+                continue
+            
+            # Get name
+            name, _, _ = parse_item_name(obj_names[item.object_id] if item.object_id < len(obj_names) else "")
+            
+            # Get proper category name
+            cat_raw = item.object_class if isinstance(item.object_class, str) else ""
+            category = CATEGORY_DISPLAY_NAMES.get(cat_raw, cat_raw.title() if cat_raw else "Unknown")
+            
+            # Get quantity for stackable items
+            quantity = ""
+            if item.object_id in STACKABLE_ITEMS and item.is_quantity:
+                quantity = item.quantity
+            
+            # Get description based on item type
+            description = self._get_item_description(item, block3, block5, spell_names, level_parser)
+            
+            # Get effect/enchantment
+            effect = self._get_item_effect(item, strings_parser, level_parser)
+            
+            values = [
+                item.level + 1, item.tile_x, item.tile_y, name, f"0x{item.object_id:03X}",
+                category, quantity, description, effect
+            ]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def _get_item_description(self, item, block3, block5, spell_names, level_parser=None) -> str:
+        """Get item description based on type and quality/owner fields."""
+        object_id = item.object_id
+        
+        # Get the link value
+        link_value = item.quantity if item.is_quantity else item.special_link
+        
+        # Keys (0x100-0x10E)
+        if 0x100 <= object_id <= 0x10E:
+            if item.owner > 0:
+                desc_idx = 100 + item.owner
+                if desc_idx < len(block5) and block5[desc_idx]:
+                    return block5[desc_idx]
+            if object_id == 0x101:
+                return "A lockpick"
+            return ""
+        
+        # Books (0x130-0x137)
+        if 0x130 <= object_id <= 0x137:
+            if item.is_quantity and link_value >= 512:
+                text_idx = link_value - 512
+                if text_idx < len(block3) and block3[text_idx]:
+                    return block3[text_idx].strip()
+            return ""
+        
+        # Scrolls (0x138-0x13F, except 0x13B map)
+        if 0x138 <= object_id <= 0x13F and object_id != 0x13B:
+            if item.is_quantity and link_value >= 512:
+                text_idx = link_value - 512
+                if text_idx < len(block3) and block3[text_idx]:
+                    return block3[text_idx].strip()
+            return ""
+        
+        # Wands (0x98-0x9B)
+        if 0x98 <= object_id <= 0x9B:
+            if level_parser and not item.is_quantity:
+                level = level_parser.get_level(item.level)
+                if level and item.special_link in level.objects:
+                    spell_obj = level.objects[item.special_link]
+                    if spell_obj.item_id == 0x120:
+                        spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                        if spell_idx < len(spell_names) and spell_names[spell_idx]:
+                            return f"Wand of {spell_names[spell_idx]}"
+            return f"Wand (unknown spell, {item.quality} charges)"
+        
+        # Map (0x13B)
+        if object_id == 0x13B:
+            return "Shows explored areas"
+        
+        # Potions (0xBB = red, 0xBC = green)
+        if object_id in (0xBB, 0xBC):
+            if item.is_quantity:
+                link = item.quantity
+                if link >= 512:
+                    ench_idx = link - 512
+                    spell = ""
+                    if ench_idx + 256 < len(spell_names) and spell_names[ench_idx + 256]:
+                        spell = spell_names[ench_idx + 256]
+                    if not spell and ench_idx < len(spell_names) and spell_names[ench_idx]:
+                        spell = spell_names[ench_idx]
+                    if spell:
+                        return f"Potion of {spell}"
+                    else:
+                        return f"Potion (unknown effect #{ench_idx})"
+            return ""
+        
+        # Coins
+        if object_id == 0xA0:
+            if item.is_quantity:
+                return f"{item.quantity} gold pieces"
+            return "Gold coin"
+        
+        # Arrows/bolts
+        if object_id in (0x10, 0x11, 0x12):
+            if item.is_quantity:
+                return f"Stack of {item.quantity}"
+            return ""
+        
+        # Runes
+        if 0xE0 <= object_id <= 0xFF:
+            return ""
+        
+        # Rings
+        if object_id in (0x36, 0x38, 0x39, 0x3A):
+            if item.is_enchanted and item.is_quantity:
+                link = item.quantity
+                if link >= 512:
+                    ench_idx = link - 512
+                    spell = spell_names[ench_idx] if ench_idx < len(spell_names) else ""
+                    if spell:
+                        return f"Ring of {spell}"
+            return ""
+        
+        # Scenery
+        if 0xC0 <= object_id <= 0xDF:
+            return ""
+        if object_id in (0x125,):
+            return ""
+        
+        return self._get_quality_description(object_id, item.quality, block5)
+    
+    def _get_quality_description(self, object_id: int, quality: int, block5: list) -> str:
+        """Get the proper quality description based on item type."""
+        offset = min(5, quality // 10)
+        skip_descriptions = {'massive', 'sturdy', 'new', 'smooth'}
+        
+        base = None
+        
+        # Melee weapons
+        if 0x00 <= object_id <= 0x0F:
+            base = 6
+        # Ranged weapons
+        elif 0x10 <= object_id <= 0x1F:
+            if object_id in (0x10, 0x11, 0x12):
+                return ""
+            base = 6
+        # Armor
+        elif 0x20 <= object_id <= 0x3F:
+            if 0x3C <= object_id <= 0x3F:
+                base = 6
+            elif object_id in (0x24, 0x25, 0x26, 0x27):
+                base = 78
+            else:
+                base = 6
+        # Light sources
+        elif 0x90 <= object_id <= 0x97:
+            base = 60
+        # Wands
+        elif 0x98 <= object_id <= 0x9B:
+            return ""
+        # Treasure
+        elif 0xA0 <= object_id <= 0xAF:
+            if object_id == 0xA0:
+                return ""
+            elif object_id in (0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7):
+                base = 42
+            else:
+                base = 36
+        # Food and drinks
+        elif 0xB0 <= object_id <= 0xBF:
+            if 0xB0 <= object_id <= 0xB7:
+                base = 18
+            else:
+                base = 24
+        # Containers
+        elif 0x80 <= object_id <= 0x8F:
+            if quality >= 40:
+                return ""
+            base = 72
+        # Books and scrolls
+        elif 0x130 <= object_id <= 0x13F:
+            return ""
+        # Quest items and misc
+        elif 0x110 <= object_id <= 0x12F:
+            return ""
+        # Keys
+        elif 0x100 <= object_id <= 0x10F:
+            return ""
+        
+        if base is None:
+            return ""
+        
+        desc_idx = base + offset
+        if desc_idx < len(block5) and block5[desc_idx]:
+            desc = block5[desc_idx]
+            if desc.lower() in skip_descriptions:
+                return ""
+            return desc
+        
+        return ""
+    
+    def _get_item_effect(self, item, strings_parser, level_parser=None) -> str:
+        """Get enchantment/effect description for an item."""
+        spell_names = {}
+        if strings_parser:
+            block6 = strings_parser.get_block(6) or []
+            for i, name in enumerate(block6):
+                if name and name.strip():
+                    spell_names[i] = name.strip()
+        
+        object_id = item.object_id
+        link_value = item.quantity if item.is_quantity else item.special_link
+        
+        # Wands
+        if 0x98 <= object_id <= 0x9B:
+            if level_parser and not item.is_quantity:
+                level = level_parser.get_level(item.level)
+                if level and item.special_link in level.objects:
+                    spell_obj = level.objects[item.special_link]
+                    if spell_obj.item_id == 0x120:
+                        spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                        spell = spell_names.get(spell_idx, "")
+                        if spell:
+                            return f"{spell} ({item.quality} charges)"
+            return f"Unknown spell ({item.quality} charges)" if item.quality > 0 else "Empty"
+        
+        # Keys
+        if 0x100 <= object_id <= 0x10E:
+            if item.owner > 0:
+                return f"Opens lock #{item.owner}"
+            return ""
+        
+        # Books/Scrolls
+        if 0x130 <= object_id <= 0x13F and object_id != 0x13B:
+            if item.is_quantity and link_value >= 512:
+                return f"Text #{link_value - 512}"
+            return ""
+        
+        # Potions
+        if object_id in (0xBB, 0xBC):
+            if item.is_quantity and link_value >= 512:
+                raw_idx = link_value - 512
+                spell_256 = spell_names.get(raw_idx + 256, "")
+                if spell_256:
+                    return spell_256
+                spell_raw = spell_names.get(raw_idx, "")
+                if spell_raw:
+                    return spell_raw
+                return f"Effect #{raw_idx}"
+            if object_id == 0xBB:
+                return "Restores Mana"
+            else:
+                return "Heals Wounds"
+        
+        if not item.is_enchanted:
+            return ""
+        
+        if item.is_quantity:
+            link = item.quantity
+        else:
+            link = item.special_link
+        
+        if link >= 512:
+            ench_property = link - 512
+        else:
+            return ""
+        
+        # Weapons
+        if object_id < 0x20:
+            if 192 <= ench_property <= 199:
+                spell_idx = 448 + (ench_property - 192)
+                return spell_names.get(spell_idx, f"Accuracy +{ench_property - 191}")
+            elif 200 <= ench_property <= 207:
+                spell_idx = 456 + (ench_property - 200)
+                return spell_names.get(spell_idx, f"Damage +{ench_property - 199}")
+            elif ench_property < 64:
+                spell_idx = 256 + ench_property
+                return spell_names.get(spell_idx, "")
+        
+        # Rings
+        elif object_id in (0x36, 0x38, 0x39, 0x3A):
+            spell = spell_names.get(ench_property, "")
+            if spell:
+                return spell
+            return f"Unknown enchantment ({ench_property})"
+        
+        # Armor
+        elif 0x20 <= object_id < 0x40:
+            if 192 <= ench_property <= 199:
+                spell_idx = 464 + (ench_property - 192)
+                return spell_names.get(spell_idx, f"Protection +{ench_property - 191}")
+            elif 200 <= ench_property <= 207:
+                spell_idx = 472 + (ench_property - 200)
+                return spell_names.get(spell_idx, f"Toughness +{ench_property - 199}")
+            elif ench_property < 64:
+                spell_idx = 256 + ench_property
+                return spell_names.get(spell_idx, "")
+        
+        return ""
+    
+    def export_unused_items(self, item_types: Dict, placed_items: List, strings_parser) -> None:
+        """Export items never placed in game."""
+        headers = ["ID", "ID (Hex)", "Name", "Category", "Notes"]
+        ws = self._create_sheet("Unused Items", headers)
+        
+        obj_names = strings_parser.get_block(4) or []
+        placed_ids: Set[int] = {item.object_id for item in placed_items}
+        
+        row = 2
+        for item_id in sorted(item_types.keys()):
+            if item_id not in placed_ids:
+                item = item_types[item_id]
+                
+                name, _, _ = parse_item_name(obj_names[item_id] if item_id < len(obj_names) else "")
+                if not name:
+                    name = "(unnamed)"
+                
+                notes = ""
+                if 0x1C0 <= item_id <= 0x1FF:
+                    notes = "System object"
+                elif not name or name == "(unnamed)":
+                    notes = "Unused/padding"
+                else:
+                    notes = "Defined but never placed"
+                
+                values = [item_id, f"0x{item_id:03X}", name, item.category, notes]
+                self._add_row(ws, row, values, row % 2 == 0)
+                row += 1
+        self._auto_column_width(ws)
+    
+    def export_secrets(self, secrets: List) -> None:
+        """Export secrets."""
+        headers = ["Level", "Type", "Tile X", "Tile Y", "Object ID", "Description"]
+        ws = self._create_sheet("Secrets & Traps", headers)
+        
+        sorted_secrets = sorted(secrets, key=lambda s: (s.level, s.secret_type, s.tile_x, s.tile_y))
+        
+        row = 2
+        for secret in sorted_secrets:
+            values = [
+                secret.level + 1, secret.secret_type, secret.tile_x, secret.tile_y,
+                f"0x{secret.object_id:03X}" if secret.object_id else "",
+                secret.description
+            ]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def export_containers(self, item_types: Dict, objects_parser, common_parser=None) -> None:
+        """Export carryable containers only."""
+        headers = ["ID", "Name", "Weight", "Capacity (stones)", "Accepts", "Slots"]
+        ws = self._create_sheet("Containers", headers)
+        
+        row = 2
+        for item_id in sorted(CARRYABLE_CONTAINERS.keys()):
+            item = item_types.get(item_id)
+            container = objects_parser.get_container(item_id)
+            if item and container:
+                weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 and item.mass < 63 else ""
+                
+                values = [
+                    item_id, item.name, weight_str, container.capacity_stones,
+                    container.accepted_type_name,
+                    container.num_slots if container.num_slots != 255 else "Unlimited"
+                ]
+                self._add_row(ws, row, values, row % 2 == 0)
+                row += 1
+        self._auto_column_width(ws)
+    
+    def export_light_sources(self, item_types: Dict, objects_parser, strings_parser=None) -> None:
+        """Export light sources (lit items only) and light-granting spells."""
+        headers = ["Type", "Name", "Light Level", "Duration", "Notes"]
+        ws = self._create_sheet("Light Sources", headers)
+        
+        row = 2
+        
+        # Light items: only lit versions
+        lit_sources = [
+            ("Item", "Lit Lantern", 5, "Long", "Brightest portable light, reusable"),
+            ("Item", "Lit Torch", 4, "Medium", "Good light, burns out over time"),
+            ("Item", "Lit Candle", 2, "Short", "Dim light, short duration"),
+            ("Item", "Taper of Sacrifice", 3, "Eternal", "Special item from Shrine of Spirituality"),
+        ]
+        
+        for type_str, name, brightness, duration, notes in lit_sources:
+            values = [type_str, name, brightness, duration, notes]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        
+        # Light spells from game
+        light_spells = [
+            ("Spell (Circle 1)", "Light", 3, "Medium", "IN LOR - Basic illumination"),
+            ("Spell (Circle 1)", "Night Vision", 4, "Long", "QUAS LOR - See in darkness"),
+            ("Spell (Circle 3)", "Daylight", 5, "Long", "VAS IN LOR - Bright area illumination"),
+            ("Spell (Circle 5)", "Sunlight", 6, "Very Long", "VAS LOR - Maximum brightness"),
+        ]
+        
+        for type_str, spell_name, brightness, duration, notes in light_spells:
+            values = [type_str, spell_name, brightness, duration, notes]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        
+        self._auto_column_width(ws)
+    
+    def export_npc_names(self, npc_names: Dict, strings_parser=None) -> None:
+        """Export NPC names (filtering out non-NPC strings from block 7)."""
+        headers = ["Conv Slot", "NPC Name"]
+        ws = self._create_sheet("NPC Names", headers)
+        
+        row = 2
+        for slot in sorted(npc_names.keys()):
+            name = npc_names[slot]
+            # Skip entries that are not actual NPC names
+            if not name or not name.strip():
+                continue
+            if "deal" in name.lower():
+                continue
+            if name.startswith("..."):
+                continue
+            if "cannot talk" in name.lower() or "no response" in name.lower():
+                continue
+            if "that I am getting" in name:
+                continue
+            
+            self._add_row(ws, row, [slot, name.strip()], row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
+    def save(self, filename: str = "ultima_underworld_data.xlsx") -> Path:
+        """Save the workbook."""
+        filepath = self.output_path / filename
+        self.wb.save(filepath)
+        return filepath
