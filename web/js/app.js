@@ -74,6 +74,7 @@ const elements = {
     categoryFilters: null,
     searchInput: null,
     tooltip: null,
+    detailsSidebar: null,
     objectDetails: null,
     locationObjects: null,
     loadingOverlay: null,
@@ -135,8 +136,7 @@ function cacheElements() {
     elements.categoryFilters = document.getElementById('category-filters');
     elements.searchInput = document.getElementById('search-input');
     elements.tooltip = document.getElementById('tooltip');
-    elements.objectDetails = document.getElementById('object-details');
-    elements.locationObjects = document.getElementById('location-objects');
+    elements.detailsSidebar = document.getElementById('details-sidebar');
     elements.loadingOverlay = document.getElementById('loading-overlay');
     elements.zoomLevel = document.getElementById('zoom-level');
     elements.statObjects = document.getElementById('stat-objects');
@@ -202,6 +202,7 @@ function handleEnchantedFilter(e) {
     state.filters.enchantedOnly = e.target.checked;
     renderMarkers();
     updateStats();
+    refreshVisibleObjectsIfNoSelection();
 }
 
 function handleWheel(e) {
@@ -276,6 +277,7 @@ function handleCoordinateLeave() {
 function handleSearch(e) {
     state.filters.search = e.target.value.toLowerCase();
     renderMarkers();
+    refreshVisibleObjectsIfNoSelection();
 }
 
 function handleKeyboard(e) {
@@ -378,6 +380,7 @@ function createCategoryFilter(cat) {
         }
         renderMarkers();
         updateStats();
+        refreshVisibleObjectsIfNoSelection();
     });
     
     const colorDot = document.createElement('span');
@@ -510,6 +513,7 @@ function selectAllCategories() {
     
     renderMarkers();
     updateStats();
+    refreshVisibleObjectsIfNoSelection();
 }
 
 function deselectAllCategories() {
@@ -523,6 +527,7 @@ function deselectAllCategories() {
     
     renderMarkers();
     updateStats();
+    refreshVisibleObjectsIfNoSelection();
 }
 
 
@@ -902,6 +907,9 @@ function selectStackedItem(item, isNpc, tileX, tileY) {
     });
     state.selectedMarker = null;
     
+    // Ensure selection pane layout is rendered
+    renderSelectionPane();
+    
     // Update details panel
     renderObjectDetails(item, isNpc);
     
@@ -1266,6 +1274,9 @@ function selectSecret(secret) {
     });
     state.selectedMarker = null;
     
+    // Ensure selection pane layout is rendered
+    renderSelectionPane();
+    
     // Update details panel
     renderSecretDetails(secret);
     
@@ -1510,6 +1521,9 @@ function selectItem(item, isNpc, markerElement) {
     markerElement.setAttribute('r', origR * 1.8);
     state.selectedMarker = markerElement;
     
+    // Ensure selection pane layout is rendered
+    renderSelectionPane();
+    
     // Update details panel
     renderObjectDetails(item, isNpc);
     
@@ -1524,8 +1538,303 @@ function clearSelection() {
         m.setAttribute('r', origR);
     });
     state.selectedMarker = null;
-    elements.objectDetails.innerHTML = '<p class="no-selection">Hover over a marker to see details</p>';
-    elements.locationObjects.innerHTML = '<p class="no-selection">Click a marker to see all objects at that tile</p>';
+    
+    // Show all visible objects list view
+    renderVisibleObjectsPane();
+}
+
+/**
+ * Refresh the visible objects list only if no object is currently selected
+ * Called after filter changes to update the list
+ */
+function refreshVisibleObjectsIfNoSelection() {
+    if (state.selectedMarker === null) {
+        renderVisibleObjectsPane();
+    }
+}
+
+/**
+ * Render the selection view with two sections: Selected Object and Objects at Location
+ */
+function renderSelectionPane() {
+    elements.detailsSidebar.innerHTML = `
+        <div class="sidebar-section">
+            <h3 class="section-title">Selected Object</h3>
+            <div class="object-details" id="object-details">
+                <p class="no-selection">Loading...</p>
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <h3 class="section-title">Objects at Location</h3>
+            <div class="location-objects" id="location-objects">
+                <p class="no-selection">Click a marker to see all objects at that tile</p>
+            </div>
+        </div>
+    `;
+    // Update element references
+    elements.objectDetails = document.getElementById('object-details');
+    elements.locationObjects = document.getElementById('location-objects');
+}
+
+/**
+ * Render the visible objects list as the entire right pane
+ * This is shown when no specific object is selected
+ */
+function renderVisibleObjectsPane() {
+    const level = state.data?.levels[state.currentLevel];
+    if (!level) {
+        elements.detailsSidebar.innerHTML = `
+            <div class="sidebar-section" style="flex: 1;">
+                <h3 class="section-title">Visible Objects</h3>
+                <p class="no-selection">No level data</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Collect all visible items based on current filters
+    const visibleItems = [];
+    
+    // Collect NPCs
+    level.npcs.forEach(npc => {
+        const npcCategoryMatch = state.filters.categories.has('npcs');
+        const hasMatchingInventory = hasContentMatchingCategory(npc.inventory);
+        
+        if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc)) {
+            visibleItems.push({ item: npc, isNpc: true, isSecret: false });
+        }
+    });
+    
+    // Collect objects
+    level.objects.forEach(obj => {
+        const objCategoryMatch = state.filters.categories.has(obj.category);
+        const hasMatchingContents = hasContentMatchingCategory(obj.contents);
+        
+        if ((objCategoryMatch || hasMatchingContents) && shouldShowItem(obj)) {
+            visibleItems.push({ item: obj, isNpc: false, isSecret: false });
+        }
+    });
+    
+    // Collect secrets (not shown when enchanted filter is on)
+    if (level.secrets && !state.filters.enchantedOnly) {
+        level.secrets.forEach(secret => {
+            if (!state.filters.categories.has(secret.category)) return;
+            
+            // Apply search filter
+            if (state.filters.search) {
+                const desc = (secret.description || '').toLowerCase();
+                const type = (secret.type || '').toLowerCase();
+                if (!desc.includes(state.filters.search) && !type.includes(state.filters.search)) {
+                    return;
+                }
+            }
+            
+            visibleItems.push({ item: secret, isNpc: false, isSecret: true });
+        });
+    }
+    
+    // Sort by category, then by name
+    visibleItems.sort((a, b) => {
+        // NPCs first
+        if (a.isNpc !== b.isNpc) return a.isNpc ? -1 : 1;
+        // Secrets last
+        if (a.isSecret !== b.isSecret) return a.isSecret ? 1 : -1;
+        // Then by category
+        const catA = a.isNpc ? 'npcs' : (a.isSecret ? a.item.category : a.item.category);
+        const catB = b.isNpc ? 'npcs' : (b.isSecret ? b.item.category : b.item.category);
+        if (catA !== catB) return catA.localeCompare(catB);
+        // Then by name
+        const nameA = a.item.name || '';
+        const nameB = b.item.name || '';
+        return nameA.localeCompare(nameB);
+    });
+    
+    // Build the sidebar content
+    elements.detailsSidebar.innerHTML = '';
+    
+    // Single section that fills the pane
+    const section = document.createElement('div');
+    section.className = 'sidebar-section visible-objects-pane';
+    section.style.cssText = 'flex: 1; display: flex; flex-direction: column; overflow: hidden;';
+    
+    // Header
+    const header = document.createElement('div');
+    header.className = 'visible-objects-header';
+    header.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    `;
+    header.innerHTML = `
+        <h3 class="section-title" style="margin-bottom: 0;">Visible Objects</h3>
+        <span style="color: var(--text-accent); font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 12px;">${visibleItems.length}</span>
+    `;
+    section.appendChild(header);
+    
+    if (visibleItems.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'no-selection';
+        empty.textContent = 'No visible objects match filters';
+        section.appendChild(empty);
+        elements.detailsSidebar.appendChild(section);
+        return;
+    }
+    
+    // Scrollable list container
+    const listContainer = document.createElement('div');
+    listContainer.className = 'visible-objects-list';
+    listContainer.style.cssText = `
+        flex: 1;
+        overflow-y: auto;
+        margin: 0 -16px;
+        padding: 0 16px;
+    `;
+    
+    // Group items by category for better organization
+    const groupedItems = new Map();
+    visibleItems.forEach(({ item, isNpc, isSecret }) => {
+        let category;
+        if (isNpc) category = 'npcs';
+        else if (isSecret) category = item.category;
+        else category = item.category;
+        
+        if (!groupedItems.has(category)) {
+            groupedItems.set(category, []);
+        }
+        groupedItems.get(category).push({ item, isNpc, isSecret });
+    });
+    
+    // Render each category group
+    groupedItems.forEach((items, categoryId) => {
+        // Category header
+        const categoryHeader = document.createElement('div');
+        categoryHeader.className = 'category-group-header';
+        const catColor = categoryId === 'npcs' ? '#ff6b6b' : 
+                         categoryId === 'illusory_walls' ? '#ff00ff' :
+                         categoryId === 'secret_doors' ? '#ffff00' :
+                         getCategoryColor(categoryId);
+        const catName = categoryId === 'npcs' ? 'NPCs' : formatCategory(categoryId);
+        categoryHeader.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0 4px 0;
+            margin-top: 4px;
+            color: ${catColor};
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 1;
+        `;
+        categoryHeader.innerHTML = `
+            <span style="width: 8px; height: 8px; background: ${catColor}; border-radius: 50%; flex-shrink: 0;"></span>
+            <span style="flex: 1;">${catName}</span>
+            <span style="color: var(--text-muted); font-weight: normal;">${items.length}</span>
+        `;
+        listContainer.appendChild(categoryHeader);
+        
+        // Render items in this category
+        items.forEach(({ item, isNpc, isSecret }) => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'visible-object-item';
+            itemEl.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 10px;
+                margin: 2px 0;
+                background: var(--bg-tertiary);
+                border-left: 3px solid ${catColor};
+                border-radius: 0 4px 4px 0;
+                cursor: pointer;
+                transition: background 0.15s ease, transform 0.1s ease;
+                font-size: 0.85rem;
+            `;
+            
+            // Build item content
+            let icon, displayName, subtitle, enchantLine = '';
+            if (isSecret) {
+                icon = item.type === 'illusory_wall' ? '🔮' : '🚪';
+                displayName = item.type === 'illusory_wall' ? 'Illusory Wall' : 'Secret Door';
+                subtitle = `(${item.tile_x}, ${item.tile_y})`;
+            } else if (isNpc) {
+                icon = '👤';
+                displayName = item.name || 'Unknown NPC';
+                subtitle = `HP ${item.hp} • (${item.tile_x}, ${item.tile_y})`;
+            } else {
+                const itemEnchanted = isEnchanted(item);
+                icon = itemEnchanted ? '✨' : '•';
+                displayName = item.name || 'Unknown';
+                subtitle = `(${item.tile_x}, ${item.tile_y})`;
+                // Show enchantment effect for enchanted items
+                if (itemEnchanted && item.effect && isMagicalEffect(item.effect)) {
+                    enchantLine = `<div style="color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;">⚡ ${escapeHtml(item.effect)}</div>`;
+                }
+            }
+            
+            // Show container/inventory indicators
+            const hasContents = !isSecret && !isNpc && item.contents && item.contents.length > 0;
+            const hasInventory = isNpc && item.inventory && item.inventory.length > 0;
+            const extraIcon = hasContents ? ' 📦' : (hasInventory ? ' 🎒' : '');
+            
+            itemEl.innerHTML = `
+                <span style="flex-shrink: 0;">${icon}</span>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${escapeHtml(displayName)}${extraIcon}
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">${subtitle}</div>
+                    ${enchantLine}
+                </div>
+            `;
+            
+            // Hover effects
+            itemEl.addEventListener('mouseenter', () => {
+                itemEl.style.background = 'var(--bg-elevated)';
+                itemEl.style.transform = 'translateX(2px)';
+            });
+            itemEl.addEventListener('mouseleave', () => {
+                itemEl.style.background = 'var(--bg-tertiary)';
+                itemEl.style.transform = 'translateX(0)';
+            });
+            
+            // Click to select
+            itemEl.addEventListener('click', () => {
+                if (isSecret) {
+                    selectSecret(item);
+                } else {
+                    selectStackedItem(item, isNpc, item.tile_x, item.tile_y);
+                }
+            });
+            
+            listContainer.appendChild(itemEl);
+        });
+    });
+    
+    section.appendChild(listContainer);
+    
+    // Hint at bottom
+    const hint = document.createElement('div');
+    hint.style.cssText = `
+        flex-shrink: 0;
+        padding: 10px 0 0 0;
+        margin-top: 8px;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        text-align: center;
+    `;
+    hint.textContent = 'Click an item to view details';
+    section.appendChild(hint);
+    
+    elements.detailsSidebar.appendChild(section);
 }
 
 function renderObjectDetails(item, isNpc) {
@@ -2214,6 +2523,11 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
         state.selectedMarker = markerElement;
     } else {
         state.selectedMarker = null;
+    }
+    
+    // Ensure selection pane layout exists (it should, but re-render to be safe)
+    if (!elements.objectDetails) {
+        renderSelectionPane();
     }
     
     // Update details panel

@@ -180,6 +180,21 @@ body {
 .details-sidebar {
     border-right: none;
     border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Visible objects pane (when no selection) */
+.visible-objects-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.visible-objects-pane .visible-objects-list {
+    flex: 1;
+    overflow-y: auto;
 }
 
 /* Filters sidebar: scrollable content with fixed stats at bottom */

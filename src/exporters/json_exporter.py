@@ -389,10 +389,23 @@ class JsonExporter:
                     return f"Opens lock #{item.owner}"
                 return ""
             
-            # Books/Scrolls - text index reference
+            # Books/Scrolls - text index reference or spell name for spell scrolls
             if 0x130 <= object_id <= 0x13F and object_id != 0x13B:
                 if is_quantity and link_value >= 512:
-                    return f"Text #{link_value - 512}"
+                    text_idx = link_value - 512
+                    # For enchanted scrolls (spell scrolls), show the spell name
+                    if is_enchanted:
+                        # Try spell index + 256 first (common offset)
+                        spell_256 = spell_names.get(text_idx + 256, "")
+                        if spell_256:
+                            return f"Spell: {format_spell(spell_256)}"
+                        # Try raw index
+                        spell_raw = spell_names.get(text_idx, "")
+                        if spell_raw:
+                            return f"Spell: {format_spell(spell_raw)}"
+                        return f"Spell #{text_idx}"
+                    # Regular readable scrolls/books
+                    return f"Text #{text_idx}"
                 return ""
             
             # Potions - show spell effect
