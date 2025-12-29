@@ -824,9 +824,7 @@ body {
 
 /* Description & Effect sections */
 .detail-description {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px dashed var(--border-color);
+    margin-top: 8px;
 }
 
 .detail-effect {

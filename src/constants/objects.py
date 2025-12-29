@@ -100,8 +100,9 @@ CARRYABLE_CATEGORIES: Set[str] = {
     "map",
 }
 
-# Carryable container IDs (excluding open versions and non-carryable)
+# Carryable container IDs (portable bags/packs the player can pick up)
 # Odd IDs (0x81, 0x83, etc.) are "open" versions - skip them
+# Note: urn (0x8C) is NOT carryable despite being in container range
 CARRYABLE_CONTAINERS: Dict[int, str] = {
     0x80: "sack",
     0x82: "pack",
@@ -114,13 +115,43 @@ CARRYABLE_CONTAINERS: Dict[int, str] = {
     0x8F: "rune bag",
 }
 
+# Static containers (non-carryable storage that can hold items)
+# Includes urn from container range and furniture items that store things
+STATIC_CONTAINERS: Dict[int, str] = {
+    0x8C: "urn",        # In container range but not carryable
+    0x158: "table",     # Tables can sometimes hold items
+    0x15B: "barrel",
+    0x15D: "chest",
+    0x15E: "nightstand",
+}
+
+# All container-like item IDs (both carryable and static)
+def is_container(item_id: int) -> bool:
+    """Check if an item ID is any type of container (can hold other items)."""
+    # Carryable containers (0x80-0x8F except urn 0x8C)
+    if 0x80 <= item_id <= 0x8F and item_id != 0x8C:
+        return True
+    # Static containers (urn, barrels, chests, etc.)
+    if item_id in STATIC_CONTAINERS:
+        return True
+    return False
+
+def is_static_container(item_id: int) -> bool:
+    """Check if an item ID is a static (non-carryable) container."""
+    return item_id in STATIC_CONTAINERS
+
+def is_carryable_container(item_id: int) -> bool:
+    """Check if an item ID is a carryable container."""
+    return item_id in CARRYABLE_CONTAINERS
+
 # Category display names for UI
 CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
     "melee_weapon": "Melee Weapon",
     "ranged_weapon": "Ranged Weapon",
     "armor": "Armor",
     "npc": "NPC",
-    "container": "Container",
+    "container": "Containers",      # Portable bags/packs
+    "storage": "Storage",           # Static containers (barrels, chests, urns)
     "light_source": "Light Source",
     "wand": "Wand",
     "broken_wand": "Broken Wand",
@@ -149,7 +180,7 @@ CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
     "open_door": "Open Door",
     "open_portcullis": "Open Portcullis",
     "secret_door": "Secret Door",
-    "furniture": "Furniture",
+    "furniture": "Furniture",       # Non-container furniture
     "decal": "Decal",
     "special_tmap": "Texture Map Object",
     "switch": "Switch",
@@ -193,6 +224,14 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
         A more specific category string
     """
     base_category = get_category(item_id)
+    
+    # Static containers (urn, barrel, chest, etc.) - categorize as "storage"
+    if item_id in STATIC_CONTAINERS:
+        return 'storage'
+    
+    # Carryable containers stay as "container"
+    if item_id in CARRYABLE_CONTAINERS:
+        return 'container'
     
     # Books and scrolls: distinguish readable from spell scrolls
     if base_category in ('book', 'scroll'):

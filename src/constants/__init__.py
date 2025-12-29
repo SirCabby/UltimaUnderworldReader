@@ -33,6 +33,7 @@ from .objects import (
     STACKABLE_ITEMS,
     CARRYABLE_CATEGORIES,
     CARRYABLE_CONTAINERS,
+    STATIC_CONTAINERS,
     CATEGORY_DISPLAY_NAMES,
     ITEM_IDS,
     POTION_EFFECTS,
@@ -43,6 +44,9 @@ from .objects import (
     is_locked_door,
     is_secret_door,
     is_special_tmap,
+    is_container,
+    is_static_container,
+    is_carryable_container,
     get_tmap_info,
 )
 from .mantras import COMPLETE_MANTRAS

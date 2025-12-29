@@ -485,8 +485,9 @@ class JsonExporter:
             'ranged_weapon': 'weapons',
             # Armor
             'armor': 'armor',
-            # Containers
+            # Containers - portable (bags, packs) vs static (barrels, chests, urns)
             'container': 'containers',
+            'storage': 'storage',
             # Keys
             'key': 'keys',
             # Consumables - now split
@@ -567,6 +568,7 @@ class JsonExporter:
         def get_container_contents(level_num: int, container_link: int, 
                                    visited: set = None) -> List[Dict]:
             """Follow the object chain to get container contents."""
+            from ..constants import STATIC_CONTAINERS, CARRYABLE_CONTAINERS
             if visited is None:
                 visited = set()
             
@@ -616,7 +618,9 @@ class JsonExporter:
                             content_item['effect'] = item_effect
                         
                         # If this item is also a container, get its contents recursively
-                        if 0x80 <= item.object_id <= 0x8F and item.special_link > 0:
+                        # Check for both portable containers and static ones (barrel, chest, urn, etc.)
+                        is_nested_container = (item.object_id in CARRYABLE_CONTAINERS) or (item.object_id in STATIC_CONTAINERS)
+                        if is_nested_container and item.special_link > 0:
                             nested_contents = get_container_contents(
                                 level_num, item.special_link, visited.copy()
                             )
@@ -709,9 +713,13 @@ class JsonExporter:
             if extra_info:
                 web_obj['extra_info'] = extra_info
             
-            # For containers, add their contents
+            # For containers (both portable and static like barrels/chests), add their contents
             special_link = item_dict.get('special_link', 0)
-            if category == 'containers' and special_link > 0:
+            obj_id = item.object_id
+            # Check if this is any type of container
+            from ..constants import STATIC_CONTAINERS, CARRYABLE_CONTAINERS
+            is_container_item = (obj_id in CARRYABLE_CONTAINERS) or (obj_id in STATIC_CONTAINERS)
+            if is_container_item and special_link > 0:
                 contents = get_container_contents(level, special_link)
                 if contents:
                     web_obj['contents'] = contents
@@ -794,6 +802,7 @@ class JsonExporter:
                 # Keys & Containers
                 {'id': 'keys', 'name': 'Keys', 'color': '#fab005'},
                 {'id': 'containers', 'name': 'Containers', 'color': '#f08c00'},
+                {'id': 'storage', 'name': 'Storage', 'color': '#d9480f'},
                 # Food, Drink & Potions
                 {'id': 'food', 'name': 'Food', 'color': '#a9e34b'},
                 {'id': 'drink', 'name': 'Drinks', 'color': '#74c0fc'},
