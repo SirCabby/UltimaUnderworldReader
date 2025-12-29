@@ -1559,7 +1559,10 @@ function refreshVisibleObjectsIfNoSelection() {
 function renderSelectionPane() {
     elements.detailsSidebar.innerHTML = `
         <div class="sidebar-section">
-            <h3 class="section-title">Selected Object</h3>
+            <div class="section-header">
+                <h3 class="section-title">Selected Object</h3>
+                <button class="close-selection-btn" id="close-selection-btn" title="Close and return to visible objects">✕</button>
+            </div>
             <div class="object-details" id="object-details">
                 <p class="no-selection">Loading...</p>
             </div>
@@ -1574,6 +1577,9 @@ function renderSelectionPane() {
     // Update element references
     elements.objectDetails = document.getElementById('object-details');
     elements.locationObjects = document.getElementById('location-objects');
+    
+    // Add close button handler
+    document.getElementById('close-selection-btn').addEventListener('click', clearSelection);
 }
 
 /**

@@ -245,6 +245,29 @@ body {
     margin-bottom: 0;
 }
 
+/* Close Selection Button */
+.close-selection-btn {
+    width: 24px;
+    height: 24px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+
+.close-selection-btn:hover {
+    background: var(--bg-elevated);
+    border-color: var(--text-accent);
+    color: var(--text-accent);
+}
+
 .category-toggle-btns {
     display: flex;
     gap: 4px;
