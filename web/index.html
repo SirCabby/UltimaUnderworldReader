@@ -29,51 +29,49 @@
         <main class="main-content">
             <!-- Sidebar - Filters -->
             <aside class="sidebar filters-sidebar">
-                <div class="sidebar-section">
-                    <h3 class="section-title">Level</h3>
-                    <div class="level-tabs" id="level-tabs">
-                        <!-- Level tabs will be populated by JS -->
-                    </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <h3 class="section-title">Special Filters</h3>
-                    <div class="special-filters">
-                        <label class="special-filter enchanted-filter">
-                            <input type="checkbox" id="enchanted-filter">
-                            <span class="filter-icon">✨</span>
-                            <span class="filter-label">Enchanted Only</span>
-                            <span class="filter-count" id="enchanted-count">0</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <div class="section-header">
-                        <h3 class="section-title">Categories</h3>
-                        <div class="category-toggle-btns">
-                            <button class="toggle-btn" id="select-all-categories" title="Select All">All</button>
-                            <button class="toggle-btn" id="deselect-all-categories" title="Deselect All">None</button>
+                <div class="sidebar-scrollable">
+                    <div class="sidebar-section">
+                        <h3 class="section-title">Level</h3>
+                        <div class="level-tabs" id="level-tabs">
+                            <!-- Level tabs will be populated by JS -->
                         </div>
                     </div>
-                    <div class="category-filters" id="category-filters">
-                        <!-- Category checkboxes will be populated by JS -->
+
+                    <div class="sidebar-section">
+                        <h3 class="section-title">Special Filters</h3>
+                        <div class="special-filters">
+                            <label class="special-filter enchanted-filter">
+                                <input type="checkbox" id="enchanted-filter">
+                                <span class="filter-icon">✨</span>
+                                <span class="filter-label">Enchanted Only</span>
+                                <span class="filter-count" id="enchanted-count">0</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Categories</h3>
+                            <div class="category-toggle-btns">
+                                <button class="toggle-btn" id="select-all-categories" title="Select All">All</button>
+                                <button class="toggle-btn" id="deselect-all-categories" title="Deselect All">None</button>
+                            </div>
+                        </div>
+                        <div class="category-filters" id="category-filters">
+                            <!-- Category checkboxes will be populated by JS -->
+                        </div>
                     </div>
                 </div>
 
-                <div class="sidebar-section">
+                <div class="sidebar-section sidebar-stats">
                     <h3 class="section-title">Statistics</h3>
                     <div class="stats-display" id="stats-display">
                         <div class="stat-item">
-                            <span class="stat-label">Objects:</span>
+                            <span class="stat-label">Total Items:</span>
                             <span class="stat-value" id="stat-objects">-</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">NPCs:</span>
-                            <span class="stat-value" id="stat-npcs">-</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Visible:</span>
+                            <span class="stat-label">Markers:</span>
                             <span class="stat-value" id="stat-visible">-</span>
                         </div>
                     </div>
@@ -133,7 +131,6 @@
         <!-- Footer -->
         <footer class="app-footer">
             <p>Data extracted from Ultima Underworld: The Stygian Abyss (1992) by Looking Glass Technologies</p>
-            <p>Maps courtesy of <a href="https://wiki.ultimacodex.com" target="_blank">Ultima Codex</a></p>
         </footer>
     </div>
 

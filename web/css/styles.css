@@ -49,7 +49,7 @@
     /* Sizing */
     --sidebar-width: 260px;
     --header-height: 70px;
-    --footer-height: 50px;
+    --footer-height: 36px;
 }
 
 /* Reset & Base */
@@ -180,6 +180,24 @@ body {
 .details-sidebar {
     border-right: none;
     border-left: 1px solid var(--border-color);
+}
+
+/* Filters sidebar: scrollable content with fixed stats at bottom */
+.filters-sidebar {
+    overflow: hidden;
+}
+
+.filters-sidebar .sidebar-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.filters-sidebar .sidebar-stats {
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: none;
+    background: var(--bg-secondary);
 }
 
 .sidebar-section {
@@ -899,10 +917,8 @@ body {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
     padding: 0 24px;
     flex-shrink: 0;
 }
@@ -910,15 +926,6 @@ body {
 .app-footer p {
     font-size: 0.75rem;
     color: var(--text-muted);
-}
-
-.app-footer a {
-    color: var(--text-accent);
-    text-decoration: none;
-}
-
-.app-footer a:hover {
-    text-decoration: underline;
 }
 
 /* Scrollbar Styling */

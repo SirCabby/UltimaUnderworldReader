@@ -79,7 +79,6 @@ const elements = {
     loadingOverlay: null,
     zoomLevel: null,
     statObjects: null,
-    statNpcs: null,
     statVisible: null,
     coordDisplay: null,
     coordValue: null,
@@ -141,7 +140,6 @@ function cacheElements() {
     elements.loadingOverlay = document.getElementById('loading-overlay');
     elements.zoomLevel = document.getElementById('zoom-level');
     elements.statObjects = document.getElementById('stat-objects');
-    elements.statNpcs = document.getElementById('stat-npcs');
     elements.statVisible = document.getElementById('stat-visible');
     elements.coordDisplay = document.getElementById('coord-display');
     elements.coordValue = document.getElementById('coord-value');
@@ -586,11 +584,21 @@ function renderMarkers() {
     });
     
     // Collect secrets (illusory walls and secret doors) - show based on their category
-    if (level.secrets) {
+    // Note: Secrets are never "enchanted" in the magical sense, so they're hidden when enchanted filter is on
+    if (level.secrets && !state.filters.enchantedOnly) {
         level.secrets.forEach(secret => {
             // Check if this secret's category is enabled
             if (!state.filters.categories.has(secret.category)) {
                 return;
+            }
+            
+            // Apply search filter to secrets
+            if (state.filters.search) {
+                const desc = (secret.description || '').toLowerCase();
+                const type = (secret.type || '').toLowerCase();
+                if (!desc.includes(state.filters.search) && !type.includes(state.filters.search)) {
+                    return;
+                }
             }
             
             const key = `${secret.tile_x},${secret.tile_y}`;
@@ -952,8 +960,16 @@ function shouldShowItem(item) {
 }
 
 /**
+ * Categories that are inherently magical (always show with enchanted filter)
+ */
+const MAGICAL_CATEGORIES = new Set([
+    'wands',          // Magic wands (cast spells)
+    'potions',        // Potions (magical effects)
+]);
+
+/**
  * Check if an effect string represents a true magical enchantment
- * Excludes: keys ("Opens lock #X"), books/scrolls ("Text #X")
+ * Excludes: keys ("Opens lock #X"), regular books/scrolls ("Text #X")
  */
 function isMagicalEffect(effect) {
     if (!effect) return false;
@@ -961,7 +977,7 @@ function isMagicalEffect(effect) {
     // Exclude keys that open locks
     if (effect.startsWith('Opens lock')) return false;
     
-    // Exclude books/scrolls with text
+    // Exclude regular books/scrolls with text (spell scrolls handled by category)
     if (effect.startsWith('Text #')) return false;
     
     // Everything else with an effect is considered enchanted
@@ -973,8 +989,17 @@ function isMagicalEffect(effect) {
  * Also recursively checks container contents and NPC inventory
  */
 function isEnchanted(item) {
+    // Check if item's category is inherently magical
+    if (MAGICAL_CATEGORIES.has(item.category)) return true;
+    
     // Check if item itself has a magical effect (not just text or lock info)
     if (isMagicalEffect(item.effect)) return true;
+    
+    // Check extra_info for spell-related properties
+    if (item.extra_info) {
+        if (item.extra_info.spell_index !== undefined) return true;
+        if (item.extra_info.spell_link !== undefined) return true;
+    }
     
     // Check container contents recursively
     if (item.contents && item.contents.length > 0) {
@@ -994,7 +1019,17 @@ function isEnchanted(item) {
  */
 function hasEnchantedContent(contents) {
     for (const contentItem of contents) {
+        // Check if category is inherently magical
+        if (MAGICAL_CATEGORIES.has(contentItem.category)) return true;
+        
+        // Check if has magical effect
         if (isMagicalEffect(contentItem.effect)) return true;
+        
+        // Check extra_info for spell-related properties
+        if (contentItem.extra_info) {
+            if (contentItem.extra_info.spell_index !== undefined) return true;
+            if (contentItem.extra_info.spell_link !== undefined) return true;
+        }
         
         // Check nested containers
         if (contentItem.contents && contentItem.contents.length > 0) {
@@ -2049,10 +2084,19 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
     const level = state.data.levels[state.currentLevel];
     if (!level) return;
     
-    // Find all items at this tile
-    const npcsAtTile = level.npcs.filter(n => n.tile_x === tileX && n.tile_y === tileY);
-    const objectsAtTile = level.objects.filter(o => o.tile_x === tileX && o.tile_y === tileY);
-    const secretsAtTile = level.secrets ? level.secrets.filter(s => s.tile_x === tileX && s.tile_y === tileY) : [];
+    // Find all items at this tile (respecting enchanted filter)
+    const npcsAtTile = level.npcs.filter(n => 
+        n.tile_x === tileX && n.tile_y === tileY && 
+        (!state.filters.enchantedOnly || isEnchanted(n))
+    );
+    const objectsAtTile = level.objects.filter(o => 
+        o.tile_x === tileX && o.tile_y === tileY &&
+        (!state.filters.enchantedOnly || isEnchanted(o))
+    );
+    // Don't show secrets when enchanted filter is on (secrets aren't magical)
+    const secretsAtTile = (level.secrets && !state.filters.enchantedOnly) 
+        ? level.secrets.filter(s => s.tile_x === tileX && s.tile_y === tileY) 
+        : [];
     
     const totalItems = npcsAtTile.length + objectsAtTile.length + secretsAtTile.length;
     
@@ -2208,26 +2252,27 @@ function updateStats() {
     const level = state.data.levels[state.currentLevel];
     if (!level) return;
     
-    // Count total objects including items inside containers and NPC inventories
+    // Count all items including nested container contents and NPC inventories
     let totalObjects = 0;
     
-    // Count top-level objects and their contents
+    // Count objects and their contents
     level.objects.forEach(obj => {
         totalObjects++;
-        if (obj.contents && obj.contents.length > 0) {
-            totalObjects += countNestedItems(obj.contents);
-        }
+        totalObjects += countNestedItems(obj.contents);
     });
     
-    // Count items in NPC inventories
+    // Count NPCs and their inventories
     level.npcs.forEach(npc => {
-        if (npc.inventory && npc.inventory.length > 0) {
-            totalObjects += countNestedItems(npc.inventory);
-        }
+        totalObjects++;
+        totalObjects += countNestedItems(npc.inventory);
     });
+    
+    // Count secrets
+    if (level.secrets) {
+        totalObjects += level.secrets.length;
+    }
     
     elements.statObjects.textContent = totalObjects;
-    elements.statNpcs.textContent = level.npc_count;
 }
 
 /**
