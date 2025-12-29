@@ -413,10 +413,18 @@ function updateCategoryCounts() {
         npcCountEl.textContent = level.npcs.length;
     }
     
-    // Update secrets count
-    const secretsCountEl = document.querySelector('.category-count[data-category-id="secrets"]');
-    if (secretsCountEl) {
-        secretsCountEl.textContent = level.secrets ? level.secrets.length : 0;
+    // Update illusory walls count
+    const illusoryCountEl = document.querySelector('.category-count[data-category-id="illusory_walls"]');
+    if (illusoryCountEl && level.secrets) {
+        const count = level.secrets.filter(s => s.category === 'illusory_walls').length;
+        illusoryCountEl.textContent = count;
+    }
+    
+    // Update secret doors count (from secrets array)
+    const secretDoorsCountEl = document.querySelector('.category-count[data-category-id="secret_doors"]');
+    if (secretDoorsCountEl && level.secrets) {
+        const count = level.secrets.filter(s => s.category === 'secret_doors').length;
+        secretDoorsCountEl.textContent = count;
     }
     
     // Update object category counts - including items inside containers and NPC inventories
@@ -439,8 +447,8 @@ function updateCategoryCounts() {
     });
     
     state.data.categories.forEach(cat => {
-        // Skip npcs and secrets categories - they're handled separately above
-        if (cat.id === 'npcs' || cat.id === 'secrets') return;
+        // Skip npcs - handled separately; illusory_walls and secret_doors are counted from secrets array
+        if (cat.id === 'npcs' || cat.id === 'illusory_walls' || cat.id === 'secret_doors') return;
         
         const countEl = document.querySelector(`.category-count[data-category-id="${cat.id}"]`);
         if (countEl) {
@@ -577,17 +585,25 @@ function renderMarkers() {
         }
     });
     
-    // Collect secrets - show if 'secrets' category is selected
-    if (level.secrets && state.filters.categories.has('secrets')) {
+    // Collect secrets (illusory walls and secret doors) - show based on their category
+    if (level.secrets) {
         level.secrets.forEach(secret => {
+            // Check if this secret's category is enabled
+            if (!state.filters.categories.has(secret.category)) {
+                return;
+            }
+            
             const key = `${secret.tile_x},${secret.tile_y}`;
             if (!tileGroups.has(key)) {
                 tileGroups.set(key, []);
             }
-            // Use bright magenta for secrets to match the map markers
+            
+            // Use different colors based on type
+            const color = secret.category === 'illusory_walls' ? '#ff00ff' : '#ffd43b';
+            
             tileGroups.get(key).push({ 
                 item: secret, 
-                color: '#ff00ff', 
+                color: color, 
                 isNpc: false, 
                 isSecret: true 
             });

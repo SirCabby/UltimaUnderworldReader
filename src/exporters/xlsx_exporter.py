@@ -499,9 +499,10 @@ class XlsxExporter:
             # Get name
             name, _, _ = parse_item_name(obj_names[item.object_id] if item.object_id < len(obj_names) else "")
             
-            # Get proper category name
-            cat_raw = item.object_class if isinstance(item.object_class, str) else ""
-            category = CATEGORY_DISPLAY_NAMES.get(cat_raw, cat_raw.title() if cat_raw else "Unknown")
+            # Get proper category name - prefer detailed_category if available
+            cat_raw = getattr(item, 'detailed_category', None) or item.object_class
+            cat_raw = cat_raw if isinstance(cat_raw, str) else ""
+            category = CATEGORY_DISPLAY_NAMES.get(cat_raw, cat_raw.replace('_', ' ').title() if cat_raw else "Unknown")
             
             # Get description based on item type
             description = self._get_item_description(item, block3, block5, spell_names, level_parser)

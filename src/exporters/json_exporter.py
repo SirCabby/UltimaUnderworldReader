@@ -478,24 +478,61 @@ class JsonExporter:
             
             return ""
         
-        # Category mapping for objects
+        # Category mapping for objects - maps base/detailed categories to web categories
         category_map = {
+            # Weapons
             'melee_weapon': 'weapons',
             'ranged_weapon': 'weapons',
+            # Armor
             'armor': 'armor',
+            # Containers
             'container': 'containers',
+            # Keys
             'key': 'keys',
-            'food': 'consumables',
-            'potion': 'consumables',
-            'scroll': 'readable',
-            'book': 'readable',
+            # Consumables - now split
+            'food': 'food',
+            'drink': 'drink',
+            'potion': 'potions',
+            # Books & Scrolls - now split
+            'scroll': 'scrolls',
+            'book': 'books',
+            'readable_scroll': 'scrolls',
+            'readable_book': 'books',
+            'spell_scroll': 'spell_scrolls',
+            'map': 'books',  # Maps shown with books
+            # Light sources
             'light_source': 'light',
-            'rune': 'magic',
-            'wand': 'magic',
+            # Runes & Talismans
+            'rune': 'runes',
+            'talisman': 'talismans',
+            # Wands
+            'wand': 'wands',
+            'broken_wand': 'wands',
+            'spell': 'misc',  # Internal spell objects
+            # Treasure
             'treasure': 'treasure',
+            # Doors - now split by type
             'door': 'doors',
+            'door_locked': 'doors_locked',
+            'door_unlocked': 'doors_unlocked',
+            'secret_door': 'secret_doors',
+            'portcullis': 'doors',
+            'portcullis_locked': 'doors_locked',
+            'open_door': 'doors_open',
+            'open_portcullis': 'doors_open',
+            # Traps & Triggers
             'trap': 'traps',
             'trigger': 'triggers',
+            # Special objects
+            'special_tmap': 'texture_objects',
+            'switch': 'switches',
+            'furniture': 'furniture',
+            'decal': 'scenery',
+            'scenery': 'scenery',
+            'animation': 'animations',
+            # Quest & misc
+            'quest_item': 'quest',
+            'misc_item': 'misc',
         }
         
         # Build index lookup for items by level and index
@@ -543,6 +580,7 @@ class JsonExporter:
                     item = items_by_level_index[level_num].get(current_idx)
                     if item:
                         item_dict = item.to_dict()
+                        detailed_cat = item_dict.get('detailed_category', '')
                         obj_class = item_dict.get('object_class', 'unknown')
                         
                         # Get rich description and effect for this item
@@ -568,7 +606,7 @@ class JsonExporter:
                         content_item = {
                             'object_id': item.object_id,
                             'name': item.name or get_item_name(item.object_id),
-                            'category': category_map.get(obj_class, 'misc'),
+                            'category': category_map.get(detailed_cat, category_map.get(obj_class, 'misc')),
                             'quantity': actual_quantity,
                         }
                         # Only include description and effect if they have meaningful values
@@ -626,8 +664,11 @@ class JsonExporter:
                 continue
                 
             level = item_dict.get('level', 0)
+            # Use detailed_category if available, otherwise fall back to object_class
+            detailed_cat = item_dict.get('detailed_category', '')
             obj_class = item_dict.get('object_class', 'unknown')
-            category = category_map.get(obj_class, 'misc')
+            # First try detailed category, then base category
+            category = category_map.get(detailed_cat, category_map.get(obj_class, 'misc'))
             
             # Get rich description and effect for this item
             obj_id = item.object_id
@@ -655,12 +696,18 @@ class JsonExporter:
                 'z': pos.get('z', 0),
                 'category': category,
                 'object_class': obj_class,
+                'detailed_category': detailed_cat,
             }
             # Only include description and effect if they have meaningful values
             if item_desc:
                 web_obj['description'] = item_desc
             if item_effect:
                 web_obj['effect'] = item_effect
+            
+            # Include extra_info for special object types (potions, doors, etc.)
+            extra_info = item_dict.get('extra_info', {})
+            if extra_info:
+                web_obj['extra_info'] = extra_info
             
             # For containers, add their contents
             special_link = item_dict.get('special_link', 0)
@@ -741,20 +788,44 @@ class JsonExporter:
                 'num_levels': 9,
             },
             'categories': [
-                {'id': 'npcs', 'name': 'NPCs', 'color': '#ff6b6b'},
-                {'id': 'weapons', 'name': 'Weapons', 'color': '#4dabf7'},
-                {'id': 'armor', 'name': 'Armor', 'color': '#69db7c'},
-                {'id': 'keys', 'name': 'Keys', 'color': '#ffd43b'},
-                {'id': 'containers', 'name': 'Containers', 'color': '#da77f2'},
-                {'id': 'consumables', 'name': 'Food & Potions', 'color': '#f783ac'},
-                {'id': 'readable', 'name': 'Books & Scrolls', 'color': '#e8d4b8'},
-                {'id': 'magic', 'name': 'Magic Items', 'color': '#9775fa'},
+                # Weapons & Armor
+                {'id': 'weapons', 'name': 'Weapons', 'color': '#e03131'},
+                {'id': 'armor', 'name': 'Armor', 'color': '#5c7cfa'},
+                # Keys & Containers
+                {'id': 'keys', 'name': 'Keys', 'color': '#fab005'},
+                {'id': 'containers', 'name': 'Containers', 'color': '#f08c00'},
+                # Food, Drink & Potions
+                {'id': 'food', 'name': 'Food', 'color': '#a9e34b'},
+                {'id': 'drink', 'name': 'Drinks', 'color': '#74c0fc'},
+                {'id': 'potions', 'name': 'Potions', 'color': '#f783ac'},
+                # Books & Scrolls
+                {'id': 'books', 'name': 'Readable Books', 'color': '#e8d4b8'},
+                {'id': 'scrolls', 'name': 'Readable Scrolls', 'color': '#d4c4a8'},
+                {'id': 'spell_scrolls', 'name': 'Spell Scrolls', 'color': '#da77f2'},
+                # Magic Items - split by type
+                {'id': 'runes', 'name': 'Runestones', 'color': '#9775fa'},
+                {'id': 'talismans', 'name': 'Talismans (Virtue Keys)', 'color': '#be4bdb'},
+                {'id': 'wands', 'name': 'Wands', 'color': '#7950f2'},
+                # Treasure & Light
                 {'id': 'treasure', 'name': 'Treasure', 'color': '#fcc419'},
                 {'id': 'light', 'name': 'Light Sources', 'color': '#ffe066'},
-                {'id': 'doors', 'name': 'Doors', 'color': '#adb5bd'},
+                # Doors
+                {'id': 'doors', 'name': 'Doors (Other)', 'color': '#adb5bd'},
+                {'id': 'doors_locked', 'name': 'Locked Doors', 'color': '#ff6b6b'},
+                {'id': 'doors_unlocked', 'name': 'Unlocked Doors', 'color': '#69db7c'},
+                {'id': 'doors_open', 'name': 'Open Doors', 'color': '#8ce99a'},
+                {'id': 'secret_doors', 'name': 'Secret Doors', 'color': '#ffd43b'},
+                # Mechanics
+                {'id': 'switches', 'name': 'Switches & Levers', 'color': '#ffa94d'},
                 {'id': 'traps', 'name': 'Traps', 'color': '#ff8787'},
                 {'id': 'triggers', 'name': 'Triggers', 'color': '#748ffc'},
-                {'id': 'secrets', 'name': 'Secrets', 'color': '#ff00ff'},
+                {'id': 'illusory_walls', 'name': 'Illusory Walls', 'color': '#ff00ff'},
+                # Special Objects
+                {'id': 'texture_objects', 'name': 'Texture Map Objects', 'color': '#845ef7'},
+                {'id': 'furniture', 'name': 'Furniture', 'color': '#b197a8'},
+                {'id': 'scenery', 'name': 'Scenery', 'color': '#a9a9a9'},
+                {'id': 'animations', 'name': 'Animations', 'color': '#20c997'},
+                {'id': 'quest', 'name': 'Quest Items', 'color': '#22b8cf'},
                 {'id': 'misc', 'name': 'Miscellaneous', 'color': '#868e96'},
             ],
             'levels': []
@@ -807,7 +878,7 @@ class JsonExporter:
                     'tile_x': tile_x,
                     'tile_y': tile_y,
                     'description': secret_dict.get('description', ''),
-                    'category': 'secrets',
+                    'category': 'illusory_walls',  # Illusory walls get their own category
                 }
                 
                 details = secret_dict.get('details', {})
@@ -848,7 +919,7 @@ class JsonExporter:
                     'tile_x': tile_x,
                     'tile_y': tile_y,
                     'description': secret_dict.get('description', ''),
-                    'category': 'secrets',
+                    'category': 'secret_doors',  # Secret doors go with other secret doors
                 }
                 
                 details = secret_dict.get('details', {})

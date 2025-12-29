@@ -3,9 +3,9 @@ Game object and item data models for Ultima Underworld.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
-from ..constants import OBJECT_CATEGORIES, get_category
+from ..constants import OBJECT_CATEGORIES, get_category, get_detailed_category
 
 # Re-export for backward compatibility
 __all__ = ['GameObjectInfo', 'ItemInfo', 'OBJECT_CATEGORIES', 'get_category']
@@ -43,15 +43,19 @@ class GameObjectInfo:
     is_quantity: bool = False
     
     # Object classification
-    object_class: str = ""      # e.g., "weapon", "armor", "container"
+    object_class: str = ""      # Base category e.g., "weapon", "armor", "container"
+    detailed_category: str = "" # Detailed category e.g., "door_locked", "spell_scroll"
     
     # Linked objects
     next_index: int = 0
     special_link: int = 0
     
+    # Extra metadata (for special objects like tmap, doors, etc.)
+    extra_info: Dict[str, Any] = field(default_factory=dict)
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON export."""
-        return {
+        result = {
             'object_id': self.object_id,
             'object_id_hex': f'0x{self.object_id:03X}',
             'index': self.index,
@@ -73,9 +77,16 @@ class GameObjectInfo:
             'is_enchanted': self.is_enchanted,
             'is_invisible': self.is_invisible,
             'object_class': self.object_class,
+            'detailed_category': self.detailed_category,
             'next_index': self.next_index,
             'special_link': self.special_link
         }
+        
+        # Include extra_info if present
+        if self.extra_info:
+            result['extra_info'] = self.extra_info
+        
+        return result
 
 
 @dataclass

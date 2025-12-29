@@ -13,7 +13,15 @@ from ..parsers.strings_parser import StringsParser
 from ..parsers.objects_parser import ObjectsParser, CommonObjectsParser
 from ..parsers.level_parser import LevelParser
 from ..models.game_object import ItemInfo, GameObjectInfo
-from ..constants import get_category
+from ..constants import (
+    get_category, 
+    get_detailed_category,
+    get_potion_effect,
+    is_special_tmap,
+    get_tmap_info,
+    is_door,
+    is_secret_door,
+)
 from ..utils import parse_item_name
 
 
@@ -191,6 +199,18 @@ class ItemExtractor:
                     quantity = obj.quantity_or_link if obj.is_quantity else 0
                     special_link = obj.quantity_or_link if not obj.is_quantity else 0
                 
+                # Get base and detailed categories
+                base_category = get_category(obj.item_id)
+                detailed_cat = get_detailed_category(
+                    obj.item_id,
+                    is_enchanted=obj.is_enchanted,
+                    owner=obj.owner,
+                    special_link=special_link
+                )
+                
+                # Build extra info for special object types
+                extra_info = self._get_extra_info(obj, special_link)
+                
                 # Create object info
                 info = GameObjectInfo(
                     object_id=obj.item_id,
@@ -210,12 +230,68 @@ class ItemExtractor:
                     is_enchanted=obj.is_enchanted,
                     is_invisible=obj.is_invisible,
                     is_quantity=obj.is_quantity,
-                    object_class=get_category(obj.item_id),
+                    object_class=base_category,
+                    detailed_category=detailed_cat,
                     next_index=obj.next_index,
-                    special_link=special_link
+                    special_link=special_link,
+                    extra_info=extra_info
                 )
                 
                 self.placed_items.append(info)
+    
+    def _get_extra_info(self, obj, special_link: int) -> dict:
+        """
+        Get extra information for special object types.
+        
+        This adds metadata for:
+        - Potions: effect type (mana/health)
+        - Doors: lock status and lock ID
+        - Special tmap objects: texture/level transition info
+        - Spell scrolls: spell information
+        """
+        extra = {}
+        
+        # Potions
+        potion_effect = get_potion_effect(obj.item_id)
+        if potion_effect:
+            extra['effect'] = potion_effect
+        
+        # Doors
+        if is_door(obj.item_id):
+            extra['is_secret'] = is_secret_door(obj.item_id)
+            if obj.owner != 0:
+                extra['is_locked'] = True
+                extra['lock_id'] = obj.owner
+            else:
+                extra['is_locked'] = False
+            # Check if door is open (IDs 0x148-0x14E are open versions)
+            extra['is_open'] = 0x148 <= obj.item_id <= 0x14E
+        
+        # Special tmap objects
+        if is_special_tmap(obj.item_id):
+            tmap_info = get_tmap_info(obj.quality, obj.owner)
+            extra.update(tmap_info)
+            # Add any link info that might indicate level transitions
+            if special_link != 0:
+                extra['linked_object'] = special_link
+        
+        # Spell scrolls (enchanted books/scrolls)
+        if obj.is_enchanted and 0x130 <= obj.item_id <= 0x13F:
+            # For enchanted scrolls, quantity contains spell info
+            # Spell index is quantity - 512 when is_quantity is True
+            if obj.is_quantity and obj.quantity_or_link >= 512:
+                spell_index = obj.quantity_or_link - 512
+                extra['spell_index'] = spell_index
+            elif obj.quantity_or_link >= 256 and obj.quantity_or_link < 512:
+                # Direct spell reference (256-319 range)
+                extra['spell_index'] = obj.quantity_or_link - 256
+        
+        # Wands - they link to spell objects
+        if 0x098 <= obj.item_id <= 0x09B:
+            if special_link != 0:
+                extra['spell_link'] = special_link
+        
+        return extra
     
     def get_all_item_types(self) -> Dict[int, ItemInfo]:
         """Get all item type definitions."""
