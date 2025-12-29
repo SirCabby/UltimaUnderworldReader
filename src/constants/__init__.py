@@ -37,6 +37,29 @@ from .objects import (
     get_category,
 )
 from .mantras import COMPLETE_MANTRAS
+from .traps import (
+    TRAP_ID_MIN,
+    TRAP_ID_MAX,
+    TRIGGER_ID_MIN,
+    TRIGGER_ID_MAX,
+    TRAP_TYPES,
+    TRIGGER_TYPES,
+    TrapInfo,
+    TriggerInfo,
+    TrapPurpose,
+    is_trap,
+    is_trigger,
+    get_trap_info,
+    get_trigger_info,
+    get_trap_name,
+    get_trigger_name,
+    get_trap_purpose,
+    describe_teleport,
+    describe_damage,
+    describe_change_terrain,
+    describe_trap_effect,
+    is_level_transition_teleport,
+)
 
 __all__ = [
     # Runes
@@ -73,4 +96,26 @@ __all__ = [
     'CARRYABLE_CONTAINERS',
     'CATEGORY_DISPLAY_NAMES',
     'get_category',
+    # Traps and Triggers
+    'TRAP_ID_MIN',
+    'TRAP_ID_MAX',
+    'TRIGGER_ID_MIN',
+    'TRIGGER_ID_MAX',
+    'TRAP_TYPES',
+    'TRIGGER_TYPES',
+    'TrapInfo',
+    'TriggerInfo',
+    'TrapPurpose',
+    'is_trap',
+    'is_trigger',
+    'get_trap_info',
+    'get_trigger_info',
+    'get_trap_name',
+    'get_trigger_name',
+    'get_trap_purpose',
+    'describe_teleport',
+    'describe_damage',
+    'describe_change_terrain',
+    'describe_trap_effect',
+    'is_level_transition_teleport',
 ]

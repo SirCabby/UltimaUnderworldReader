@@ -1531,13 +1531,28 @@ function renderObjectDetails(item, isNpc) {
         html += getTypeSpecificDetails(item);
         
         // Show description if available (books, scrolls, keys, potions, etc.)
+        // For triggers and traps, show the effect description inline without extra section
         if (item.description) {
-            html += `
-                <div class="detail-description">
-                    <div class="detail-label" style="margin-bottom: 4px;">Description</div>
-                    <div class="description-text">${escapeHtml(item.description)}</div>
-                </div>
-            `;
+            const objId = item.object_id || 0;
+            const isTrapOrTrigger = objId >= 0x180 && objId <= 0x1BF;
+            
+            if (isTrapOrTrigger) {
+                // Show trap/trigger effect inline as a detail row
+                html += `
+                    <div class="detail-row">
+                        <span class="detail-label">Effect</span>
+                        <span class="detail-value" style="color: var(--color-traps);">${escapeHtml(item.description)}</span>
+                    </div>
+                `;
+            } else {
+                // Show description in a separate section for books/scrolls/etc
+                html += `
+                    <div class="detail-description">
+                        <div class="detail-label" style="margin-bottom: 4px;">Description</div>
+                        <div class="description-text">${escapeHtml(item.description)}</div>
+                    </div>
+                `;
+            }
         }
         
         // Show effect/enchantment only for truly magical effects

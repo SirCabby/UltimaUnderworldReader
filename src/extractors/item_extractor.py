@@ -177,6 +177,20 @@ class ItemExtractor:
                     raw_name = object_names[obj.item_id]
                     name, _, _ = parse_item_name(raw_name)
                 
+                # Determine quantity vs special_link
+                # For triggers (0x1A0-0x1BF), quantity_or_link ALWAYS contains
+                # the link to the trap, regardless of is_quantity flag
+                is_trigger = 0x1A0 <= obj.item_id <= 0x1BF
+                
+                if is_trigger:
+                    # Triggers always use quantity_or_link as a link
+                    quantity = 0
+                    special_link = obj.quantity_or_link
+                else:
+                    # Normal items follow is_quantity flag
+                    quantity = obj.quantity_or_link if obj.is_quantity else 0
+                    special_link = obj.quantity_or_link if not obj.is_quantity else 0
+                
                 # Create object info
                 info = GameObjectInfo(
                     object_id=obj.item_id,
@@ -191,14 +205,14 @@ class ItemExtractor:
                     heading=obj.heading,
                     quality=obj.quality,
                     owner=obj.owner,
-                    quantity=obj.quantity_or_link if obj.is_quantity else 0,
+                    quantity=quantity,
                     flags=obj.flags,
                     is_enchanted=obj.is_enchanted,
                     is_invisible=obj.is_invisible,
                     is_quantity=obj.is_quantity,
                     object_class=get_category(obj.item_id),
                     next_index=obj.next_index,
-                    special_link=obj.quantity_or_link if not obj.is_quantity else 0
+                    special_link=special_link
                 )
                 
                 self.placed_items.append(info)

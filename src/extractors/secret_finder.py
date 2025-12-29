@@ -7,15 +7,39 @@ Analyzes game data to find:
 - Hidden objects (invisible items)
 - Unreachable areas
 - Easter eggs
+
+Trap/Trigger System Overview:
+- TRIGGERS (0x1A0-0x1BF) detect player actions and link to traps
+- TRAPS (0x180-0x19F) execute game effects
+
+Key trap types:
+- damage_trap (0x180): Deals damage, quality = damage amount
+- teleport_trap (0x181): Teleports player, quality=dest_x, owner=dest_y
+- change_terrain_trap (0x185): Modifies terrain (illusory walls)
+
+Key trigger types:
+- move_trigger (0x1A0): Activates when player enters tile
+- use_trigger (0x1A2): Activates when object is used
 """
 
 from pathlib import Path
-from typing import Dict, List, Any
-from dataclasses import dataclass
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass, field
 
 from ..parsers.strings_parser import StringsParser
 from ..parsers.level_parser import LevelParser, TileType
 from ..utils import parse_item_name
+from ..constants.traps import (
+    is_trap, is_trigger,
+    get_trap_name, get_trigger_name,
+    get_trap_info, get_trigger_info,
+    get_trap_purpose, TrapPurpose,
+    describe_teleport, describe_damage, describe_change_terrain,
+    describe_trap_effect,
+    is_level_transition_teleport,
+    TRAP_ID_MIN, TRAP_ID_MAX,
+    TRIGGER_ID_MIN, TRIGGER_ID_MAX,
+)
 
 
 @dataclass
@@ -27,7 +51,7 @@ class Secret:
     tile_y: int
     description: str
     object_id: int = 0
-    details: Dict[str, Any] = None
+    details: Dict[str, Any] = field(default_factory=dict)
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -51,15 +75,20 @@ class SecretFinder:
         secrets = finder.get_all_secrets()
     """
     
-    # Trap object ID ranges
-    TRAP_IDS = range(0x180, 0x1A0)
-    TRIGGER_IDS = range(0x1A0, 0x1C0)
+    # Trap object ID ranges (using constants module)
+    TRAP_IDS = range(TRAP_ID_MIN, TRAP_ID_MAX + 1)
+    TRIGGER_IDS = range(TRIGGER_ID_MIN, TRIGGER_ID_MAX + 1)
     
     # Secret door ID
     SECRET_DOOR_ID = 0x147
     
-    # Change terrain trap ID (used for illusory walls)
+    # Specific trap types for special handling
+    DAMAGE_TRAP_ID = 0x180
+    TELEPORT_TRAP_ID = 0x181
     CHANGE_TERRAIN_TRAP_ID = 0x185
+    
+    # Move trigger ID for level transitions
+    MOVE_TRIGGER_ID = 0x1A0
     
     def __init__(self, data_path: str | Path):
         self.data_path = Path(data_path)
@@ -93,60 +122,170 @@ class SecretFinder:
         self._analyzed = True
     
     def _find_triggers(self, level_num: int, level) -> None:
-        """Find all trigger objects."""
+        """Find all trigger objects with detailed effect analysis."""
         object_names = self.strings.get_block(StringsParser.BLOCK_OBJECT_NAMES) or []
         
         for idx, obj in level.objects.items():
-            if obj.item_id in self.TRIGGER_IDS:
-                name = ""
-                if obj.item_id < len(object_names):
-                    raw = object_names[obj.item_id]
-                    name, _, _ = parse_item_name(raw)
+            if not is_trigger(obj.item_id):
+                continue
                 
-                trigger_type = self._get_trigger_type(obj.item_id)
+            name = ""
+            if obj.item_id < len(object_names):
+                raw = object_names[obj.item_id]
+                name, _, _ = parse_item_name(raw)
+            
+            trigger_type = get_trigger_name(obj.item_id)
+            trigger_info = get_trigger_info(obj.item_id)
+            
+            # Get the link target to understand what this trigger does
+            # For triggers, quantity_or_link ALWAYS contains the trap link,
+            # regardless of the is_quantity flag
+            special_link = obj.quantity_or_link
+            target_obj = level.objects.get(special_link) if special_link > 0 else None
+            
+            # Determine the effect of this trigger
+            effect_description = ""
+            effect_type = "unknown"
+            linked_trap_name = ""
+            
+            if target_obj and is_trap(target_obj.item_id):
+                # Trigger links to a trap - describe the trap and its effect
+                trap_purpose = get_trap_purpose(target_obj.item_id)
+                linked_trap_name = get_trap_name(target_obj.item_id)
                 
-                self.secrets.append(Secret(
-                    secret_type="trigger",
-                    level=level_num,
-                    tile_x=obj.tile_x,
-                    tile_y=obj.tile_y,
-                    description=f"{trigger_type}: {name}",
-                    object_id=obj.item_id,
-                    details={
-                        'trigger_type': trigger_type,
-                        'quality': obj.quality,
-                        'owner': obj.owner,
-                        'special_link': obj.quantity_or_link if not obj.is_quantity else 0
-                    }
-                ))
+                # Get the detailed effect description
+                effect_description = describe_trap_effect(
+                    target_obj.item_id,
+                    target_obj.quality,
+                    target_obj.owner,
+                    target_obj.z_pos,
+                    target_obj.tile_x,
+                    target_obj.tile_y,
+                    level_num
+                )
+                effect_type = trap_purpose
+                
+                # Special case for teleport - check if level transition
+                if target_obj.item_id == self.TELEPORT_TRAP_ID:
+                    if is_level_transition_teleport(
+                        target_obj.quality, target_obj.owner,
+                        target_obj.tile_x, target_obj.tile_y
+                    ):
+                        effect_type = "level_transition"
+                    else:
+                        effect_type = "teleport"
+                        
+            elif special_link == 0:
+                # Link is 0 - for move_trigger, quality/owner may encode destination
+                if obj.item_id == self.MOVE_TRIGGER_ID:
+                    effect_description = f"Move to ({obj.quality}, {obj.owner})"
+                    effect_type = "movement"
+            
+            # Build description - show trigger type, linked trap, and effect
+            full_description = f"{trigger_type}"
+            if linked_trap_name and effect_description:
+                # Show: "move_trigger -> damage_trap: Deals 20 damage"
+                full_description += f" -> {linked_trap_name}: {effect_description}"
+            elif effect_description:
+                full_description += f": {effect_description}"
+            elif name:
+                full_description += f": {name}"
+            
+            self.secrets.append(Secret(
+                secret_type="trigger",
+                level=level_num,
+                tile_x=obj.tile_x,
+                tile_y=obj.tile_y,
+                description=full_description,
+                object_id=obj.item_id,
+                details={
+                    'trigger_type': trigger_type,
+                    'linked_trap': linked_trap_name,
+                    'effect_type': effect_type,
+                    'quality': obj.quality,
+                    'owner': obj.owner,
+                    'special_link': special_link,
+                    'effect_description': effect_description,
+                    'target_trap_id': target_obj.item_id if target_obj else None,
+                }
+            ))
     
     def _find_traps(self, level_num: int, level) -> None:
-        """Find all trap objects."""
+        """Find all trap objects with detailed effect descriptions."""
         object_names = self.strings.get_block(StringsParser.BLOCK_OBJECT_NAMES) or []
         
         for idx, obj in level.objects.items():
-            if obj.item_id in self.TRAP_IDS:
-                name = ""
-                if obj.item_id < len(object_names):
-                    raw = object_names[obj.item_id]
-                    name, _, _ = parse_item_name(raw)
+            if not is_trap(obj.item_id):
+                continue
                 
-                trap_type = self._get_trap_type(obj.item_id)
-                
-                self.secrets.append(Secret(
-                    secret_type="trap",
-                    level=level_num,
-                    tile_x=obj.tile_x,
-                    tile_y=obj.tile_y,
-                    description=f"{trap_type}: {name}",
-                    object_id=obj.item_id,
-                    details={
-                        'trap_type': trap_type,
-                        'quality': obj.quality,
-                        'owner': obj.owner,
-                        'target_link': obj.quantity_or_link if not obj.is_quantity else 0
-                    }
-                ))
+            name = ""
+            if obj.item_id < len(object_names):
+                raw = object_names[obj.item_id]
+                name, _, _ = parse_item_name(raw)
+            
+            trap_type = get_trap_name(obj.item_id)
+            trap_info = get_trap_info(obj.item_id)
+            trap_purpose = get_trap_purpose(obj.item_id)
+            
+            # Use comprehensive effect description
+            effect_description = describe_trap_effect(
+                obj.item_id,
+                obj.quality,
+                obj.owner,
+                obj.z_pos,
+                obj.tile_x,
+                obj.tile_y,
+                level_num
+            )
+            
+            # Special handling for teleport traps to classify level transitions vs warps
+            if obj.item_id == self.TELEPORT_TRAP_ID:
+                if is_level_transition_teleport(
+                    obj.quality, obj.owner, obj.tile_x, obj.tile_y
+                ):
+                    trap_purpose = "level_transition"
+                else:
+                    trap_purpose = "teleport"
+            
+            # Build full description
+            full_description = trap_type
+            if effect_description:
+                full_description += f": {effect_description}"
+            elif name:
+                full_description += f": {name}"
+            
+            # Determine if this is a direct trap (stepped on) or activated by trigger
+            is_direct = self._is_direct_trap(level, idx)
+            
+            self.secrets.append(Secret(
+                secret_type="trap",
+                level=level_num,
+                tile_x=obj.tile_x,
+                tile_y=obj.tile_y,
+                description=full_description,
+                object_id=obj.item_id,
+                details={
+                    'trap_type': trap_type,
+                    'trap_purpose': trap_purpose,
+                    'effect_description': effect_description,
+                    'quality': obj.quality,
+                    'owner': obj.owner,
+                    'z_pos': obj.z_pos,
+                    'target_link': obj.quantity_or_link if not obj.is_quantity else 0,
+                    'is_direct': is_direct,
+                }
+            ))
+    
+    def _is_direct_trap(self, level, trap_index: int) -> bool:
+        """Check if a trap is stepped on directly vs activated by a trigger."""
+        # Look for any trigger that links to this trap
+        for idx, obj in level.objects.items():
+            if is_trigger(obj.item_id):
+                # For triggers, quantity_or_link ALWAYS contains the trap link
+                link = obj.quantity_or_link
+                if link == trap_index:
+                    return False  # Activated by trigger
+        return True  # Direct trap
     
     def _find_secret_doors(self, level_num: int, level) -> None:
         """Find all secret doors."""
@@ -261,8 +400,8 @@ class SecretFinder:
         # Look for triggers that link to this trap
         for idx, obj in level.objects.items():
             if obj.item_id in self.TRIGGER_IDS:
-                # Check if this trigger links to our trap
-                if not obj.is_quantity and obj.quantity_or_link == trap_index:
+                # For triggers, quantity_or_link ALWAYS contains the trap link
+                if obj.quantity_or_link == trap_index:
                     trigger_name = trigger_types.get(obj.item_id, f"trigger_0x{obj.item_id:03X}")
                     return f"{trigger_name} trigger at ({obj.tile_x}, {obj.tile_y})"
         
@@ -312,40 +451,11 @@ class SecretFinder:
     
     def _get_trigger_type(self, item_id: int) -> str:
         """Get the trigger type name."""
-        trigger_types = {
-            0x1A0: "move_trigger",
-            0x1A1: "pick_up_trigger",
-            0x1A2: "use_trigger",
-            0x1A3: "look_trigger",
-            0x1A4: "step_on_trigger",
-            0x1A5: "open_trigger",
-            0x1A6: "unlock_trigger",
-            0x1A7: "timer_trigger",
-            0x1A8: "scheduled_trigger",
-        }
-        return trigger_types.get(item_id, f"trigger_0x{item_id:03X}")
+        return get_trigger_name(item_id)
     
     def _get_trap_type(self, item_id: int) -> str:
         """Get the trap type name."""
-        trap_types = {
-            0x180: "damage_trap",
-            0x181: "teleport_trap",
-            0x182: "arrow_trap",
-            0x183: "do_trap",
-            0x184: "pit_trap",
-            0x185: "change_terrain_trap",
-            0x186: "spell_trap",
-            0x187: "create_object_trap",
-            0x188: "door_trap",
-            0x189: "ward_trap",
-            0x18A: "tell_trap",
-            0x18B: "delete_object_trap",
-            0x18C: "inventory_trap",
-            0x18D: "set_variable_trap",
-            0x18E: "check_variable_trap",
-            0x18F: "combination_trap",
-        }
-        return trap_types.get(item_id, f"trap_0x{item_id:03X}")
+        return get_trap_name(item_id)
     
     def get_all_secrets(self) -> List[Secret]:
         """Get all found secrets."""

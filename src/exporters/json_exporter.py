@@ -318,6 +318,42 @@ class JsonExporter:
                     return f"Stack of {quantity}"
                 return ""
             
+            # Traps (0x180-0x19F) - use detailed descriptions
+            if 0x180 <= object_id <= 0x19F:
+                from ..constants.traps import describe_trap_effect
+                return describe_trap_effect(
+                    object_id, quality, owner, 
+                    getattr(item, 'z_pos', 0) if hasattr(item, 'z_pos') else item.to_dict().get('position', {}).get('z', 0),
+                    getattr(item, 'tile_x', 0), getattr(item, 'tile_y', 0),
+                    level_num
+                )
+            
+            # Triggers (0x1A0-0x1BF) - show what trap they link to
+            if 0x1A0 <= object_id <= 0x1BF:
+                from ..constants.traps import get_trigger_name, get_trap_name, describe_trap_effect, is_trap
+                trigger_name = get_trigger_name(object_id)
+                
+                # Check if trigger links to a trap
+                # Note: For triggers, special_link is always the trap link
+                # (is_quantity flag doesn't apply to triggers the same way)
+                if special_link > 0 and levels:
+                    level = levels.get(level_num)
+                    if level and special_link in level.objects:
+                        target = level.objects[special_link]
+                        if is_trap(target.item_id):
+                            trap_name = get_trap_name(target.item_id)
+                            effect = describe_trap_effect(
+                                target.item_id, target.quality, target.owner,
+                                target.z_pos, target.tile_x, target.tile_y,
+                                level_num
+                            )
+                            return f"-> {trap_name}: {effect}"
+                
+                # For move_trigger with no linked trap, show destination
+                if object_id == 0x1A0:
+                    return f"Move to ({quality}, {owner})"
+                return ""
+            
             return ""
         
         def get_item_effect(item, object_id: int, is_enchanted: bool, is_quantity: bool,
@@ -567,11 +603,18 @@ class JsonExporter:
             tile_x = pos.get('tile_x', 0)
             tile_y = pos.get('tile_y', 0)
             
-            # Skip objects at origin (templates) and invisible objects
+            # Skip objects at origin (templates)
             if tile_x == 0 and tile_y == 0:
                 continue
+            
+            # Get object class to determine if we should show invisible objects
+            obj_class = item_dict.get('object_class', 'unknown')
+            
+            # Skip invisible objects EXCEPT for traps and triggers
+            # (traps/triggers are typically invisible game mechanics we want to show on the map)
             if item_dict.get('is_invisible', False):
-                continue
+                if obj_class not in ('trap', 'trigger'):
+                    continue
             
             # Skip NPCs - they are exported separately
             obj_id = item_dict.get('object_id', 0)
