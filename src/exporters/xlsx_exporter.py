@@ -561,6 +561,11 @@ class XlsxExporter:
                         spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
                         if spell_idx < len(spell_names) and spell_names[spell_idx]:
                             return f"Wand of {spell_names[spell_idx]}"
+            # Check for special wands with unique spells
+            from ..constants import get_special_wand_info
+            special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
+            if special_wand:
+                return f"{special_wand['name']} ({item.quality} charges)"
             return f"Wand (unknown spell, {item.quality} charges)"
         
         # Map (0x13B)
@@ -691,7 +696,7 @@ class XlsxExporter:
     
     def _get_item_effect(self, item, strings_parser, level_parser=None) -> str:
         """Get enchantment/effect description for an item."""
-        from ..constants import SPELL_DESCRIPTIONS
+        from ..constants import SPELL_DESCRIPTIONS, get_special_wand_info
         
         spell_names = {}
         if strings_parser:
@@ -724,6 +729,10 @@ class XlsxExporter:
                         if spell:
                             spell_with_desc = format_spell_with_description(spell)
                             return f"{spell_with_desc} ({item.quality} charges)"
+            # Check for special wands with unique spells not in the spell table
+            special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
+            if special_wand:
+                return f"{special_wand['name']} ({item.quality} charges)"
             return f"Unknown spell ({item.quality} charges)" if item.quality > 0 else "Empty"
         
         # Keys

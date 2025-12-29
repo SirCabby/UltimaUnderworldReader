@@ -321,3 +321,29 @@ def get_tmap_info(quality: int, owner: int) -> Dict[str, Any]:
         info['marker_data'] = quality
     
     return info
+
+
+# Special Wands with unique spells that can't be cast normally
+# These wands have spells that aren't in the spell table, so they show as "unknown spell"
+# Key: (level, tile_x, tile_y) -> description dict
+SPECIAL_WANDS = {
+    # Bullfrog Wand on Level 4 - used to solve the Puzzle of the Bullfrog
+    (3, 46, 47): {
+        'name': 'Bullfrog Wand',
+    },
+}
+
+
+def get_special_wand_info(level: int, tile_x: int, tile_y: int) -> Optional[Dict[str, str]]:
+    """
+    Get information about a special wand at a specific location.
+    
+    Args:
+        level: The level index (0-based)
+        tile_x: X coordinate on the tilemap
+        tile_y: Y coordinate on the tilemap
+    
+    Returns:
+        Dictionary with wand info or None if not a special wand
+    """
+    return SPECIAL_WANDS.get((level, tile_x, tile_y))

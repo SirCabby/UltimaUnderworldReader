@@ -37,6 +37,7 @@ from .objects import (
     CATEGORY_DISPLAY_NAMES,
     ITEM_IDS,
     POTION_EFFECTS,
+    SPECIAL_WANDS,
     get_category,
     get_detailed_category,
     get_potion_effect,
@@ -48,6 +49,7 @@ from .objects import (
     is_static_container,
     is_carryable_container,
     get_tmap_info,
+    get_special_wand_info,
 )
 from .mantras import COMPLETE_MANTRAS
 from .traps import (
@@ -110,6 +112,7 @@ __all__ = [
     'CATEGORY_DISPLAY_NAMES',
     'ITEM_IDS',
     'POTION_EFFECTS',
+    'SPECIAL_WANDS',
     'get_category',
     'get_detailed_category',
     'get_potion_effect',
@@ -118,6 +121,7 @@ __all__ = [
     'is_secret_door',
     'is_special_tmap',
     'get_tmap_info',
+    'get_special_wand_info',
     # Traps and Triggers
     'TRAP_ID_MIN',
     'TRAP_ID_MAX',

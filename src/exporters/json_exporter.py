@@ -284,6 +284,13 @@ class JsonExporter:
                             spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
                             if spell_idx in spell_names:
                                 return f"Wand of {spell_names[spell_idx]}"
+                # Check for special wands with unique spells
+                from ..constants import get_special_wand_info
+                tile_x = getattr(item, 'tile_x', 0)
+                tile_y = getattr(item, 'tile_y', 0)
+                special_wand = get_special_wand_info(level_num, tile_x, tile_y)
+                if special_wand:
+                    return f"{special_wand['name']} ({quality} charges)"
                 return f"Wand ({quality} charges)"
             
             # Map (0x13B)
@@ -381,6 +388,13 @@ class JsonExporter:
                             spell = spell_names.get(spell_idx, "")
                             if spell:
                                 return f"{format_spell(spell)} ({quality} charges)"
+                # Check for special wands with unique spells not in the spell table
+                from ..constants import get_special_wand_info
+                tile_x = getattr(item, 'tile_x', 0)
+                tile_y = getattr(item, 'tile_y', 0)
+                special_wand = get_special_wand_info(level_num, tile_x, tile_y)
+                if special_wand:
+                    return f"{special_wand['name']} ({quality} charges)"
                 return f"Unknown spell ({quality} charges)" if quality > 0 else "Empty"
             
             # Keys
@@ -521,7 +535,7 @@ class JsonExporter:
             'talisman': 'talismans',
             # Wands
             'wand': 'wands',
-            'broken_wand': 'wands',
+            'broken_wand': 'misc',  # Broken wands can't cast spells, not magical
             'spell': 'misc',  # Internal spell objects
             # Treasure
             'treasure': 'treasure',
@@ -963,4 +977,12 @@ class JsonExporter:
             }
             web_data['levels'].append(level_entry)
         
-        return self._write_json('web_map_data.json', web_data)
+        output_file = self._write_json('web_map_data.json', web_data)
+        
+        # Also copy to web/data/ folder for the web viewer
+        import shutil
+        web_data_dir = self.output_path.parent / 'web' / 'data'
+        if web_data_dir.exists():
+            shutil.copy(output_file, web_data_dir / 'web_map_data.json')
+        
+        return output_file
