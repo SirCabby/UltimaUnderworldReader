@@ -116,4 +116,3 @@ desktop.ini
 # Regenerate with: python main.py (for data) and python web/generate_maps.py (for maps)
 /web/data/
 /web/maps/
-

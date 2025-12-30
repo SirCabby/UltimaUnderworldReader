@@ -30,7 +30,7 @@ web: extract maps
 start:
 	@echo "Starting web server at http://localhost:$(WEB_PORT)"
 	@echo "Press Ctrl+C to stop the server"
-	cd web && python -m http.server $(WEB_PORT)
+	python -m http.server $(WEB_PORT) --bind 127.0.0.1 -d web
 
 # Open the web viewer in default browser (cross-platform)
 open:
