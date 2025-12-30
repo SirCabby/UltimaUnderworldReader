@@ -540,11 +540,11 @@ class JsonExporter:
             # Treasure
             'treasure': 'treasure',
             # Doors - now split by type
-            'door': 'doors',
+            'door': 'doors_unlocked',  # Base door category (shouldn't happen, but default to unlocked)
             'door_locked': 'doors_locked',
             'door_unlocked': 'doors_unlocked',
             'secret_door': 'secret_doors',
-            'portcullis': 'doors',
+            'portcullis': 'doors_unlocked',  # Unlocked portcullis = unlocked door
             'portcullis_locked': 'doors_locked',
             'open_door': 'doors_open',
             'open_portcullis': 'doors_open',
@@ -846,7 +846,6 @@ class JsonExporter:
                 {'id': 'treasure', 'name': 'Treasure', 'color': '#fcc419'},
                 {'id': 'light', 'name': 'Light Sources', 'color': '#ffe066'},
                 # Doors
-                {'id': 'doors', 'name': 'Doors (Other)', 'color': '#adb5bd'},
                 {'id': 'doors_locked', 'name': 'Locked Doors', 'color': '#ff6b6b'},
                 {'id': 'doors_unlocked', 'name': 'Unlocked Doors', 'color': '#69db7c'},
                 {'id': 'doors_open', 'name': 'Open Doors', 'color': '#8ce99a'},

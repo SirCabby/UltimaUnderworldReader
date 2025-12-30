@@ -242,8 +242,11 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     
     # Doors: distinguish locked from unlocked
     if base_category == 'door':
-        # A door is locked if it has an owner (lock ID) that requires a key
-        if owner != 0:
+        # A door is locked if:
+        # 1. It has a non-zero special_link (pointing to a lock object 0x10F), OR
+        # 2. It has a non-zero owner (for template doors at 0,0)
+        # The lock ID (what key opens it) is stored in the door's quality field
+        if special_link != 0 or owner != 0:
             return 'door_locked'
         return 'door_unlocked'
     
@@ -266,15 +269,21 @@ def is_door(item_id: int) -> bool:
     return 0x140 <= item_id <= 0x14F
 
 
-def is_locked_door(item_id: int, owner: int = 0) -> bool:
-    """Check if a door is locked based on its ID and owner field."""
+def is_locked_door(item_id: int, owner: int = 0, special_link: int = 0) -> bool:
+    """Check if a door is locked based on its ID, owner, and special_link.
+    
+    A door is locked if it has a non-zero special_link (pointing to a lock
+    object 0x10F) or a non-zero owner (for template doors).
+    The lock ID (what key opens it) is stored in the door's quality field.
+    Keys with owner matching the lock ID can open the door.
+    """
     if not is_door(item_id):
         return False
     # Open doors and open portcullises are not locked
     if item_id in range(0x148, 0x14F):
         return False
-    # Locked if owner is non-zero
-    return owner != 0
+    # Locked if special_link points to a lock or owner is non-zero
+    return special_link != 0 or owner != 0
 
 
 def is_secret_door(item_id: int) -> bool:

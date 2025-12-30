@@ -209,7 +209,7 @@ class ItemExtractor:
                 )
                 
                 # Build extra info for special object types
-                extra_info = self._get_extra_info(obj, special_link)
+                extra_info = self._get_extra_info(obj, special_link, level.objects)
                 
                 # Create object info
                 info = GameObjectInfo(
@@ -239,7 +239,7 @@ class ItemExtractor:
                 
                 self.placed_items.append(info)
     
-    def _get_extra_info(self, obj, special_link: int) -> dict:
+    def _get_extra_info(self, obj, special_link: int, level_objects: dict = None) -> dict:
         """
         Get extra information for special object types.
         
@@ -248,6 +248,11 @@ class ItemExtractor:
         - Doors: lock status and lock ID
         - Special tmap objects: texture/level transition info
         - Spell scrolls: spell information
+        
+        Args:
+            obj: The game object
+            special_link: The special_link value for this object
+            level_objects: Dictionary of all objects on this level (for following links)
         """
         extra = {}
         
@@ -259,13 +264,47 @@ class ItemExtractor:
         # Doors
         if is_door(obj.item_id):
             extra['is_secret'] = is_secret_door(obj.item_id)
-            if obj.owner != 0:
-                extra['is_locked'] = True
-                extra['lock_id'] = obj.owner
-            else:
-                extra['is_locked'] = False
             # Check if door is open (IDs 0x148-0x14E are open versions)
             extra['is_open'] = 0x148 <= obj.item_id <= 0x14E
+            
+            # A door is locked if:
+            # 1. It has a non-zero special_link (pointing to a lock object 0x10F), OR
+            # 2. It has a non-zero owner (for template doors at 0,0)
+            if special_link != 0 or obj.owner != 0:
+                extra['is_locked'] = True
+                
+                # The real lock ID is stored in the lock object's quantity field
+                # lock.quantity - 512 = lock_id that matches key.owner
+                lock_id = None
+                lock_quality = None
+                if special_link != 0 and level_objects:
+                    lock_obj = level_objects.get(special_link)
+                    if lock_obj and lock_obj.item_id == 0x10F:  # Lock object
+                        # Lock ID is stored as quantity - 512
+                        lock_quantity = lock_obj.quantity_or_link if lock_obj.is_quantity else 0
+                        if lock_quantity >= 512:
+                            lock_id = lock_quantity - 512
+                        lock_quality = lock_obj.quality
+                
+                # Fallback to owner for template doors at (0,0)
+                if lock_id is None and obj.owner != 0:
+                    lock_id = obj.owner
+                
+                if lock_id is not None:
+                    extra['lock_id'] = lock_id
+                    extra['lock_type'] = 'keyed'  # Needs key with owner=lock_id
+                else:
+                    # No lock ID found - might be trigger-opened
+                    extra['lock_type'] = 'special'
+                
+                # Check if lock is pickable based on lock quality
+                # Quality 40 = pickable, Quality 63 = special/not pickable
+                if lock_quality is not None:
+                    extra['is_pickable'] = lock_quality == 40
+                else:
+                    extra['is_pickable'] = False
+            else:
+                extra['is_locked'] = False
         
         # Special tmap objects
         if is_special_tmap(obj.item_id):

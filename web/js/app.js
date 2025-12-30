@@ -1375,6 +1375,22 @@ function showTooltip(e, item, isNpc) {
         }
     } else {
         html += `<div class="tooltip-info">${formatCategory(item.category)}</div>`;
+        // Show lock information for locked doors
+        if (item.extra_info && item.extra_info.is_locked) {
+            const lockId = item.extra_info.lock_id;
+            const lockType = item.extra_info.lock_type;
+            const isPickable = item.extra_info.is_pickable;
+            let lockText = '';
+            if (lockType === 'special') {
+                lockText = '🔒 Special Lock (trigger-opened)';
+            } else {
+                lockText = `🔒 Locked (lock #${lockId})`;
+                if (isPickable) {
+                    lockText += ' - 🪝 Pickable';
+                }
+            }
+            html += `<div class="tooltip-info" style="color: #ff6b6b; font-size: 0.85rem;">${lockText}</div>`;
+        }
         // Show effect preview in tooltip only for truly magical effects
         if (isMagicalEffect(item.effect)) {
             html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">✨ ${escapeHtml(truncateText(item.effect, 50))}</div>`;
@@ -1782,6 +1798,34 @@ function renderVisibleObjectsPane() {
                 // Show enchantment effect for enchanted items
                 if (itemEnchanted && item.effect && isMagicalEffect(item.effect)) {
                     enchantLine = `<div style="color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;">⚡ ${escapeHtml(item.effect)}</div>`;
+                }
+                // Show lock info for doors
+                const isLocked = item.extra_info && item.extra_info.is_locked;
+                const lockId = item.extra_info && item.extra_info.lock_id;
+                const lockType = item.extra_info && item.extra_info.lock_type;
+                const isPickable = item.extra_info && item.extra_info.is_pickable;
+                if (isLocked) {
+                    let lockText = '';
+                    if (lockType === 'special') {
+                        lockText = '🔒 Special Lock';
+                    } else if (lockId !== undefined) {
+                        lockText = `🔒 Lock #${lockId}`;
+                        if (isPickable) {
+                            lockText += ' 🪝';  // Can be picked
+                        }
+                    } else {
+                        lockText = '🔒 Locked';
+                    }
+                    enchantLine = `<div style="color: #ff6b6b; font-size: 0.7rem; margin-top: 2px;">${lockText}</div>`;
+                }
+                // Show lock info for keys (0x100-0x10E) - they have "Opens lock #N" in effect field
+                const objId = item.object_id || 0;
+                if (objId >= 0x100 && objId <= 0x10E) {
+                    const effectText = item.effect || '';
+                    const match = effectText.match(/lock #(\d+)/i);
+                    if (match) {
+                        enchantLine = `<div style="color: #fab005; font-size: 0.7rem; margin-top: 2px;">🔑 Opens Lock #${match[1]}</div>`;
+                    }
                 }
             }
             
@@ -2459,6 +2503,34 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         const color = getCategoryColor(obj.category);
         const hasContents = obj.contents && obj.contents.length > 0;
         
+        // Check for lock info (doors)
+        const isLocked = obj.extra_info && obj.extra_info.is_locked;
+        const lockId = obj.extra_info && obj.extra_info.lock_id;
+        const lockType = obj.extra_info && obj.extra_info.lock_type;
+        const isPickable = obj.extra_info && obj.extra_info.is_pickable;
+        let lockInfo = '';
+        if (isLocked) {
+            if (lockType === 'special') {
+                lockInfo = '🔒 Special';
+            } else if (lockId !== undefined) {
+                lockInfo = `🔒 Lock #${lockId}`;
+                if (isPickable) {
+                    lockInfo += ' 🪝';  // Can be picked
+                }
+            } else {
+                lockInfo = '🔒 Locked';
+            }
+        }
+        // Check for lock info (keys 0x100-0x10E) - they have "Opens lock #N" in effect field
+        const objId = obj.object_id || 0;
+        if (objId >= 0x100 && objId <= 0x10E) {
+            const effectText = obj.effect || '';
+            const match = effectText.match(/lock #(\d+)/i);
+            if (match) {
+                lockInfo = `🔑 Lock #${match[1]}`;
+            }
+        }
+        
         const card = document.createElement('div');
         card.className = 'detail-card location-item';
         card.style.cssText = `border-left: 3px solid ${color}; cursor: pointer;`;
@@ -2467,7 +2539,7 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         }
         
         card.innerHTML = `
-            <div class="detail-name" style="font-size: 0.9rem;">${obj.name || 'Unknown'}${hasContents ? ' 📦' : ''}</div>
+            <div class="detail-name" style="font-size: 0.9rem;">${obj.name || 'Unknown'}${hasContents ? ' 📦' : ''}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
             ${hasContents ? `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>` : ''}
         `;
@@ -2676,8 +2748,21 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Keys (0x100-0x10E) - description shows what lock it opens
+    // Keys (0x100-0x10E) - show which lock it opens
     if (objId >= 0x100 && objId <= 0x10E) {
+        // Check effect field for "Opens lock #N"
+        const effectText = item.effect || item.description || '';
+        if (effectText.includes('lock #')) {
+            const match = effectText.match(/lock #(\d+)/);
+            if (match) {
+                html += `
+                    <div class="detail-row">
+                        <span class="detail-label">Opens Lock</span>
+                        <span class="detail-value" style="color: #fab005;">🔑 Lock ID ${match[1]}</span>
+                    </div>
+                `;
+            }
+        }
         return html;
     }
     
@@ -2686,8 +2771,59 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Doors (0x140-0x17F) - no special fields for now
+    // Doors (0x140-0x17F) - show lock information
     if (objId >= 0x140 && objId <= 0x17F) {
+        if (item.extra_info && item.extra_info.is_locked) {
+            const lockId = item.extra_info.lock_id;
+            const lockType = item.extra_info.lock_type;
+            const isPickable = item.extra_info.is_pickable;
+            
+            if (lockType === 'special') {
+                html += `
+                    <div class="detail-row">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value" style="color: #ff6b6b;">🔒 Special Lock</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Opens With</span>
+                        <span class="detail-value" style="color: #fab005;">Trigger/mechanism</span>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="detail-row">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value" style="color: #ff6b6b;">🔒 Locked</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Lock ID</span>
+                        <span class="detail-value" style="color: #fab005;">${lockId}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Opens With</span>
+                        <span class="detail-value" style="color: #fab005;">Key with owner = ${lockId}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Pickable</span>
+                        <span class="detail-value" style="color: ${isPickable ? '#69db7c' : '#ff6b6b'};">${isPickable ? '🪝 Yes - can use lockpicks' : '🚫 No'}</span>
+                    </div>
+                `;
+            }
+        } else if (item.extra_info && item.extra_info.is_open) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" style="color: #69db7c;">Open</span>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" style="color: #69db7c;">Unlocked</span>
+                </div>
+            `;
+        }
         return html;
     }
     
