@@ -146,7 +146,8 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
         items.item_types,
         levels.levels,  # Pass levels for container content extraction
         strings,  # Pass strings for rich descriptions (books, scrolls, keys, spells)
-        secrets.secrets  # Pass secrets (illusory walls, secret doors)
+        secrets.secrets,  # Pass secrets (illusory walls, secret doors)
+        convs.conversations  # Pass conversations to verify dialogue scripts exist
     )
     print(f"       Exported web map data to {web_map_path.name}")
     

@@ -214,7 +214,8 @@ class JsonExporter:
 
     def export_web_map_data(self, placed_items: List, npcs: List, npc_names: Dict, 
                             item_types: Dict = None, levels: Dict = None,
-                            strings_parser = None, secrets: List = None) -> Path:
+                            strings_parser = None, secrets: List = None,
+                            conversations: Dict = None) -> Path:
         """Export optimized data for the interactive web map viewer.
         
         Creates a single JSON file with all placed objects and NPCs,
@@ -228,6 +229,7 @@ class JsonExporter:
             levels: Dict of Level objects for following container chains
             strings_parser: StringsParser for looking up text (books, scrolls, keys, spells)
             secrets: List of Secret objects (illusory walls, secret doors, etc.)
+            conversations: Dict of conversation slot -> Conversation (to verify dialogue exists)
         """
         from ..constants import SPELL_DESCRIPTIONS
         
@@ -800,7 +802,7 @@ class JsonExporter:
                 'hp': npc_dict.get('stats', {}).get('hp', 0),
                 'level': npc_dict.get('stats', {}).get('level', 0),
                 'attitude': npc_dict.get('behavior', {}).get('attitude_name', 'unknown'),
-                'has_conversation': conv_slot > 0,
+                'has_conversation': conv_slot > 0 and (conversations is not None and conv_slot in conversations),
                 'conversation_slot': conv_slot,
             }
             
