@@ -854,7 +854,40 @@ function showStackedTooltip(e, items, tileX, tileY) {
             displayName = item.name || 'Unknown';
         }
         const enchantIcon = (!isSecret && isEnchanted(item)) ? ' ✨' : '';
-        itemEl.textContent = `${icon} ${displayName}${enchantIcon}`;
+        
+        // Create name line
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = `${icon} ${displayName}${enchantIcon}`;
+        itemEl.appendChild(nameSpan);
+        
+        // Add stats line for non-secret items (weapons/armor)
+        if (!isSecret && !isNpc) {
+            const objId = item.object_id || 0;
+            
+            // Weapon damage
+            if (objId <= 0x0F && (item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined)) {
+                const damageDiv = document.createElement('div');
+                damageDiv.style.cssText = `font-size: 0.7rem; font-family: var(--font-mono); color: #e03131; margin-top: 2px;`;
+                damageDiv.textContent = formatDamage(item);
+                itemEl.appendChild(damageDiv);
+            }
+            
+            // Weapon durability (melee and ranged)
+            if (objId <= 0x1F && item.durability !== undefined) {
+                const durDiv = document.createElement('div');
+                durDiv.style.cssText = `font-size: 0.7rem; font-family: var(--font-mono); color: #fab005; margin-top: 2px;`;
+                durDiv.textContent = formatDurability(item);
+                itemEl.appendChild(durDiv);
+            }
+            
+            // Armor stats
+            if (isArmor(item) && (item.protection !== undefined || item.durability !== undefined)) {
+                const armorDiv = document.createElement('div');
+                armorDiv.style.cssText = `font-size: 0.7rem; font-family: var(--font-mono); color: #5c7cfa; margin-top: 2px;`;
+                armorDiv.textContent = formatArmor(item);
+                itemEl.appendChild(armorDiv);
+            }
+        }
         
         // Hover effect
         itemEl.addEventListener('mouseenter', () => {
@@ -1380,6 +1413,14 @@ function showTooltip(e, item, isNpc) {
         if (objId <= 0x0F && (item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined)) {
             html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: #e03131;">${formatDamage(item)}</div>`;
         }
+        // Show durability for weapons (melee 0x00-0x0F and ranged 0x10-0x1F)
+        if (objId <= 0x1F && item.durability !== undefined) {
+            html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: #fab005;">${formatDurability(item)}</div>`;
+        }
+        // Show protection/durability for armor
+        if (isArmor(item) && (item.protection !== undefined || item.durability !== undefined)) {
+            html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: #5c7cfa;">${formatArmor(item)}</div>`;
+        }
         // Show weight for items that have it
         if (item.weight !== undefined && item.weight > 0) {
             html += `<div class="tooltip-info" style="font-size: 0.8rem; color: var(--text-muted);">⚖️ ${formatWeight(item.weight)}</div>`;
@@ -1839,6 +1880,14 @@ function renderVisibleObjectsPane() {
                 // Show damage info for melee weapons
                 if (objId <= 0x0F && (item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined)) {
                     enchantLine += `<div style="color: #e03131; font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">${formatDamage(item)}</div>`;
+                }
+                // Show durability for weapons (melee and ranged)
+                if (objId <= 0x1F && item.durability !== undefined) {
+                    enchantLine += `<div style="color: #fab005; font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">${formatDurability(item)}</div>`;
+                }
+                // Show protection/durability for armor
+                if (isArmor(item) && (item.protection !== undefined || item.durability !== undefined)) {
+                    enchantLine += `<div style="color: #5c7cfa; font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">${formatArmor(item)}</div>`;
                 }
                 // Show weight for items that have it
                 if (item.weight !== undefined && item.weight > 0) {
@@ -2555,10 +2604,17 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             card.classList.add('selected-location-item');
         }
         
-        // Build damage/weight info line for weapons
+        // Build damage/armor/weight info line
         let statsLine = '';
         if (objId <= 0x0F && (obj.slash_damage !== undefined || obj.bash_damage !== undefined || obj.stab_damage !== undefined)) {
             statsLine = `<div style="font-size: 0.75rem; color: #e03131; font-family: var(--font-mono);">${formatDamage(obj)}</div>`;
+        }
+        // Show durability for weapons (melee and ranged)
+        if (objId <= 0x1F && obj.durability !== undefined) {
+            statsLine += `<div style="font-size: 0.75rem; color: #fab005; font-family: var(--font-mono);">${formatDurability(obj)}</div>`;
+        }
+        if (isArmor(obj) && (obj.protection !== undefined || obj.durability !== undefined)) {
+            statsLine += `<div style="font-size: 0.75rem; color: #5c7cfa; font-family: var(--font-mono);">${formatArmor(obj)}</div>`;
         }
         if (obj.weight !== undefined && obj.weight > 0) {
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-muted);">⚖️ ${formatWeight(obj.weight)}</div>`;
@@ -2726,7 +2782,7 @@ function getTypeSpecificDetails(item) {
     let html = '';
     const objId = item.object_id;
     
-    // Melee Weapons (0x00-0x0F) - show all three damage values and weight
+    // Melee Weapons (0x00-0x0F) - show all three damage values, durability, and weight
     if (objId <= 0x0F) {
         const hasDamage = item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined;
         if (hasDamage) {
@@ -2738,6 +2794,15 @@ function getTypeSpecificDetails(item) {
                         <span style="margin-left: 8px;" title="Bash">🔨 ${item.bash_damage || 0}</span>
                         <span style="margin-left: 8px;" title="Stab">🗡️ ${item.stab_damage || 0}</span>
                     </span>
+                </div>
+            `;
+        }
+        // Show durability for melee weapons
+        if (item.durability !== undefined) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Durability</span>
+                    <span class="detail-value" style="font-family: var(--font-mono);">${formatDurability(item)}</span>
                 </div>
             `;
         }
@@ -2753,8 +2818,17 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Ranged Weapons (0x10-0x1F) - show weight only
+    // Ranged Weapons (0x10-0x1F) - show durability and weight
     if (objId >= 0x10 && objId <= 0x1F) {
+        // Show durability for ranged weapons
+        if (item.durability !== undefined) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Durability</span>
+                    <span class="detail-value" style="font-family: var(--font-mono);">${formatDurability(item)}</span>
+                </div>
+            `;
+        }
         if (item.weight !== undefined && item.weight > 0) {
             html += `
                 <div class="detail-row">
@@ -2766,8 +2840,20 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Armor (0x20-0x3F) - show weight
+    // Armor (0x20-0x3F) - show protection, durability, and weight
     if (objId >= 0x20 && objId <= 0x3F) {
+        if (item.protection !== undefined || item.durability !== undefined) {
+            const durStr = item.durability !== undefined ? formatDurability(item) : '';
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Stats</span>
+                    <span class="detail-value" style="font-family: var(--font-mono);">
+                        <span title="Protection">🛡️ ${item.protection || 0}</span>
+                        ${durStr ? `<span style="margin-left: 8px;" title="Durability">${durStr}</span>` : ''}
+                    </span>
+                </div>
+            `;
+        }
         if (item.weight !== undefined && item.weight > 0) {
             html += `
                 <div class="detail-row">
@@ -2934,6 +3020,40 @@ function formatDamage(item) {
         return '';
     }
     return `⚔️${item.slash_damage || 0} 🔨${item.bash_damage || 0} 🗡️${item.stab_damage || 0}`;
+}
+
+/**
+ * Format armor stats (protection and durability) as a compact string
+ */
+function formatArmor(item) {
+    if (item.protection === undefined && item.durability === undefined) {
+        return '';
+    }
+    const durabilityStr = formatDurability(item);
+    return `🛡️${item.protection || 0} ${durabilityStr}`;
+}
+
+/**
+ * Format durability as current/total
+ * In UW1: quality field = current durability remaining
+ *         durability from OBJECTS.DAT = max durability
+ * However, the values appear swapped in the data, so we display durability/quality
+ */
+function formatDurability(item) {
+    if (item.durability === undefined) {
+        return '';
+    }
+    const current = item.current_durability !== undefined ? item.current_durability : item.durability;
+    // Swap order: durability (smaller base value) / current_durability (quality, larger value)
+    return `🔧${item.durability}/${current}`;
+}
+
+/**
+ * Check if an item is armor (object_id 0x20-0x3F)
+ */
+function isArmor(item) {
+    const objId = item.object_id || 0;
+    return objId >= 0x20 && objId <= 0x3F;
 }
 
 /**

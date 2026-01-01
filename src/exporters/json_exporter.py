@@ -588,12 +588,12 @@ class JsonExporter:
             return ""
         
         def get_item_stats(obj_id: int) -> dict:
-            """Get item stats (damage, weight) from item_types if available."""
+            """Get item stats (damage, weight, protection, durability) from item_types if available."""
             stats = {}
             if item_types and obj_id in item_types:
                 item_type = item_types[obj_id]
                 
-                # Add weapon damage for melee weapons (0x00-0x0F)
+                # Add weapon damage and durability for melee weapons (0x00-0x0F)
                 if obj_id <= 0x0F and item_type.properties:
                     props = item_type.properties
                     if 'slash_damage' in props:
@@ -602,6 +602,22 @@ class JsonExporter:
                         stats['bash_damage'] = props['bash_damage']
                     if 'stab_damage' in props:
                         stats['stab_damage'] = props['stab_damage']
+                    if 'durability' in props:
+                        stats['durability'] = props['durability']
+                
+                # Add durability for ranged weapons (0x10-0x1F)
+                if 0x10 <= obj_id <= 0x1F and item_type.properties:
+                    props = item_type.properties
+                    if 'durability' in props:
+                        stats['durability'] = props['durability']
+                
+                # Add armor stats for armor items (0x20-0x3F)
+                if 0x20 <= obj_id <= 0x3F and item_type.properties:
+                    props = item_type.properties
+                    if 'protection' in props:
+                        stats['protection'] = props['protection']
+                    if 'durability' in props:
+                        stats['durability'] = props['durability']
                 
                 # Add weight for all items that have mass > 0
                 if item_type.mass > 0:
@@ -668,7 +684,7 @@ class JsonExporter:
                         if item_effect:
                             content_item['effect'] = item_effect
                         
-                        # Add item stats (weapon damage, weight) for contained items
+                        # Add item stats (weapon damage, armor stats, weight) for contained items
                         cont_item_stats = get_item_stats(item.object_id)
                         if cont_item_stats:
                             if 'slash_damage' in cont_item_stats:
@@ -677,6 +693,13 @@ class JsonExporter:
                                 content_item['bash_damage'] = cont_item_stats['bash_damage']
                             if 'stab_damage' in cont_item_stats:
                                 content_item['stab_damage'] = cont_item_stats['stab_damage']
+                            if 'protection' in cont_item_stats:
+                                content_item['protection'] = cont_item_stats['protection']
+                            if 'durability' in cont_item_stats:
+                                content_item['durability'] = cont_item_stats['durability']
+                                # Add current durability (quality) for weapons and armor
+                                if item.object_id <= 0x3F:
+                                    content_item['current_durability'] = item.quality
                             if 'weight' in cont_item_stats:
                                 content_item['weight'] = cont_item_stats['weight']
                         
@@ -776,7 +799,7 @@ class JsonExporter:
             if extra_info:
                 web_obj['extra_info'] = extra_info
             
-            # Add item stats (weapon damage, weight)
+            # Add item stats (weapon damage, armor stats, weight)
             item_stats = get_item_stats(obj_id)
             if item_stats:
                 if 'slash_damage' in item_stats:
@@ -785,6 +808,14 @@ class JsonExporter:
                     web_obj['bash_damage'] = item_stats['bash_damage']
                 if 'stab_damage' in item_stats:
                     web_obj['stab_damage'] = item_stats['stab_damage']
+                if 'protection' in item_stats:
+                    web_obj['protection'] = item_stats['protection']
+                if 'durability' in item_stats:
+                    web_obj['durability'] = item_stats['durability']
+                    # Add current durability (quality) for weapons and armor
+                    # Quality represents the current condition of the item
+                    if obj_id <= 0x3F:  # Weapons (0x00-0x1F) and Armor (0x20-0x3F)
+                        web_obj['current_durability'] = quality
                 if 'weight' in item_stats:
                     web_obj['weight'] = item_stats['weight']
             
