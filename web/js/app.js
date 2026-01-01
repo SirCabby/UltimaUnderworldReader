@@ -887,6 +887,18 @@ function showStackedTooltip(e, items, tileX, tileY) {
                 armorDiv.textContent = formatArmor(item);
                 itemEl.appendChild(armorDiv);
             }
+            
+            // Container capacity
+            if (item.capacity !== undefined) {
+                const capDiv = document.createElement('div');
+                capDiv.style.cssText = `font-size: 0.7rem; color: var(--text-accent); margin-top: 2px;`;
+                let capText = `📦 ${item.capacity} stone${item.capacity !== 1 ? 's' : ''}`;
+                if (item.accepts && item.accepts !== 'any') {
+                    capText += ` (${item.accepts})`;
+                }
+                capDiv.textContent = capText;
+                itemEl.appendChild(capDiv);
+            }
         }
         
         // Hover effect
@@ -1456,6 +1468,14 @@ function showTooltip(e, item, isNpc) {
         if (item.description && item.description.length > 0) {
             html += `<div class="tooltip-info" style="color: var(--text-accent); font-size: 0.8rem;">${escapeHtml(truncateText(item.description, 60))}</div>`;
         }
+        // Show container capacity and weight for containers
+        if (item.capacity !== undefined) {
+            let containerInfo = `📦 Capacity: ${item.capacity} stone${item.capacity !== 1 ? 's' : ''}`;
+            if (item.accepts && item.accepts !== 'any') {
+                containerInfo += ` (${item.accepts} only)`;
+            }
+            html += `<div class="tooltip-info" style="color: var(--text-accent);">${containerInfo}</div>`;
+        }
         // Show container count
         if (item.contents && item.contents.length > 0) {
             html += `<div class="tooltip-info" style="color: var(--text-accent);">📦 ${item.contents.length} item${item.contents.length > 1 ? 's' : ''} inside</div>`;
@@ -1900,6 +1920,14 @@ function renderVisibleObjectsPane() {
                 if (item.weight !== undefined && item.weight > 0) {
                     enchantLine += `<div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 2px;">⚖️ ${formatWeight(item.weight)}</div>`;
                 }
+                // Show container capacity
+                if (item.capacity !== undefined) {
+                    let capacityText = `📦 ${item.capacity} stone${item.capacity !== 1 ? 's' : ''}`;
+                    if (item.accepts && item.accepts !== 'any') {
+                        capacityText += ` (${item.accepts})`;
+                    }
+                    enchantLine += `<div style="color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;">${capacityText}</div>`;
+                }
             }
             
             // Show container/inventory indicators
@@ -2146,6 +2174,26 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
             contentItem.appendChild(descDiv);
         }
         
+        // Show weight if available
+        if (item.weight !== undefined && item.weight > 0) {
+            const weightDiv = document.createElement('div');
+            weightDiv.style.cssText = 'color: var(--text-muted); font-size: 0.7rem; margin-top: 2px;';
+            weightDiv.textContent = `⚖️ ${formatWeight(item.weight)}`;
+            contentItem.appendChild(weightDiv);
+        }
+        
+        // Show container capacity for nested containers
+        if (item.capacity !== undefined) {
+            const capDiv = document.createElement('div');
+            capDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;';
+            let capText = `📦 Capacity: ${item.capacity} stone${item.capacity !== 1 ? 's' : ''}`;
+            if (item.accepts && item.accepts !== 'any') {
+                capText += ` (${item.accepts} only)`;
+            }
+            capDiv.textContent = capText;
+            contentItem.appendChild(capDiv);
+        }
+        
         // Add hover effects
         contentItem.addEventListener('mouseenter', () => {
             contentItem.style.background = 'var(--bg-elevated)';
@@ -2238,6 +2286,26 @@ function renderNpcInventory(inventory, parentNpc = null) {
             descDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px; font-style: italic;';
             descDiv.textContent = truncateText(item.description, 50);
             inventoryItem.appendChild(descDiv);
+        }
+        
+        // Show weight if available
+        if (item.weight !== undefined && item.weight > 0) {
+            const weightDiv = document.createElement('div');
+            weightDiv.style.cssText = 'color: var(--text-muted); font-size: 0.7rem; margin-top: 2px;';
+            weightDiv.textContent = `⚖️ ${formatWeight(item.weight)}`;
+            inventoryItem.appendChild(weightDiv);
+        }
+        
+        // Show container capacity
+        if (item.capacity !== undefined) {
+            const capDiv = document.createElement('div');
+            capDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;';
+            let capText = `📦 Capacity: ${item.capacity} stone${item.capacity !== 1 ? 's' : ''}`;
+            if (item.accepts && item.accepts !== 'any') {
+                capText += ` (${item.accepts} only)`;
+            }
+            capDiv.textContent = capText;
+            inventoryItem.appendChild(capDiv);
         }
         
         // Add hover effects
@@ -2626,6 +2694,14 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         if (obj.weight !== undefined && obj.weight > 0) {
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-muted);">⚖️ ${formatWeight(obj.weight)}</div>`;
         }
+        // Show container capacity
+        if (obj.capacity !== undefined) {
+            let capacityText = `📦 Capacity: ${obj.capacity} stone${obj.capacity !== 1 ? 's' : ''}`;
+            if (obj.accepts && obj.accepts !== 'any') {
+                capacityText += ` (${obj.accepts} only)`;
+            }
+            statsLine += `<div style="font-size: 0.75rem; color: var(--text-accent);">${capacityText}</div>`;
+        }
         
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem;">${obj.name || 'Unknown'}${hasContents ? ' 📦' : ''}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
@@ -2872,8 +2948,35 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Containers (0x80-0x8F) - no special fields needed
+    // Containers (0x80-0x8F) - show capacity and weight
     if (objId >= 0x80 && objId <= 0x8F) {
+        // Show capacity if available
+        if (item.capacity !== undefined) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Capacity</span>
+                    <span class="detail-value">${item.capacity} stone${item.capacity !== 1 ? 's' : ''}</span>
+                </div>
+            `;
+        }
+        // Show what the container accepts if not "any"
+        if (item.accepts && item.accepts !== 'any') {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Accepts</span>
+                    <span class="detail-value" style="text-transform: capitalize;">${item.accepts}</span>
+                </div>
+            `;
+        }
+        // Show weight if available
+        if (item.weight !== undefined && item.weight > 0) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Weight</span>
+                    <span class="detail-value">${formatWeight(item.weight)}</span>
+                </div>
+            `;
+        }
         return html;
     }
     

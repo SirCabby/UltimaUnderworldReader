@@ -619,6 +619,14 @@ class JsonExporter:
                     if 'durability' in props:
                         stats['durability'] = props['durability']
                 
+                # Add container capacity for containers (0x80-0x8F)
+                if 0x80 <= obj_id <= 0x8F and item_type.properties:
+                    props = item_type.properties
+                    if 'capacity' in props:
+                        stats['capacity'] = props['capacity']
+                    if 'accepts' in props:
+                        stats['accepts'] = props['accepts']
+                
                 # Add weight for all items that have mass > 0
                 if item_type.mass > 0:
                     stats['weight'] = item_type.mass / 10.0  # Convert to stones
@@ -818,6 +826,10 @@ class JsonExporter:
                         web_obj['current_durability'] = quality
                 if 'weight' in item_stats:
                     web_obj['weight'] = item_stats['weight']
+                if 'capacity' in item_stats:
+                    web_obj['capacity'] = item_stats['capacity']
+                if 'accepts' in item_stats:
+                    web_obj['accepts'] = item_stats['accepts']
             
             # For containers (both portable and static like barrels/chests), add their contents
             special_link = item_dict.get('special_link', 0)
