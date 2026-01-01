@@ -1375,6 +1375,15 @@ function showTooltip(e, item, isNpc) {
         }
     } else {
         html += `<div class="tooltip-info">${formatCategory(item.category)}</div>`;
+        // Show damage values for melee weapons
+        const objId = item.object_id || 0;
+        if (objId <= 0x0F && (item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined)) {
+            html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: #e03131;">${formatDamage(item)}</div>`;
+        }
+        // Show weight for items that have it
+        if (item.weight !== undefined && item.weight > 0) {
+            html += `<div class="tooltip-info" style="font-size: 0.8rem; color: var(--text-muted);">⚖️ ${formatWeight(item.weight)}</div>`;
+        }
         // Show lock information for locked doors
         if (item.extra_info && item.extra_info.is_locked) {
             const lockId = item.extra_info.lock_id;
@@ -1826,6 +1835,14 @@ function renderVisibleObjectsPane() {
                     if (match) {
                         enchantLine = `<div style="color: #fab005; font-size: 0.7rem; margin-top: 2px;">🔑 Opens Lock #${match[1]}</div>`;
                     }
+                }
+                // Show damage info for melee weapons
+                if (objId <= 0x0F && (item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined)) {
+                    enchantLine += `<div style="color: #e03131; font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">${formatDamage(item)}</div>`;
+                }
+                // Show weight for items that have it
+                if (item.weight !== undefined && item.weight > 0) {
+                    enchantLine += `<div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 2px;">⚖️ ${formatWeight(item.weight)}</div>`;
                 }
             }
             
@@ -2538,9 +2555,19 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             card.classList.add('selected-location-item');
         }
         
+        // Build damage/weight info line for weapons
+        let statsLine = '';
+        if (objId <= 0x0F && (obj.slash_damage !== undefined || obj.bash_damage !== undefined || obj.stab_damage !== undefined)) {
+            statsLine = `<div style="font-size: 0.75rem; color: #e03131; font-family: var(--font-mono);">${formatDamage(obj)}</div>`;
+        }
+        if (obj.weight !== undefined && obj.weight > 0) {
+            statsLine += `<div style="font-size: 0.75rem; color: var(--text-muted);">⚖️ ${formatWeight(obj.weight)}</div>`;
+        }
+        
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem;">${obj.name || 'Unknown'}${hasContents ? ' 📦' : ''}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
+            ${statsLine}
             ${hasContents ? `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>` : ''}
         `;
         
@@ -2699,16 +2726,56 @@ function getTypeSpecificDetails(item) {
     let html = '';
     const objId = item.object_id;
     
-    // Weapons (0x00-0x1F) - show effect if enchanted, otherwise minimal info
-    if (objId <= 0x1F) {
-        // Only show enchantment info if there's an actual effect
-        // The effect field already contains the meaningful enchantment text
+    // Melee Weapons (0x00-0x0F) - show all three damage values and weight
+    if (objId <= 0x0F) {
+        const hasDamage = item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined;
+        if (hasDamage) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Damage</span>
+                    <span class="detail-value" style="font-family: var(--font-mono);">
+                        <span title="Slash">⚔️ ${item.slash_damage || 0}</span>
+                        <span style="margin-left: 8px;" title="Bash">🔨 ${item.bash_damage || 0}</span>
+                        <span style="margin-left: 8px;" title="Stab">🗡️ ${item.stab_damage || 0}</span>
+                    </span>
+                </div>
+            `;
+        }
+        // Show weight for melee weapons
+        if (item.weight !== undefined && item.weight > 0) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Weight</span>
+                    <span class="detail-value">${formatWeight(item.weight)}</span>
+                </div>
+            `;
+        }
         return html;
     }
     
-    // Armor (0x20-0x3F) - show effect if enchanted
+    // Ranged Weapons (0x10-0x1F) - show weight only
+    if (objId >= 0x10 && objId <= 0x1F) {
+        if (item.weight !== undefined && item.weight > 0) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Weight</span>
+                    <span class="detail-value">${formatWeight(item.weight)}</span>
+                </div>
+            `;
+        }
+        return html;
+    }
+    
+    // Armor (0x20-0x3F) - show weight
     if (objId >= 0x20 && objId <= 0x3F) {
-        // Only show enchantment info if there's an actual effect
+        if (item.weight !== undefined && item.weight > 0) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Weight</span>
+                    <span class="detail-value">${formatWeight(item.weight)}</span>
+                </div>
+            `;
+        }
         return html;
     }
     
@@ -2844,6 +2911,29 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+/**
+ * Format weight value in stones
+ */
+function formatWeight(weight) {
+    if (weight === undefined || weight === null) return '';
+    // Weight is in stones (already converted from 0.1 stones in the exporter)
+    if (weight >= 1) {
+        return `${weight.toFixed(1)} stones`;
+    } else {
+        return `${weight.toFixed(1)} stone`;
+    }
+}
+
+/**
+ * Format weapon damage values as a compact string
+ */
+function formatDamage(item) {
+    if (item.slash_damage === undefined && item.bash_damage === undefined && item.stab_damage === undefined) {
+        return '';
+    }
+    return `⚔️${item.slash_damage || 0} 🔨${item.bash_damage || 0} 🗡️${item.stab_damage || 0}`;
 }
 
 /**

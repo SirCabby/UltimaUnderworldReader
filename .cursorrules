@@ -118,17 +118,19 @@ results = extractor.get_all_items()
 
 ## Testing Changes
 
-**IMPORTANT: Always regenerate the XLSX after making any code changes so the user can test it.**
+**IMPORTANT: Always regenerate outputs after making any code changes so the user can test them.**
 
-Run extraction to verify changes work:
+### For XLSX output:
 ```bash
 python main.py Input/UW1/DATA Output --xlsx
 ```
 
-This command:
-- Extracts all game data to JSON files
-- Generates `Output/ultima_underworld_data.xlsx` with formatted sheets
-- Must be run after ANY changes to extractors, constants, or output formatting
+### For Web Map Viewer:
+```bash
+make web
+```
+
+This generates `web/data/game_data.json` which the web viewer uses. **If the changes require regeneration to take effect, prompt the user to restart their local web server** (e.g., refresh the browser or restart `python -m http.server`).
 
 The game data files are in `Input/UW1/DATA/`. Required files:
 - STRINGS.PAK

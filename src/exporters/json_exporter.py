@@ -532,9 +532,9 @@ class JsonExporter:
             'map': 'books',  # Maps shown with books
             # Light sources
             'light_source': 'light',
-            # Runes & Talismans
+            # Runes (talismans/virtue keys are quest items)
             'rune': 'runes',
-            'talisman': 'talismans',
+            'talisman': 'quest',
             # Wands
             'wand': 'wands',
             'broken_wand': 'misc',  # Broken wands can't cast spells, not magical
@@ -586,6 +586,28 @@ class JsonExporter:
             if item_types and obj_id in item_types:
                 return item_types[obj_id].name
             return ""
+        
+        def get_item_stats(obj_id: int) -> dict:
+            """Get item stats (damage, weight) from item_types if available."""
+            stats = {}
+            if item_types and obj_id in item_types:
+                item_type = item_types[obj_id]
+                
+                # Add weapon damage for melee weapons (0x00-0x0F)
+                if obj_id <= 0x0F and item_type.properties:
+                    props = item_type.properties
+                    if 'slash_damage' in props:
+                        stats['slash_damage'] = props['slash_damage']
+                    if 'bash_damage' in props:
+                        stats['bash_damage'] = props['bash_damage']
+                    if 'stab_damage' in props:
+                        stats['stab_damage'] = props['stab_damage']
+                
+                # Add weight for all items that have mass > 0
+                if item_type.mass > 0:
+                    stats['weight'] = item_type.mass / 10.0  # Convert to stones
+            
+            return stats
         
         def is_valid_npc_name(name: str) -> bool:
             """Check if an NPC name is valid (not a bug artifact)."""
@@ -645,6 +667,18 @@ class JsonExporter:
                             content_item['description'] = item_desc
                         if item_effect:
                             content_item['effect'] = item_effect
+                        
+                        # Add item stats (weapon damage, weight) for contained items
+                        cont_item_stats = get_item_stats(item.object_id)
+                        if cont_item_stats:
+                            if 'slash_damage' in cont_item_stats:
+                                content_item['slash_damage'] = cont_item_stats['slash_damage']
+                            if 'bash_damage' in cont_item_stats:
+                                content_item['bash_damage'] = cont_item_stats['bash_damage']
+                            if 'stab_damage' in cont_item_stats:
+                                content_item['stab_damage'] = cont_item_stats['stab_damage']
+                            if 'weight' in cont_item_stats:
+                                content_item['weight'] = cont_item_stats['weight']
                         
                         # If this item is also a container, get its contents recursively
                         # Check for both portable containers and static ones (barrel, chest, urn, etc.)
@@ -741,6 +775,18 @@ class JsonExporter:
             extra_info = item_dict.get('extra_info', {})
             if extra_info:
                 web_obj['extra_info'] = extra_info
+            
+            # Add item stats (weapon damage, weight)
+            item_stats = get_item_stats(obj_id)
+            if item_stats:
+                if 'slash_damage' in item_stats:
+                    web_obj['slash_damage'] = item_stats['slash_damage']
+                if 'bash_damage' in item_stats:
+                    web_obj['bash_damage'] = item_stats['bash_damage']
+                if 'stab_damage' in item_stats:
+                    web_obj['stab_damage'] = item_stats['stab_damage']
+                if 'weight' in item_stats:
+                    web_obj['weight'] = item_stats['weight']
             
             # For containers (both portable and static like barrels/chests), add their contents
             special_link = item_dict.get('special_link', 0)
@@ -842,7 +888,6 @@ class JsonExporter:
                 {'id': 'spell_scrolls', 'name': 'Spell Scrolls', 'color': '#da77f2'},
                 # Magic Items - split by type
                 {'id': 'runes', 'name': 'Runestones', 'color': '#9775fa'},
-                {'id': 'talismans', 'name': 'Talismans (Virtue Keys)', 'color': '#be4bdb'},
                 {'id': 'wands', 'name': 'Wands', 'color': '#7950f2'},
                 # Treasure & Light
                 {'id': 'treasure', 'name': 'Treasure', 'color': '#fcc419'},
