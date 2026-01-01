@@ -1441,6 +1441,13 @@ function showTooltip(e, item, isNpc) {
             }
             html += `<div class="tooltip-info" style="color: #ff6b6b; font-size: 0.85rem;">${lockText}</div>`;
         }
+        // Show lock number for keys (0x100-0x10E)
+        if (objId >= 0x100 && objId <= 0x10E && item.effect) {
+            const lockMatch = item.effect.match(/lock #(\d+)/i);
+            if (lockMatch) {
+                html += `<div class="tooltip-info" style="color: #fab005; font-size: 0.85rem;">🔑 Opens lock #${lockMatch[1]}</div>`;
+            }
+        }
         // Show effect preview in tooltip only for truly magical effects
         if (isMagicalEffect(item.effect)) {
             html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">✨ ${escapeHtml(truncateText(item.effect, 50))}</div>`;
