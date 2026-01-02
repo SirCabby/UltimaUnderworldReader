@@ -519,9 +519,8 @@ class JsonExporter:
             'storage': 'storage',
             # Keys
             'key': 'keys',
-            # Consumables - now split
+            # Consumables
             'food': 'food',
-            'drink': 'drink',
             'potion': 'potions',
             # Books & Scrolls - now split
             'scroll': 'scrolls',
@@ -588,8 +587,9 @@ class JsonExporter:
             return ""
         
         def get_item_stats(obj_id: int) -> dict:
-            """Get item stats (damage, weight, protection, durability, nutrition) from item_types if available."""
-            from ..constants import FOOD_NUTRITION, FOOD_ID_MIN, FOOD_ID_MAX
+            """Get item stats (damage, weight, protection, durability, nutrition, intoxication) from item_types if available."""
+            from ..constants import FOOD_NUTRITION, FOOD_IDS
+            from ..constants import DRINK_INTOXICATION, DRINK_NUTRITION, ACTUAL_DRINK_IDS, is_alcoholic
             
             stats = {}
             if item_types and obj_id in item_types:
@@ -629,11 +629,18 @@ class JsonExporter:
                     if 'accepts' in props:
                         stats['accepts'] = props['accepts']
                 
-                # Add nutrition for food items (0xB0-0xB9)
-                if FOOD_ID_MIN <= obj_id <= FOOD_ID_MAX:
+                # Add nutrition for food items (includes ale, water, port)
+                # Note: Wine (0xBF) is a quest item, not in FOOD_IDS
+                if obj_id in FOOD_IDS:
                     nutrition = FOOD_NUTRITION.get(obj_id)
                     if nutrition is not None:
                         stats['nutrition'] = nutrition
+                
+                # Add intoxication for alcoholic beverages (ale 0xBA, port 0xBE)
+                # Wine (0xBF) is a quest item with no intoxication
+                intoxication = DRINK_INTOXICATION.get(obj_id)
+                if intoxication is not None and intoxication > 0:
+                    stats['intoxication'] = intoxication
                 
                 # Add weight for all items that have mass > 0
                 if item_type.mass > 0:
@@ -700,7 +707,7 @@ class JsonExporter:
                         if item_effect:
                             content_item['effect'] = item_effect
                         
-                        # Add item stats (weapon damage, armor stats, weight, nutrition) for contained items
+                        # Add item stats (weapon damage, armor stats, weight, nutrition, intoxication) for contained items
                         cont_item_stats = get_item_stats(item.object_id)
                         if cont_item_stats:
                             if 'slash_damage' in cont_item_stats:
@@ -720,6 +727,8 @@ class JsonExporter:
                                 content_item['weight'] = cont_item_stats['weight']
                             if 'nutrition' in cont_item_stats:
                                 content_item['nutrition'] = cont_item_stats['nutrition']
+                            if 'intoxication' in cont_item_stats:
+                                content_item['intoxication'] = cont_item_stats['intoxication']
                         
                         # If this item is also a container, get its contents recursively
                         # Check for both portable containers and static ones (barrel, chest, urn, etc.)
@@ -817,7 +826,7 @@ class JsonExporter:
             if extra_info:
                 web_obj['extra_info'] = extra_info
             
-            # Add item stats (weapon damage, armor stats, weight, nutrition)
+            # Add item stats (weapon damage, armor stats, weight, nutrition, intoxication)
             item_stats = get_item_stats(obj_id)
             if item_stats:
                 if 'slash_damage' in item_stats:
@@ -842,6 +851,8 @@ class JsonExporter:
                     web_obj['accepts'] = item_stats['accepts']
                 if 'nutrition' in item_stats:
                     web_obj['nutrition'] = item_stats['nutrition']
+                if 'intoxication' in item_stats:
+                    web_obj['intoxication'] = item_stats['intoxication']
             
             # For containers (both portable and static like barrels/chests), add their contents
             special_link = item_dict.get('special_link', 0)
@@ -933,9 +944,8 @@ class JsonExporter:
                 {'id': 'keys', 'name': 'Keys', 'color': '#fab005'},
                 {'id': 'containers', 'name': 'Containers', 'color': '#f08c00'},
                 {'id': 'storage', 'name': 'Storage', 'color': '#d9480f'},
-                # Food, Drink & Potions
+                # Food & Potions
                 {'id': 'food', 'name': 'Food', 'color': '#a9e34b'},
-                {'id': 'drink', 'name': 'Drinks', 'color': '#74c0fc'},
                 {'id': 'potions', 'name': 'Potions', 'color': '#f783ac'},
                 # Books & Scrolls
                 {'id': 'books', 'name': 'Readable Books', 'color': '#e8d4b8'},

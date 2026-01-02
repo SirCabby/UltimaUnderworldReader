@@ -1437,12 +1437,18 @@ function showTooltip(e, item, isNpc) {
         if (item.weight !== undefined && item.weight > 0) {
             html += `<div class="tooltip-info" style="font-size: 0.8rem; color: var(--text-muted);">⚖️ ${formatWeight(item.weight)}</div>`;
         }
-        // Show nutrition for food items (0xB0-0xB9)
+        // Show nutrition for food items (0xB0-0xB9, 0xBD water)
         if (item.nutrition !== undefined) {
             const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
                                    item.nutrition >= 20 ? '#a9e34b' : 
                                    item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
             html += `<div class="tooltip-info" style="font-size: 0.8rem; color: ${nutritionColor};">🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}</div>`;
+        }
+        // Show intoxication for alcoholic drinks (ale 0xBA, port 0xBE, wine 0xBF)
+        if (item.intoxication !== undefined && item.intoxication > 0) {
+            const intoxColor = item.intoxication >= 100 ? '#ff6b6b' : 
+                               item.intoxication >= 50 ? '#ffa94d' : '#fcc419';
+            html += `<div class="tooltip-info" style="font-size: 0.8rem; color: ${intoxColor};">🍺 Intoxication: ${item.intoxication}</div>`;
         }
         // Show lock information for locked doors
         if (item.extra_info && item.extra_info.is_locked) {
@@ -1927,12 +1933,18 @@ function renderVisibleObjectsPane() {
                 if (item.weight !== undefined && item.weight > 0) {
                     enchantLine += `<div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 2px;">⚖️ ${formatWeight(item.weight)}</div>`;
                 }
-                // Show nutrition for food items (0xB0-0xB9)
+                // Show nutrition for food items (0xB0-0xB9, 0xBD water)
                 if (item.nutrition !== undefined) {
                     const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
                                            item.nutrition >= 20 ? '#a9e34b' : 
                                            item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
                     enchantLine += `<div style="color: ${nutritionColor}; font-size: 0.7rem; margin-top: 2px;">🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}</div>`;
+                }
+                // Show intoxication for alcoholic drinks
+                if (item.intoxication !== undefined && item.intoxication > 0) {
+                    const intoxColor = item.intoxication >= 100 ? '#ff6b6b' : 
+                                       item.intoxication >= 50 ? '#ffa94d' : '#fcc419';
+                    enchantLine += `<div style="color: ${intoxColor}; font-size: 0.7rem; margin-top: 2px;">🍺 Intoxication: ${item.intoxication}</div>`;
                 }
                 // Show container capacity
                 if (item.capacity !== undefined) {
@@ -2196,7 +2208,7 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
             contentItem.appendChild(weightDiv);
         }
         
-        // Show nutrition for food items (0xB0-0xB9)
+        // Show nutrition for food items (0xB0-0xB9, 0xBD water)
         if (item.nutrition !== undefined) {
             const nutritionDiv = document.createElement('div');
             const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
@@ -2205,6 +2217,16 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
             nutritionDiv.style.cssText = `color: ${nutritionColor}; font-size: 0.7rem; margin-top: 2px;`;
             nutritionDiv.textContent = `🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}`;
             contentItem.appendChild(nutritionDiv);
+        }
+        
+        // Show intoxication for alcoholic drinks
+        if (item.intoxication !== undefined && item.intoxication > 0) {
+            const intoxDiv = document.createElement('div');
+            const intoxColor = item.intoxication >= 100 ? '#ff6b6b' : 
+                               item.intoxication >= 50 ? '#ffa94d' : '#fcc419';
+            intoxDiv.style.cssText = `color: ${intoxColor}; font-size: 0.7rem; margin-top: 2px;`;
+            intoxDiv.textContent = `🍺 Intoxication: ${item.intoxication}`;
+            contentItem.appendChild(intoxDiv);
         }
         
         // Show container capacity for nested containers
@@ -2321,7 +2343,7 @@ function renderNpcInventory(inventory, parentNpc = null) {
             inventoryItem.appendChild(weightDiv);
         }
         
-        // Show nutrition for food items (0xB0-0xB9)
+        // Show nutrition for food items (0xB0-0xB9, 0xBD water)
         if (item.nutrition !== undefined) {
             const nutritionDiv = document.createElement('div');
             const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
@@ -2330,6 +2352,16 @@ function renderNpcInventory(inventory, parentNpc = null) {
             nutritionDiv.style.cssText = `color: ${nutritionColor}; font-size: 0.7rem; margin-top: 2px;`;
             nutritionDiv.textContent = `🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}`;
             inventoryItem.appendChild(nutritionDiv);
+        }
+        
+        // Show intoxication for alcoholic drinks
+        if (item.intoxication !== undefined && item.intoxication > 0) {
+            const intoxDiv = document.createElement('div');
+            const intoxColor = item.intoxication >= 100 ? '#ff6b6b' : 
+                               item.intoxication >= 50 ? '#ffa94d' : '#fcc419';
+            intoxDiv.style.cssText = `color: ${intoxColor}; font-size: 0.7rem; margin-top: 2px;`;
+            intoxDiv.textContent = `🍺 Intoxication: ${item.intoxication}`;
+            inventoryItem.appendChild(intoxDiv);
         }
         
         // Show container capacity
@@ -2730,12 +2762,18 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         if (obj.weight !== undefined && obj.weight > 0) {
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-muted);">⚖️ ${formatWeight(obj.weight)}</div>`;
         }
-        // Show nutrition for food items (0xB0-0xB9)
+        // Show nutrition for food items (0xB0-0xB9, 0xBD water)
         if (obj.nutrition !== undefined) {
             const nutritionColor = obj.nutrition >= 40 ? '#69db7c' : 
                                    obj.nutrition >= 20 ? '#a9e34b' : 
                                    obj.nutrition > 0 ? '#fcc419' : '#ff6b6b';
             statsLine += `<div style="font-size: 0.75rem; color: ${nutritionColor};">🍖 Nutrition: ${obj.nutrition}${obj.nutrition === 0 ? ' (none!)' : ''}</div>`;
+        }
+        // Show intoxication for alcoholic drinks
+        if (obj.intoxication !== undefined && obj.intoxication > 0) {
+            const intoxColor = obj.intoxication >= 100 ? '#ff6b6b' : 
+                               obj.intoxication >= 50 ? '#ffa94d' : '#fcc419';
+            statsLine += `<div style="font-size: 0.75rem; color: ${intoxColor};">🍺 Intoxication: ${obj.intoxication}</div>`;
         }
         // Show container capacity
         if (obj.capacity !== undefined) {
@@ -3039,17 +3077,34 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Food items (0xB0-0xB9) - show nutrition value
-    if (objId >= 0xB0 && objId <= 0xB9) {
+    // Food items (0xB0-0xB9, 0xBA ale, 0xBD water, 0xBE port) - show nutrition and intoxication
+    if ((objId >= 0xB0 && objId <= 0xB9) || objId === 0xBA || objId === 0xBD || objId === 0xBE) {
+        // Show intoxication for alcoholic drinks (ale, port)
+        if (item.intoxication !== undefined && item.intoxication > 0) {
+            const intoxColor = item.intoxication >= 100 ? '#ff6b6b' : 
+                               item.intoxication >= 50 ? '#ffa94d' : '#fcc419';
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Intoxication</span>
+                    <span class="detail-value" style="color: ${intoxColor}; font-weight: 500;">
+                        🍺 ${item.intoxication}
+                    </span>
+                </div>
+            `;
+        }
+        // Show nutrition (or "no effect" for water)
         if (item.nutrition !== undefined) {
             const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
                                    item.nutrition >= 20 ? '#a9e34b' : 
                                    item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
+            // Special note for water (0xBD) which has no effect
+            const noEffectNote = (objId === 0xBD && item.nutrition === 0) ? ' (no effect!)' : 
+                                 (item.nutrition === 0) ? ' (no nutrition!)' : '';
             html += `
                 <div class="detail-row">
                     <span class="detail-label">Nutrition</span>
                     <span class="detail-value" style="color: ${nutritionColor}; font-weight: 500;">
-                        🍖 ${item.nutrition}${item.nutrition === 0 ? ' (no nutrition!)' : ''}
+                        🍖 ${item.nutrition}${noEffectNote}
                     </span>
                 </div>
             `;
@@ -3066,8 +3121,13 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Potions (0xBA-0xBF) - effect shows potion type
-    if (objId >= 0xBA && objId <= 0xBF) {
+    // Potions (0xBB red mana, 0xBC green health) - effect shows potion type
+    if (objId === 0xBB || objId === 0xBC) {
+        return html;
+    }
+    
+    // Wine of Compassion (0xBF) - quest item, no consumable stats needed
+    if (objId === 0xBF) {
         return html;
     }
     

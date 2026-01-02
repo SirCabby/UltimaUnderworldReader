@@ -20,9 +20,11 @@ OBJECT_CATEGORIES: Dict[Tuple[int, int], str] = {
     (0x09C, 0x09F): "broken_wand",
     (0x0A0, 0x0AF): "treasure",
     (0x0B0, 0x0B9): "food",           # Actual food items
-    (0x0BA, 0x0BA): "drink",          # Bottle of ale
+    (0x0BA, 0x0BA): "food",           # Bottle of ale (alcoholic, causes intoxication)
     (0x0BB, 0x0BC): "potion",         # Red/green potions
-    (0x0BD, 0x0BF): "drink",          # Water, port, wine
+    (0x0BD, 0x0BD): "food",           # Water - no effect (UW1 has no thirst system)
+    (0x0BE, 0x0BE): "food",           # Flask of port (alcoholic, causes intoxication)
+    (0x0BF, 0x0BF): "talisman",       # Wine of Compassion - quest item (Talisman of Sir Cabirus)
     (0x0C0, 0x0DF): "scenery",
     (0x0E0, 0x0E0): "rune",             # Generic runestone
     (0x0E1, 0x0E7): "talisman",         # Virtue keys and two-part keys

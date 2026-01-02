@@ -16,7 +16,7 @@ from typing import Dict, Optional
 # Based on game data analysis and community research
 # Note: IDs verified against STRINGS.PAK block 4
 FOOD_NUTRITION: Dict[int, int] = {
-    0xB0: 64,   # Piece of Meat - most filling solid food
+    0xB0: 64,   # Piece of Meat - most filling food item
     0xB1: 16,   # Loaf of Bread
     0xB2: 12,   # Piece of Cheese
     0xB3: 6,    # Apple
@@ -26,6 +26,9 @@ FOOD_NUTRITION: Dict[int, int] = {
     0xB7: 2,    # Popcorn - least filling
     0xB8: 0,    # Mushroom - provides NO nutrition!
     0xB9: 6,    # Toadstool
+    0xBA: 5,    # Bottle of Ale - minimal nutrition, causes intoxication
+    0xBD: 0,    # Bottle of Water - NO effect (UW1 has no thirst system!)
+    0xBE: 8,    # Flask of Port - minimal nutrition, causes intoxication
 }
 
 # Food item names for reference (from STRINGS.PAK block 4)
@@ -40,6 +43,9 @@ FOOD_NAMES: Dict[int, str] = {
     0xB7: "popcorn",
     0xB8: "mushroom",
     0xB9: "toadstool",
+    0xBA: "bottle of ale",    # Alcoholic beverage
+    0xBD: "bottle of water",  # No effect in game
+    0xBE: "flask of port",    # Alcoholic beverage
 }
 
 # Notes about each food item
@@ -54,16 +60,23 @@ FOOD_NOTES: Dict[int, str] = {
     0xB7: "Almost no nutrition value",
     0xB8: "WARNING: Provides no nutrition!",
     0xB9: "Light snack, may have other effects",
+    0xBA: "Alcoholic - causes intoxication!",
+    0xBD: "No effect - UW1 has no thirst system",
+    0xBE: "Strong alcohol - causes intoxication!",
 }
 
 # Food ID range constants
 FOOD_ID_MIN = 0xB0
-FOOD_ID_MAX = 0xB9
+FOOD_ID_MAX = 0xB9  # For solid foods only
+
+# All food item IDs (includes beverages: ale, water, port)
+# Note: Wine (0xBF) is a quest item, not a consumable food
+FOOD_IDS = {0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBD, 0xBE}
 
 
 def is_food(item_id: int) -> bool:
-    """Check if an item ID is a food item."""
-    return FOOD_ID_MIN <= item_id <= FOOD_ID_MAX
+    """Check if an item ID is a food item (includes water which has nutrition)."""
+    return item_id in FOOD_IDS
 
 
 def get_food_nutrition(item_id: int) -> Optional[int]:
