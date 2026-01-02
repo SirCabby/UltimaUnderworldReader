@@ -52,6 +52,16 @@ from .objects import (
     get_special_wand_info,
 )
 from .mantras import COMPLETE_MANTRAS
+from .food import (
+    FOOD_NUTRITION,
+    FOOD_NAMES,
+    FOOD_NOTES,
+    FOOD_ID_MIN,
+    FOOD_ID_MAX,
+    is_food,
+    get_food_nutrition,
+    get_food_note,
+)
 from .traps import (
     TRAP_ID_MIN,
     TRAP_ID_MAX,
@@ -104,6 +114,15 @@ __all__ = [
     'get_npc_type_name',
     # Mantras
     'COMPLETE_MANTRAS',
+    # Food
+    'FOOD_NUTRITION',
+    'FOOD_NAMES',
+    'FOOD_NOTES',
+    'FOOD_ID_MIN',
+    'FOOD_ID_MAX',
+    'is_food',
+    'get_food_nutrition',
+    'get_food_note',
     # Objects
     'OBJECT_CATEGORIES',
     'STACKABLE_ITEMS',

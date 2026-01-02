@@ -588,7 +588,9 @@ class JsonExporter:
             return ""
         
         def get_item_stats(obj_id: int) -> dict:
-            """Get item stats (damage, weight, protection, durability) from item_types if available."""
+            """Get item stats (damage, weight, protection, durability, nutrition) from item_types if available."""
+            from ..constants import FOOD_NUTRITION, FOOD_ID_MIN, FOOD_ID_MAX
+            
             stats = {}
             if item_types and obj_id in item_types:
                 item_type = item_types[obj_id]
@@ -626,6 +628,12 @@ class JsonExporter:
                         stats['capacity'] = props['capacity']
                     if 'accepts' in props:
                         stats['accepts'] = props['accepts']
+                
+                # Add nutrition for food items (0xB0-0xB9)
+                if FOOD_ID_MIN <= obj_id <= FOOD_ID_MAX:
+                    nutrition = FOOD_NUTRITION.get(obj_id)
+                    if nutrition is not None:
+                        stats['nutrition'] = nutrition
                 
                 # Add weight for all items that have mass > 0
                 if item_type.mass > 0:
@@ -692,7 +700,7 @@ class JsonExporter:
                         if item_effect:
                             content_item['effect'] = item_effect
                         
-                        # Add item stats (weapon damage, armor stats, weight) for contained items
+                        # Add item stats (weapon damage, armor stats, weight, nutrition) for contained items
                         cont_item_stats = get_item_stats(item.object_id)
                         if cont_item_stats:
                             if 'slash_damage' in cont_item_stats:
@@ -710,6 +718,8 @@ class JsonExporter:
                                     content_item['current_durability'] = item.quality
                             if 'weight' in cont_item_stats:
                                 content_item['weight'] = cont_item_stats['weight']
+                            if 'nutrition' in cont_item_stats:
+                                content_item['nutrition'] = cont_item_stats['nutrition']
                         
                         # If this item is also a container, get its contents recursively
                         # Check for both portable containers and static ones (barrel, chest, urn, etc.)
@@ -807,7 +817,7 @@ class JsonExporter:
             if extra_info:
                 web_obj['extra_info'] = extra_info
             
-            # Add item stats (weapon damage, armor stats, weight)
+            # Add item stats (weapon damage, armor stats, weight, nutrition)
             item_stats = get_item_stats(obj_id)
             if item_stats:
                 if 'slash_damage' in item_stats:
@@ -830,6 +840,8 @@ class JsonExporter:
                     web_obj['capacity'] = item_stats['capacity']
                 if 'accepts' in item_stats:
                     web_obj['accepts'] = item_stats['accepts']
+                if 'nutrition' in item_stats:
+                    web_obj['nutrition'] = item_stats['nutrition']
             
             # For containers (both portable and static like barrels/chests), add their contents
             special_link = item_dict.get('special_link', 0)

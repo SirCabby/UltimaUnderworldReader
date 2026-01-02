@@ -219,6 +219,9 @@ def export_to_xlsx(data_path: Path, output_path: Path, extracted_data: dict) -> 
     print("  - Containers sheet (carryable only)...")
     xlsx.export_containers(items.item_types, objects_parser, common_parser)
     
+    print("  - Food sheet (with nutrition values)...")
+    xlsx.export_food(items.item_types, strings)
+    
     print("  - Light Sources sheet (with spells)...")
     xlsx.export_light_sources(items.item_types, objects_parser, strings)
     

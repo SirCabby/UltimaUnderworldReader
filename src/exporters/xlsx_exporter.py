@@ -906,6 +906,51 @@ class XlsxExporter:
                 row += 1
         self._auto_column_width(ws)
     
+    def export_food(self, item_types: Dict, strings_parser=None) -> None:
+        """Export food items with nutrition values."""
+        from ..constants import FOOD_NUTRITION, FOOD_NOTES, FOOD_ID_MIN, FOOD_ID_MAX
+        
+        headers = ["ID", "Name", "Nutrition", "Weight", "Nutrition/Weight", "Notes"]
+        ws = self._create_sheet("Food", headers)
+        
+        # Get object names from strings
+        obj_names = []
+        if strings_parser:
+            obj_names = strings_parser.get_block(4) or []
+        
+        row = 2
+        for item_id in range(FOOD_ID_MIN, FOOD_ID_MAX + 1):
+            item = item_types.get(item_id)
+            nutrition = FOOD_NUTRITION.get(item_id, 0)
+            notes = FOOD_NOTES.get(item_id, "")
+            
+            # Get name from strings or item_types
+            name = ""
+            if item:
+                name = item.name
+            elif item_id < len(obj_names) and obj_names[item_id]:
+                name, _, _ = parse_item_name(obj_names[item_id])
+            
+            # Weight in stones (mass is in 0.1 stones)
+            weight = 0.0
+            weight_str = ""
+            if item and item.mass > 0:
+                weight = item.mass / 10.0
+                weight_str = f"{weight:.1f}"
+            
+            # Calculate nutrition per weight (efficiency)
+            efficiency_str = ""
+            if weight > 0:
+                efficiency = nutrition / weight
+                efficiency_str = f"{efficiency:.1f}"
+            
+            values = [
+                item_id, name, nutrition, weight_str, efficiency_str, notes
+            ]
+            self._add_row(ws, row, values, row % 2 == 0)
+            row += 1
+        self._auto_column_width(ws)
+    
     def export_light_sources(self, item_types: Dict, objects_parser, strings_parser=None) -> None:
         """Export light sources (lit items only) and light-granting spells."""
         from ..constants import SPELL_CIRCLES, LIGHT_SPELL_LEVELS

@@ -1437,6 +1437,13 @@ function showTooltip(e, item, isNpc) {
         if (item.weight !== undefined && item.weight > 0) {
             html += `<div class="tooltip-info" style="font-size: 0.8rem; color: var(--text-muted);">⚖️ ${formatWeight(item.weight)}</div>`;
         }
+        // Show nutrition for food items (0xB0-0xB9)
+        if (item.nutrition !== undefined) {
+            const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
+                                   item.nutrition >= 20 ? '#a9e34b' : 
+                                   item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
+            html += `<div class="tooltip-info" style="font-size: 0.8rem; color: ${nutritionColor};">🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}</div>`;
+        }
         // Show lock information for locked doors
         if (item.extra_info && item.extra_info.is_locked) {
             const lockId = item.extra_info.lock_id;
@@ -1920,6 +1927,13 @@ function renderVisibleObjectsPane() {
                 if (item.weight !== undefined && item.weight > 0) {
                     enchantLine += `<div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 2px;">⚖️ ${formatWeight(item.weight)}</div>`;
                 }
+                // Show nutrition for food items (0xB0-0xB9)
+                if (item.nutrition !== undefined) {
+                    const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
+                                           item.nutrition >= 20 ? '#a9e34b' : 
+                                           item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
+                    enchantLine += `<div style="color: ${nutritionColor}; font-size: 0.7rem; margin-top: 2px;">🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}</div>`;
+                }
                 // Show container capacity
                 if (item.capacity !== undefined) {
                     let capacityText = `📦 ${item.capacity} stone${item.capacity !== 1 ? 's' : ''}`;
@@ -2182,6 +2196,17 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
             contentItem.appendChild(weightDiv);
         }
         
+        // Show nutrition for food items (0xB0-0xB9)
+        if (item.nutrition !== undefined) {
+            const nutritionDiv = document.createElement('div');
+            const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
+                                   item.nutrition >= 20 ? '#a9e34b' : 
+                                   item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
+            nutritionDiv.style.cssText = `color: ${nutritionColor}; font-size: 0.7rem; margin-top: 2px;`;
+            nutritionDiv.textContent = `🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}`;
+            contentItem.appendChild(nutritionDiv);
+        }
+        
         // Show container capacity for nested containers
         if (item.capacity !== undefined) {
             const capDiv = document.createElement('div');
@@ -2294,6 +2319,17 @@ function renderNpcInventory(inventory, parentNpc = null) {
             weightDiv.style.cssText = 'color: var(--text-muted); font-size: 0.7rem; margin-top: 2px;';
             weightDiv.textContent = `⚖️ ${formatWeight(item.weight)}`;
             inventoryItem.appendChild(weightDiv);
+        }
+        
+        // Show nutrition for food items (0xB0-0xB9)
+        if (item.nutrition !== undefined) {
+            const nutritionDiv = document.createElement('div');
+            const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
+                                   item.nutrition >= 20 ? '#a9e34b' : 
+                                   item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
+            nutritionDiv.style.cssText = `color: ${nutritionColor}; font-size: 0.7rem; margin-top: 2px;`;
+            nutritionDiv.textContent = `🍖 Nutrition: ${item.nutrition}${item.nutrition === 0 ? ' (none!)' : ''}`;
+            inventoryItem.appendChild(nutritionDiv);
         }
         
         // Show container capacity
@@ -2694,6 +2730,13 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         if (obj.weight !== undefined && obj.weight > 0) {
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-muted);">⚖️ ${formatWeight(obj.weight)}</div>`;
         }
+        // Show nutrition for food items (0xB0-0xB9)
+        if (obj.nutrition !== undefined) {
+            const nutritionColor = obj.nutrition >= 40 ? '#69db7c' : 
+                                   obj.nutrition >= 20 ? '#a9e34b' : 
+                                   obj.nutrition > 0 ? '#fcc419' : '#ff6b6b';
+            statsLine += `<div style="font-size: 0.75rem; color: ${nutritionColor};">🍖 Nutrition: ${obj.nutrition}${obj.nutrition === 0 ? ' (none!)' : ''}</div>`;
+        }
         // Show container capacity
         if (obj.capacity !== undefined) {
             let capacityText = `📦 Capacity: ${obj.capacity} stone${obj.capacity !== 1 ? 's' : ''}`;
@@ -2996,8 +3039,35 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Food and Potions (0xB0-0xBF) - effect shows potion type
-    if (objId >= 0xB0 && objId <= 0xBF) {
+    // Food items (0xB0-0xB9) - show nutrition value
+    if (objId >= 0xB0 && objId <= 0xB9) {
+        if (item.nutrition !== undefined) {
+            const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
+                                   item.nutrition >= 20 ? '#a9e34b' : 
+                                   item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Nutrition</span>
+                    <span class="detail-value" style="color: ${nutritionColor}; font-weight: 500;">
+                        🍖 ${item.nutrition}${item.nutrition === 0 ? ' (no nutrition!)' : ''}
+                    </span>
+                </div>
+            `;
+        }
+        // Show weight if available
+        if (item.weight !== undefined && item.weight > 0) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Weight</span>
+                    <span class="detail-value">${formatWeight(item.weight)}</span>
+                </div>
+            `;
+        }
+        return html;
+    }
+    
+    // Potions (0xBA-0xBF) - effect shows potion type
+    if (objId >= 0xBA && objId <= 0xBF) {
         return html;
     }
     
