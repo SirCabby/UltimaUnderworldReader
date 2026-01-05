@@ -1995,16 +1995,37 @@ function renderVisibleObjectsPane() {
         });
     }
     
-    // Sort by category, then by name
+    // Build category order map to match sidebar order:
+    // 1. NPC categories first (hostile, friendly, named)
+    // 2. Then data-defined categories in their order
+    // 3. Then secret categories last
+    const categoryOrder = new Map();
+    let orderIndex = 0;
+    categoryOrder.set('npcs_hostile', orderIndex++);
+    categoryOrder.set('npcs_friendly', orderIndex++);
+    categoryOrder.set('npcs_named', orderIndex++);
+    state.data.categories.forEach(cat => {
+        if (!cat.id.startsWith('npcs')) {
+            categoryOrder.set(cat.id, orderIndex++);
+        }
+    });
+    // Secrets at the end
+    categoryOrder.set('illusory_walls', orderIndex++);
+    categoryOrder.set('secret_doors', orderIndex++);
+    
+    function getCategoryOrderIndex(categoryId) {
+        return categoryOrder.has(categoryId) ? categoryOrder.get(categoryId) : 9999;
+    }
+    
+    // Sort by category (matching sidebar order), then by name
     visibleItems.sort((a, b) => {
-        // NPCs first
-        if (a.isNpc !== b.isNpc) return a.isNpc ? -1 : 1;
-        // Secrets last
-        if (a.isSecret !== b.isSecret) return a.isSecret ? 1 : -1;
-        // Then by category (use NPC category for NPCs)
-        const catA = a.isNpc ? getNpcCategory(a.item) : (a.isSecret ? a.item.category : a.item.category);
-        const catB = b.isNpc ? getNpcCategory(b.item) : (b.isSecret ? b.item.category : b.item.category);
-        if (catA !== catB) return catA.localeCompare(catB);
+        // Get category for each item
+        const catA = a.isNpc ? getNpcCategory(a.item) : a.item.category;
+        const catB = b.isNpc ? getNpcCategory(b.item) : b.item.category;
+        // Sort by sidebar order
+        const orderA = getCategoryOrderIndex(catA);
+        const orderB = getCategoryOrderIndex(catB);
+        if (orderA !== orderB) return orderA - orderB;
         // Then by name
         const nameA = a.item.name || '';
         const nameB = b.item.name || '';
