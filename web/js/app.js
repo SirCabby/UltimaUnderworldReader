@@ -58,6 +58,7 @@ const state = {
     selectedMarker: null,
     tooltipHideTimeout: null,  // For delayed tooltip hiding
     isTooltipHovered: false,   // Track if tooltip is being hovered
+    collapsedCategories: new Set(),  // Tracks which categories are collapsed in visible objects list
 };
 
 // ============================================================================
@@ -2027,9 +2028,14 @@ function renderVisibleObjectsPane() {
         align-items: center;
         margin-bottom: 12px;
         flex-shrink: 0;
+        gap: 8px;
     `;
     header.innerHTML = `
-        <h3 class="section-title" style="margin-bottom: 0;">Visible Objects</h3>
+        <h3 class="section-title" style="margin-bottom: 0; flex: 1;">Visible Objects</h3>
+        <div class="collapse-toggle-btns" style="display: flex; gap: 4px;">
+            <button class="toggle-btn" id="expand-all-categories" title="Expand All">▼</button>
+            <button class="toggle-btn" id="collapse-all-categories" title="Collapse All">▲</button>
+        </div>
         <span style="color: var(--text-accent); font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 12px;">${visibleItems.length}</span>
     `;
     section.appendChild(header);
@@ -2067,11 +2073,25 @@ function renderVisibleObjectsPane() {
         groupedItems.get(category).push({ item, isNpc, isSecret });
     });
     
+    // Add expand/collapse all button handlers (now that groupedItems exists)
+    header.querySelector('#expand-all-categories').addEventListener('click', () => {
+        state.collapsedCategories.clear();
+        renderVisibleObjectsPane();
+    });
+    header.querySelector('#collapse-all-categories').addEventListener('click', () => {
+        groupedItems.forEach((_, categoryId) => {
+            state.collapsedCategories.add(categoryId);
+        });
+        renderVisibleObjectsPane();
+    });
+    
     // Render each category group
     groupedItems.forEach((items, categoryId) => {
-        // Category header
+        const isCollapsed = state.collapsedCategories.has(categoryId);
+        
+        // Category header (clickable to toggle)
         const categoryHeader = document.createElement('div');
-        categoryHeader.className = 'category-group-header';
+        categoryHeader.className = 'category-group-header collapsible-header' + (isCollapsed ? ' collapsed' : '');
         const catColor = categoryId === 'npcs_hostile' ? '#ff4444' :
                          categoryId === 'npcs_friendly' ? '#69db7c' :
                          categoryId === 'npcs_named' ? '#ffd43b' :
@@ -2098,13 +2118,41 @@ function renderVisibleObjectsPane() {
             top: 0;
             background: var(--bg-secondary);
             z-index: 1;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s ease;
         `;
         categoryHeader.innerHTML = `
+            <span class="collapse-chevron" style="font-size: 0.65rem; transition: transform 0.2s ease; transform: rotate(${isCollapsed ? '-90deg' : '0deg'});">▼</span>
             <span style="width: 8px; height: 8px; background: ${catColor}; border-radius: 50%; flex-shrink: 0;"></span>
             <span style="flex: 1;">${catName}</span>
             <span style="color: var(--text-muted); font-weight: normal;">${items.length}</span>
         `;
+        
+        // Toggle collapse on click
+        categoryHeader.addEventListener('click', () => {
+            if (state.collapsedCategories.has(categoryId)) {
+                state.collapsedCategories.delete(categoryId);
+            } else {
+                state.collapsedCategories.add(categoryId);
+            }
+            renderVisibleObjectsPane();
+        });
+        
+        // Hover effect
+        categoryHeader.addEventListener('mouseenter', () => {
+            categoryHeader.style.background = 'var(--bg-tertiary)';
+        });
+        categoryHeader.addEventListener('mouseleave', () => {
+            categoryHeader.style.background = 'var(--bg-secondary)';
+        });
+        
         listContainer.appendChild(categoryHeader);
+        
+        // Create collapsible container for items
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = 'category-items-container' + (isCollapsed ? ' collapsed' : '');
+        itemsContainer.style.cssText = isCollapsed ? 'display: none;' : '';
         
         // Render items in this category
         items.forEach(({ item, isNpc, isSecret }) => {
@@ -2259,8 +2307,10 @@ function renderVisibleObjectsPane() {
                 }
             });
             
-            listContainer.appendChild(itemEl);
+            itemsContainer.appendChild(itemEl);
         });
+        
+        listContainer.appendChild(itemsContainer);
     });
     
     section.appendChild(listContainer);

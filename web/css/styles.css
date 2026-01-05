@@ -197,6 +197,49 @@ body {
     overflow-y: auto;
 }
 
+/* Collapsible category headers */
+.collapsible-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.collapsible-header:hover {
+    background: var(--bg-tertiary);
+}
+
+.collapsible-header .collapse-chevron {
+    display: inline-block;
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+    color: var(--text-muted);
+}
+
+.collapsible-header.collapsed .collapse-chevron {
+    transform: rotate(-90deg);
+}
+
+/* Category items container */
+.category-items-container {
+    overflow: hidden;
+    transition: max-height 0.25s ease-out, opacity 0.2s ease;
+}
+
+.category-items-container.collapsed {
+    display: none;
+}
+
+/* Collapse/Expand toggle buttons in header */
+.collapse-toggle-btns {
+    display: flex;
+    gap: 4px;
+}
+
+.collapse-toggle-btns .toggle-btn {
+    padding: 3px 6px;
+    font-size: 0.6rem;
+    min-width: 24px;
+}
+
 /* Filters sidebar: scrollable content with fixed stats at bottom */
 .filters-sidebar {
     overflow: hidden;
