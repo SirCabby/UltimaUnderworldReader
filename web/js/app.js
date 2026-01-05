@@ -764,14 +764,33 @@ function createStackedMarker(item, color, px, py, isNpc, isPrimary) {
     // Make non-primary markers slightly smaller
     const radius = isPrimary ? baseRadius : baseRadius * 0.8;
     
-    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    marker.setAttribute('cx', px);
-    marker.setAttribute('cy', py);
-    marker.setAttribute('r', radius);
-    marker.setAttribute('fill', color);
-    marker.setAttribute('stroke', isNpc ? '#fff' : 'rgba(0,0,0,0.5)');
-    marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
-    marker.classList.add('marker');
+    // Check if this is a named NPC (should use star shape)
+    const isNamedNpc = isNpc && hasUniqueName(item);
+    
+    let marker;
+    if (isNamedNpc) {
+        // Create star-shaped marker for named NPCs
+        marker = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const starPath = createStarPath(px, py, radius * 1.2);
+        marker.setAttribute('d', starPath);
+        marker.setAttribute('fill', color);
+        marker.setAttribute('stroke', '#fff');
+        marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
+        marker.classList.add('marker', 'star-marker');
+        // Store original transform origin for scaling
+        marker.style.transformOrigin = `${px}px ${py}px`;
+    } else {
+        // Create circle marker for regular items/NPCs
+        marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        marker.setAttribute('cx', px);
+        marker.setAttribute('cy', py);
+        marker.setAttribute('r', radius);
+        marker.setAttribute('fill', color);
+        marker.setAttribute('stroke', isNpc ? '#fff' : 'rgba(0,0,0,0.5)');
+        marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
+        marker.classList.add('marker');
+    }
+    
     if (!isPrimary) {
         marker.classList.add('stacked-marker');
     }
@@ -782,16 +801,27 @@ function createStackedMarker(item, color, px, py, isNpc, isPrimary) {
     marker.dataset.tileX = item.tile_x;
     marker.dataset.tileY = item.tile_y;
     marker.dataset.originalRadius = radius;
+    marker.dataset.isStarMarker = isNamedNpc;
+    marker.dataset.centerX = px;
+    marker.dataset.centerY = py;
     
     // Event listeners - limit hover expansion to stay within tile
     const hoverRadius = Math.min(radius * 1.3, 4);
     marker.addEventListener('mouseenter', (e) => {
-        marker.setAttribute('r', hoverRadius);
+        if (isNamedNpc) {
+            marker.style.transform = 'scale(1.3)';
+        } else {
+            marker.setAttribute('r', hoverRadius);
+        }
         showTooltip(e, item, isNpc);
     });
     marker.addEventListener('mouseleave', () => {
         if (!marker.classList.contains('selected')) {
-            marker.setAttribute('r', radius);
+            if (isNamedNpc) {
+                marker.style.transform = 'scale(1)';
+            } else {
+                marker.setAttribute('r', radius);
+            }
         }
         hideTooltip();
     });
@@ -1006,10 +1036,32 @@ function selectStackedItem(item, isNpc, tileX, tileY) {
     // Clear previous selection
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
-        const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
-        m.setAttribute('r', origR);
+        if (m.dataset.isStarMarker === 'true') {
+            m.style.transform = 'scale(1)';
+        } else {
+            const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
+            m.setAttribute('r', origR);
+        }
     });
     state.selectedMarker = null;
+    
+    // Find and select the corresponding marker on the map
+    // Use the same approach as selectLocationItem - iterate to find matching marker
+    const markers = document.querySelectorAll('.marker');
+    for (const marker of markers) {
+        if (marker.dataset.id === String(item.id) && 
+            marker.dataset.isNpc === String(isNpc)) {
+            marker.classList.add('selected');
+            if (marker.dataset.isStarMarker === 'true') {
+                marker.style.transform = 'scale(1.8)';
+            } else {
+                const origR = parseFloat(marker.dataset.originalRadius) || CONFIG.marker.radius;
+                marker.setAttribute('r', origR * 1.8);
+            }
+            state.selectedMarker = marker;
+            break;
+        }
+    }
     
     // Ensure selection pane layout is rendered
     renderSelectionPane();
@@ -1130,13 +1182,34 @@ function isEnchanted(item) {
 /**
  * Check if an NPC has a unique name (different from their creature type)
  * Named NPCs are ones that have dialogue and personal identities
+ * Generic descriptors like "bandit" don't count as unique names
  */
 function hasUniqueName(npc) {
-    if (!npc) return false;
-    // An NPC has a unique name if their name differs from their creature type
-    // This includes named NPCs like "Drog" (a goblin) or "Bragit" (an outcast)
-    return npc.name && npc.creature_type && 
-           npc.name.toLowerCase() !== npc.creature_type.toLowerCase();
+    if (!npc || !npc.name) return false;
+    
+    const nameLower = npc.name.toLowerCase();
+    
+    // Exclude exact generic aliases (not compound names like "head bandit")
+    // "bandit" alone is generic, but "head bandit" is a specific character
+    const genericAliases = ['bandit', 'guard'];
+    if (genericAliases.includes(nameLower)) return false;
+    
+    // Exclude ethereal creatures from Level 9 (names like "a_bizarre fish", "an_eyeball")
+    // These start with "a_" or "an_" and are generic enemy types, not named characters
+    if (nameLower.startsWith('a_') || nameLower.startsWith('an_')) return false;
+    
+    // If creature_type is empty/missing, check if it looks like a proper name
+    // "the Slasher of Veils" and "Tyball" are proper names (capital letters after articles)
+    if (!npc.creature_type) {
+        // Check if name has at least one capital letter (proper name indicator)
+        // This distinguishes "the Slasher of Veils" from generic lowercase descriptors
+        return /[A-Z]/.test(npc.name);
+    }
+    
+    // Name must be different from creature type
+    if (nameLower === npc.creature_type.toLowerCase()) return false;
+    
+    return true;
 }
 
 /**
@@ -1147,6 +1220,31 @@ function isHostile(npc) {
     if (!npc) return false;
     const attitude = (npc.attitude || '').toLowerCase();
     return attitude === 'hostile';
+}
+
+/**
+ * Generate an SVG path for a 5-pointed star centered at (cx, cy) with given outer radius
+ * @param {number} cx - Center X coordinate
+ * @param {number} cy - Center Y coordinate
+ * @param {number} outerRadius - Radius to the outer points of the star
+ * @param {number} innerRadius - Radius to the inner points (usually outerRadius * 0.4)
+ * @returns {string} SVG path data for the star
+ */
+function createStarPath(cx, cy, outerRadius, innerRadius = null) {
+    if (innerRadius === null) innerRadius = outerRadius * 0.4;
+    const points = 5;
+    const angleOffset = -Math.PI / 2; // Start from top point
+    let path = '';
+    
+    for (let i = 0; i < points * 2; i++) {
+        const radius = i % 2 === 0 ? outerRadius : innerRadius;
+        const angle = angleOffset + (i * Math.PI) / points;
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        path += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ',' + y.toFixed(2);
+    }
+    path += 'Z';
+    return path;
 }
 
 /**
@@ -1216,6 +1314,9 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     // Use smaller radius for NPCs to fit within tile
     const radius = isNpc ? CONFIG.marker.radius + 0.5 : CONFIG.marker.radius;
     
+    // Check if this is a named NPC (should use star shape)
+    const isNamedNpc = isNpc && hasUniqueName(item);
+    
     // Create a group to hold both hover area and marker
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('marker-group');
@@ -1233,15 +1334,29 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     hoverArea.setAttribute('fill', 'transparent');
     hoverArea.classList.add('tile-hover-area');
     
-    // Create the visual marker circle
-    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    marker.setAttribute('cx', px);
-    marker.setAttribute('cy', py);
-    marker.setAttribute('r', radius);
-    marker.setAttribute('fill', color);
-    marker.setAttribute('stroke', isNpc ? '#fff' : 'rgba(0,0,0,0.5)');
-    marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
-    marker.classList.add('marker');
+    // Create the visual marker (star for named NPCs, circle otherwise)
+    let marker;
+    if (isNamedNpc) {
+        // Create star-shaped marker for named NPCs
+        marker = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const starPath = createStarPath(px, py, radius * 1.2);
+        marker.setAttribute('d', starPath);
+        marker.setAttribute('fill', color);
+        marker.setAttribute('stroke', '#fff');
+        marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
+        marker.classList.add('marker', 'star-marker');
+        marker.style.transformOrigin = `${px}px ${py}px`;
+    } else {
+        // Create circle marker for regular items/NPCs
+        marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        marker.setAttribute('cx', px);
+        marker.setAttribute('cy', py);
+        marker.setAttribute('r', radius);
+        marker.setAttribute('fill', color);
+        marker.setAttribute('stroke', isNpc ? '#fff' : 'rgba(0,0,0,0.5)');
+        marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
+        marker.classList.add('marker');
+    }
     marker.style.pointerEvents = 'none'; // Visual only
     
     // Store item data on marker for selection
@@ -1250,18 +1365,29 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     marker.dataset.tileX = item.tile_x;
     marker.dataset.tileY = item.tile_y;
     marker.dataset.originalRadius = radius;
+    marker.dataset.isStarMarker = isNamedNpc;
+    marker.dataset.centerX = px;
+    marker.dataset.centerY = py;
     
     // Hover radius for visual feedback
     const hoverRadius = Math.min(radius * 1.3, 4);
     
     // Event listeners on the tile hover area
     hoverArea.addEventListener('mouseenter', (e) => {
-        marker.setAttribute('r', hoverRadius);
+        if (isNamedNpc) {
+            marker.style.transform = 'scale(1.3)';
+        } else {
+            marker.setAttribute('r', hoverRadius);
+        }
         showTooltip(e, item, isNpc);
     });
     hoverArea.addEventListener('mouseleave', () => {
         if (!marker.classList.contains('selected')) {
-            marker.setAttribute('r', radius);
+            if (isNamedNpc) {
+                marker.style.transform = 'scale(1)';
+            } else {
+                marker.setAttribute('r', radius);
+            }
         }
         hideTooltip();
     });
@@ -1724,17 +1850,25 @@ function setupTooltipHoverTracking() {
 // ============================================================================
 
 function selectItem(item, isNpc, markerElement) {
-    // Clear previous selection and restore original radius
+    // Clear previous selection and restore original size
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
-        const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
-        m.setAttribute('r', origR);
+        if (m.dataset.isStarMarker === 'true') {
+            m.style.transform = 'scale(1)';
+        } else {
+            const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
+            m.setAttribute('r', origR);
+        }
     });
     
-    // Mark new selection and increase radius
+    // Mark new selection and increase size
     markerElement.classList.add('selected');
-    const origR = parseFloat(markerElement.dataset.originalRadius) || CONFIG.marker.radius;
-    markerElement.setAttribute('r', origR * 1.8);
+    if (markerElement.dataset.isStarMarker === 'true') {
+        markerElement.style.transform = 'scale(1.8)';
+    } else {
+        const origR = parseFloat(markerElement.dataset.originalRadius) || CONFIG.marker.radius;
+        markerElement.setAttribute('r', origR * 1.8);
+    }
     state.selectedMarker = markerElement;
     
     // Ensure selection pane layout is rendered
@@ -1750,8 +1884,12 @@ function selectItem(item, isNpc, markerElement) {
 function clearSelection() {
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
-        const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
-        m.setAttribute('r', origR);
+        if (m.dataset.isStarMarker === 'true') {
+            m.style.transform = 'scale(1)';
+        } else {
+            const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
+            m.setAttribute('r', origR);
+        }
     });
     state.selectedMarker = null;
     
@@ -3015,15 +3153,23 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
     // Clear previous marker selection
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
-        const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
-        m.setAttribute('r', origR);
+        if (m.dataset.isStarMarker === 'true') {
+            m.style.transform = 'scale(1)';
+        } else {
+            const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
+            m.setAttribute('r', origR);
+        }
     });
     
     // If marker exists, select it visually
     if (markerElement) {
         markerElement.classList.add('selected');
-        const origR = parseFloat(markerElement.dataset.originalRadius) || CONFIG.marker.radius;
-        markerElement.setAttribute('r', origR * 1.8);
+        if (markerElement.dataset.isStarMarker === 'true') {
+            markerElement.style.transform = 'scale(1.8)';
+        } else {
+            const origR = parseFloat(markerElement.dataset.originalRadius) || CONFIG.marker.radius;
+            markerElement.setAttribute('r', origR * 1.8);
+        }
         state.selectedMarker = markerElement;
     } else {
         state.selectedMarker = null;
