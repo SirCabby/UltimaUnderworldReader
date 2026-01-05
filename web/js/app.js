@@ -3092,7 +3092,7 @@ function getTypeSpecificDetails(item) {
                     <span class="detail-label">Stats</span>
                     <span class="detail-value" style="font-family: var(--font-mono);">
                         <span title="Protection">🛡️ ${item.protection || 0}</span>
-                        ${durStr ? `<span style="margin-left: 8px;" title="Durability">${durStr}</span>` : ''}
+                        ${durStr ? `<span style="margin-left: 8px;" title="${getDurabilityTooltip(item)}">${durStr}</span>` : ''}
                     </span>
                 </div>
             `;
@@ -3357,14 +3357,32 @@ function formatArmor(item) {
  * In UW1: quality field = current durability remaining
  *         durability from OBJECTS.DAT = max durability
  * However, the values appear swapped in the data, so we display durability/quality
+ * Items with 255 durability are indestructible
  */
 function formatDurability(item) {
     if (item.durability === undefined) {
         return '';
     }
+    // 255 durability = indestructible
+    if (item.durability === 255) {
+        return '🔧∞';
+    }
     const current = item.current_durability !== undefined ? item.current_durability : item.durability;
     // Swap order: durability (smaller base value) / current_durability (quality, larger value)
     return `🔧${item.durability}/${current}`;
+}
+
+/**
+ * Get tooltip text for durability
+ */
+function getDurabilityTooltip(item) {
+    if (item.durability === undefined) {
+        return 'Durability';
+    }
+    if (item.durability === 255) {
+        return 'Indestructible';
+    }
+    return 'Durability';
 }
 
 /**
