@@ -158,8 +158,10 @@ async function loadData() {
     state.data.categories.forEach(cat => {
         state.filters.categories.add(cat.id);
     });
-    // Also add NPCs category
-    state.filters.categories.add('npcs');
+    // Also add NPC categories (split by hostility and named status)
+    state.filters.categories.add('npcs_hostile');
+    state.filters.categories.add('npcs_friendly');
+    state.filters.categories.add('npcs_named');
 }
 
 // ============================================================================
@@ -347,17 +349,31 @@ function selectLevel(levelNum) {
 function renderCategoryFilters() {
     elements.categoryFilters.innerHTML = '';
     
-    // Add NPC filter first (not included in data.categories)
-    const npcFilter = createCategoryFilter({
-        id: 'npcs',
-        name: 'NPCs',
-        color: '#ff6b6b'
+    // Add NPC categories first (split by hostility and named status)
+    const npcHostileFilter = createCategoryFilter({
+        id: 'npcs_hostile',
+        name: 'Hostile NPCs',
+        color: '#ff4444'  // Red for hostile
     });
-    elements.categoryFilters.appendChild(npcFilter);
+    elements.categoryFilters.appendChild(npcHostileFilter);
     
-    // Add other categories (skip if it's 'npcs' to avoid duplicate)
+    const npcFriendlyFilter = createCategoryFilter({
+        id: 'npcs_friendly',
+        name: 'Friendly NPCs',
+        color: '#69db7c'  // Green for friendly
+    });
+    elements.categoryFilters.appendChild(npcFriendlyFilter);
+    
+    const npcNamedFilter = createCategoryFilter({
+        id: 'npcs_named',
+        name: 'Named NPCs',
+        color: '#ffd43b'  // Gold for named characters
+    });
+    elements.categoryFilters.appendChild(npcNamedFilter);
+    
+    // Add other categories (skip if it's an NPC category to avoid duplicate)
     state.data.categories.forEach(cat => {
-        if (cat.id === 'npcs') return;  // Already added above
+        if (cat.id === 'npcs' || cat.id.startsWith('npcs_')) return;  // Already added above
         const filter = createCategoryFilter(cat);
         elements.categoryFilters.appendChild(filter);
     });
@@ -408,11 +424,27 @@ function updateCategoryCounts() {
     const level = state.data.levels[state.currentLevel];
     if (!level) return;
     
-    // Update NPC count
-    const npcCountEl = document.querySelector('.category-count[data-category-id="npcs"]');
-    if (npcCountEl) {
-        npcCountEl.textContent = level.npcs.length;
-    }
+    // Count NPCs by category
+    let hostileCount = 0;
+    let friendlyCount = 0;
+    let namedCount = 0;
+    
+    level.npcs.forEach(npc => {
+        const npcCat = getNpcCategory(npc);
+        if (npcCat === 'npcs_hostile') hostileCount++;
+        else if (npcCat === 'npcs_friendly') friendlyCount++;
+        else if (npcCat === 'npcs_named') namedCount++;
+    });
+    
+    // Update NPC category counts
+    const hostileCountEl = document.querySelector('.category-count[data-category-id="npcs_hostile"]');
+    if (hostileCountEl) hostileCountEl.textContent = hostileCount;
+    
+    const friendlyCountEl = document.querySelector('.category-count[data-category-id="npcs_friendly"]');
+    if (friendlyCountEl) friendlyCountEl.textContent = friendlyCount;
+    
+    const namedCountEl = document.querySelector('.category-count[data-category-id="npcs_named"]');
+    if (namedCountEl) namedCountEl.textContent = namedCount;
     
     // Update illusory walls count
     const illusoryCountEl = document.querySelector('.category-count[data-category-id="illusory_walls"]');
@@ -501,7 +533,9 @@ function updateEnchantedCount() {
 
 function selectAllCategories() {
     // Add all categories to the filter set
-    state.filters.categories.add('npcs');
+    state.filters.categories.add('npcs_hostile');
+    state.filters.categories.add('npcs_friendly');
+    state.filters.categories.add('npcs_named');
     state.data.categories.forEach(cat => {
         state.filters.categories.add(cat.id);
     });
@@ -558,9 +592,10 @@ function renderMarkers() {
     // Collect all visible items grouped by tile
     const tileGroups = new Map(); // key: "x,y" -> array of {item, color, isNpc}
     
-    // Collect NPCs - show if 'npcs' category is selected OR if they carry items matching selected categories
+    // Collect NPCs - show if matching NPC category is selected OR if they carry items matching selected categories
     level.npcs.forEach(npc => {
-        const npcCategoryMatch = state.filters.categories.has('npcs');
+        const npcCategory = getNpcCategory(npc);
+        const npcCategoryMatch = state.filters.categories.has(npcCategory);
         const hasMatchingInventory = hasContentMatchingCategory(npc.inventory);
         
         if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc)) {
@@ -568,7 +603,10 @@ function renderMarkers() {
             if (!tileGroups.has(key)) {
                 tileGroups.set(key, []);
             }
-            tileGroups.get(key).push({ item: npc, color: '#ff6b6b', isNpc: true });
+            // Use category-specific colors
+            const npcColor = npcCategory === 'npcs_hostile' ? '#ff4444' :
+                            npcCategory === 'npcs_named' ? '#ffd43b' : '#69db7c';
+            tileGroups.get(key).push({ item: npc, color: npcColor, isNpc: true });
             visibleCount++;
         }
     });
@@ -1090,6 +1128,42 @@ function isEnchanted(item) {
 }
 
 /**
+ * Check if an NPC has a unique name (different from their creature type)
+ * Named NPCs are ones that have dialogue and personal identities
+ */
+function hasUniqueName(npc) {
+    if (!npc) return false;
+    // An NPC has a unique name if their name differs from their creature type
+    // This includes named NPCs like "Drog" (a goblin) or "Bragit" (an outcast)
+    return npc.name && npc.creature_type && 
+           npc.name.toLowerCase() !== npc.creature_type.toLowerCase();
+}
+
+/**
+ * Check if an NPC is hostile based on their attitude
+ * Only "hostile" attitude is considered hostile; "upset" and "mellow" are friendly
+ */
+function isHostile(npc) {
+    if (!npc) return false;
+    const attitude = (npc.attitude || '').toLowerCase();
+    return attitude === 'hostile';
+}
+
+/**
+ * Get the NPC category based on hostility and unique name
+ * Returns: 'npcs_hostile', 'npcs_friendly', or 'npcs_named'
+ */
+function getNpcCategory(npc) {
+    if (isHostile(npc)) {
+        return 'npcs_hostile';
+    } else if (hasUniqueName(npc)) {
+        return 'npcs_named';
+    } else {
+        return 'npcs_friendly';
+    }
+}
+
+/**
  * Recursively check if any content item is enchanted
  */
 function hasEnchantedContent(contents) {
@@ -1425,10 +1499,11 @@ function getCategoryColor(categoryId) {
 function showTooltip(e, item, isNpc) {
     const tooltip = elements.tooltip;
     
-    let html = `<div class="tooltip-name">${item.name || (isNpc ? 'Unknown NPC' : 'Unknown Object')}</div>`;
+    const uniqueIndicator = isNpc && hasUniqueName(item) ? '⭐ ' : '';
+    let html = `<div class="tooltip-name">${uniqueIndicator}${item.name || (isNpc ? 'Unknown NPC' : 'Unknown Object')}</div>`;
     
     if (isNpc) {
-        // Show creature type if different from name
+        // Show creature type if different from name (already indicated by ⭐ but add context)
         if (item.creature_type && item.creature_type !== item.name) {
             html += `<div class="tooltip-info" style="color: var(--text-muted); font-style: italic;">${item.creature_type}</div>`;
         }
@@ -1556,7 +1631,8 @@ function countOtherItemsAtTile(tileX, tileY, excludeId) {
     // Count NPCs at this tile
     level.npcs.forEach(npc => {
         if (npc.tile_x === tileX && npc.tile_y === tileY && npc.id !== excludeId) {
-            const npcCategoryMatch = state.filters.categories.has('npcs');
+            const npcCategory = getNpcCategory(npc);
+            const npcCategoryMatch = state.filters.categories.has(npcCategory);
             const hasMatchingInventory = hasContentMatchingCategory(npc.inventory);
             if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc)) {
                 count++;
@@ -1743,7 +1819,8 @@ function renderVisibleObjectsPane() {
     
     // Collect NPCs
     level.npcs.forEach(npc => {
-        const npcCategoryMatch = state.filters.categories.has('npcs');
+        const npcCategory = getNpcCategory(npc);
+        const npcCategoryMatch = state.filters.categories.has(npcCategory);
         const hasMatchingInventory = hasContentMatchingCategory(npc.inventory);
         
         if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc)) {
@@ -1785,9 +1862,9 @@ function renderVisibleObjectsPane() {
         if (a.isNpc !== b.isNpc) return a.isNpc ? -1 : 1;
         // Secrets last
         if (a.isSecret !== b.isSecret) return a.isSecret ? 1 : -1;
-        // Then by category
-        const catA = a.isNpc ? 'npcs' : (a.isSecret ? a.item.category : a.item.category);
-        const catB = b.isNpc ? 'npcs' : (b.isSecret ? b.item.category : b.item.category);
+        // Then by category (use NPC category for NPCs)
+        const catA = a.isNpc ? getNpcCategory(a.item) : (a.isSecret ? a.item.category : a.item.category);
+        const catB = b.isNpc ? getNpcCategory(b.item) : (b.isSecret ? b.item.category : b.item.category);
         if (catA !== catB) return catA.localeCompare(catB);
         // Then by name
         const nameA = a.item.name || '';
@@ -1842,7 +1919,7 @@ function renderVisibleObjectsPane() {
     const groupedItems = new Map();
     visibleItems.forEach(({ item, isNpc, isSecret }) => {
         let category;
-        if (isNpc) category = 'npcs';
+        if (isNpc) category = getNpcCategory(item);  // Use specific NPC category
         else if (isSecret) category = item.category;
         else category = item.category;
         
@@ -1857,11 +1934,16 @@ function renderVisibleObjectsPane() {
         // Category header
         const categoryHeader = document.createElement('div');
         categoryHeader.className = 'category-group-header';
-        const catColor = categoryId === 'npcs' ? '#ff6b6b' : 
+        const catColor = categoryId === 'npcs_hostile' ? '#ff4444' :
+                         categoryId === 'npcs_friendly' ? '#69db7c' :
+                         categoryId === 'npcs_named' ? '#ffd43b' :
                          categoryId === 'illusory_walls' ? '#ff00ff' :
                          categoryId === 'secret_doors' ? '#ffff00' :
                          getCategoryColor(categoryId);
-        const catName = categoryId === 'npcs' ? 'NPCs' : formatCategory(categoryId);
+        const catName = categoryId === 'npcs_hostile' ? 'Hostile NPCs' :
+                        categoryId === 'npcs_friendly' ? 'Friendly NPCs' :
+                        categoryId === 'npcs_named' ? 'Named NPCs' :
+                        formatCategory(categoryId);
         categoryHeader.style.cssText = `
             display: flex;
             align-items: center;
@@ -1911,7 +1993,8 @@ function renderVisibleObjectsPane() {
                 displayName = item.type === 'illusory_wall' ? 'Illusory Wall' : 'Secret Door';
                 subtitle = `(${item.tile_x}, ${item.tile_y})`;
             } else if (isNpc) {
-                icon = '👤';
+                const isUnique = hasUniqueName(item);
+                icon = isUnique ? '⭐' : '👤';
                 displayName = item.name || 'Unknown NPC';
                 subtitle = `HP ${item.hp} • (${item.tile_x}, ${item.tile_y})`;
             } else {
@@ -2063,13 +2146,22 @@ function renderVisibleObjectsPane() {
 
 function renderObjectDetails(item, isNpc) {
     let html = '<div class="detail-card">';
-    html += `<div class="detail-name">${item.name || (isNpc ? 'Unknown NPC' : 'Unknown Object')}</div>`;
+    const uniqueIndicator = isNpc && hasUniqueName(item) ? '⭐ ' : '';
+    html += `<div class="detail-name">${uniqueIndicator}${item.name || (isNpc ? 'Unknown NPC' : 'Unknown Object')}</div>`;
     
     if (isNpc) {
+        const npcCategory = getNpcCategory(item);
+        const npcColor = npcCategory === 'npcs_hostile' ? '#ff4444' :
+                        npcCategory === 'npcs_named' ? '#ffd43b' : '#69db7c';
+        const npcLabel = npcCategory === 'npcs_hostile' ? 'Hostile NPC' :
+                        npcCategory === 'npcs_named' ? 'Named NPC' : 'Friendly NPC';
+        const npcColorBg = npcCategory === 'npcs_hostile' ? 'rgba(255,68,68,0.2)' :
+                          npcCategory === 'npcs_named' ? 'rgba(255,212,59,0.2)' : 'rgba(105,219,124,0.2)';
+        
         html += `
             <div class="detail-row">
                 <span class="detail-label">Type</span>
-                <span class="detail-category" style="background: rgba(255,107,107,0.2); color: #ff6b6b;">NPC</span>
+                <span class="detail-category" style="background: ${npcColorBg}; color: ${npcColor};">${npcLabel}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Creature</span>
@@ -2754,9 +2846,15 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
     
     // Render NPCs
     npcsAtTile.forEach(npc => {
+        const npcCategory = getNpcCategory(npc);
+        const npcColor = npcCategory === 'npcs_hostile' ? '#ff4444' :
+                        npcCategory === 'npcs_named' ? '#ffd43b' : '#69db7c';
+        const npcLabel = npcCategory === 'npcs_hostile' ? 'Hostile NPC' :
+                        npcCategory === 'npcs_named' ? 'Named NPC' : 'Friendly NPC';
+        
         const card = document.createElement('div');
         card.className = 'detail-card location-item';
-        card.style.cssText = `border-left: 3px solid #ff6b6b; cursor: pointer;`;
+        card.style.cssText = `border-left: 3px solid ${npcColor}; cursor: pointer;`;
         if (selectedItemId === npc.id) {
             card.classList.add('selected-location-item');
         }
@@ -2767,10 +2865,12 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             : '';
         
         const hasInventory = npc.inventory && npc.inventory.length > 0;
+        const isUnique = hasUniqueName(npc);
+        const uniqueIndicator = isUnique ? '⭐ ' : '';
         
         card.innerHTML = `
-            <div class="detail-name" style="font-size: 0.9rem;">${npc.name || 'Unknown NPC'}${creatureInfo}${hasInventory ? ' 🎒' : ''}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">NPC - HP: ${npc.hp}</div>
+            <div class="detail-name" style="font-size: 0.9rem;">${uniqueIndicator}${npc.name || 'Unknown NPC'}${creatureInfo}${hasInventory ? ' 🎒' : ''}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">${npcLabel} - HP: ${npc.hp}</div>
             ${hasInventory ? `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${npc.inventory.length} item${npc.inventory.length > 1 ? 's' : ''} carried</div>` : ''}
         `;
         
