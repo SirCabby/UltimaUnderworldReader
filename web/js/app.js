@@ -864,6 +864,14 @@ function showStackedTooltip(e, items, tileX, tileY) {
         if (!isSecret && !isNpc) {
             const objId = item.object_id || 0;
             
+            // Show enchantment effect for enchanted items (spell scrolls, enchanted weapons, etc.)
+            if (isEnchanted(item) && item.effect && isMagicalEffect(item.effect)) {
+                const effectDiv = document.createElement('div');
+                effectDiv.style.cssText = `font-size: 0.7rem; color: #da77f2; margin-top: 2px;`;
+                effectDiv.textContent = `⚡ ${item.effect}`;
+                itemEl.appendChild(effectDiv);
+            }
+            
             // Weapon damage
             if (objId <= 0x0F && (item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined)) {
                 const damageDiv = document.createElement('div');
@@ -898,6 +906,19 @@ function showStackedTooltip(e, items, tileX, tileY) {
                 }
                 capDiv.textContent = capText;
                 itemEl.appendChild(capDiv);
+            }
+            
+            // Show book/scroll content for readable items
+            const isStackedReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B);
+            if (isStackedReadable && item.description && item.description.length > 0) {
+                const descDiv = document.createElement('div');
+                const maxLen = 60;
+                const displayText = item.description.length > maxLen 
+                    ? item.description.substring(0, maxLen) + '...' 
+                    : item.description;
+                descDiv.style.cssText = `font-size: 0.7rem; color: #e8d4b8; margin-top: 4px; padding: 3px 5px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3;`;
+                descDiv.textContent = `📜 "${displayText}"`;
+                itemEl.appendChild(descDiv);
             }
         }
         
@@ -1018,6 +1039,7 @@ function shouldShowItem(item) {
 const MAGICAL_CATEGORIES = new Set([
     'wands',          // Magic wands (cast spells)
     'potions',        // Potions (magical effects)
+    'spell_scrolls',  // Spell scrolls (cast spells when used)
 ]);
 
 /**
@@ -1477,9 +1499,21 @@ function showTooltip(e, item, isNpc) {
         if (isMagicalEffect(item.effect)) {
             html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">✨ ${escapeHtml(truncateText(item.effect, 50))}</div>`;
         }
-        // Show description preview (truncated) for books/scrolls/keys
+        // Show description for books/scrolls with enhanced formatting
+        // Books: 0x130-0x137, Scrolls: 0x138-0x13F (excluding 0x13B map)
+        const isReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B);
         if (item.description && item.description.length > 0) {
-            html += `<div class="tooltip-info" style="color: var(--text-accent); font-size: 0.8rem;">${escapeHtml(truncateText(item.description, 60))}</div>`;
+            if (isReadable) {
+                // For readable books/scrolls, show longer text with book styling
+                const maxLen = 200;
+                const displayText = item.description.length > maxLen 
+                    ? item.description.substring(0, maxLen) + '...' 
+                    : item.description;
+                html += `<div class="tooltip-book-content" style="color: #e8d4b8; font-size: 0.8rem; margin-top: 6px; padding: 6px 8px; background: rgba(232, 212, 184, 0.08); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; white-space: pre-wrap; max-width: 250px; line-height: 1.4;">📜 "${escapeHtml(displayText)}"</div>`;
+            } else {
+                // For other items (keys, etc.) show short preview
+                html += `<div class="tooltip-info" style="color: var(--text-accent); font-size: 0.8rem;">${escapeHtml(truncateText(item.description, 60))}</div>`;
+            }
         }
         // Show container capacity and weight for containers
         if (item.capacity !== undefined) {
@@ -1885,8 +1919,12 @@ function renderVisibleObjectsPane() {
                 icon = itemEnchanted ? '✨' : '•';
                 displayName = item.name || 'Unknown';
                 subtitle = `(${item.tile_x}, ${item.tile_y})`;
-                // Show enchantment effect for enchanted items
-                if (itemEnchanted && item.effect && isMagicalEffect(item.effect)) {
+                // Show enchantment effect for enchanted items (including spell scrolls)
+                // Also show effect for spell_scrolls category directly (they always have spell effects)
+                if (item.category === 'spell_scrolls' && item.effect) {
+                    enchantLine = `<div style="color: #da77f2; font-size: 0.7rem; margin-top: 2px;">⚡ ${escapeHtml(item.effect)}</div>`;
+                } else if (itemEnchanted && item.effect && isMagicalEffect(item.effect)) {
+                    // Use gold for other enchantments
                     enchantLine = `<div style="color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;">⚡ ${escapeHtml(item.effect)}</div>`;
                 }
                 // Show lock info for doors
@@ -1953,6 +1991,15 @@ function renderVisibleObjectsPane() {
                         capacityText += ` (${item.accepts})`;
                     }
                     enchantLine += `<div style="color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;">${capacityText}</div>`;
+                }
+                // Show book/scroll content for readable items (0x130-0x13F excluding 0x13B map)
+                const isReadableItem = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B);
+                if (isReadableItem && item.description && item.description.length > 0) {
+                    const maxLen = 100;
+                    const displayText = item.description.length > maxLen 
+                        ? item.description.substring(0, maxLen) + '...' 
+                        : item.description;
+                    enchantLine += `<div style="color: #e8d4b8; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3; white-space: pre-wrap;">📜 "${escapeHtml(displayText)}"</div>`;
                 }
             }
             
@@ -2193,10 +2240,22 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
         contentItem.appendChild(infoDiv);
         
         // Show description preview for readable items (books, scrolls)
+        const contObjId = item.object_id || 0;
+        const isContainerReadable = (contObjId >= 0x130 && contObjId <= 0x13F && contObjId !== 0x13B);
         if (item.description && item.description.length > 0) {
             const descDiv = document.createElement('div');
-            descDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px; font-style: italic;';
-            descDiv.textContent = truncateText(item.description, 50);
+            if (isContainerReadable) {
+                // Enhanced book/scroll styling
+                const maxLen = 80;
+                const displayText = item.description.length > maxLen 
+                    ? item.description.substring(0, maxLen) + '...' 
+                    : item.description;
+                descDiv.style.cssText = 'color: #e8d4b8; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3; white-space: pre-wrap;';
+                descDiv.textContent = `📜 "${displayText}"`;
+            } else {
+                descDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px; font-style: italic;';
+                descDiv.textContent = truncateText(item.description, 50);
+            }
             contentItem.appendChild(descDiv);
         }
         
@@ -2328,10 +2387,22 @@ function renderNpcInventory(inventory, parentNpc = null) {
         inventoryItem.appendChild(infoDiv);
         
         // Show description preview for readable items (books, scrolls)
+        const invObjId = item.object_id || 0;
+        const isInvReadable = (invObjId >= 0x130 && invObjId <= 0x13F && invObjId !== 0x13B);
         if (item.description && item.description.length > 0) {
             const descDiv = document.createElement('div');
-            descDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px; font-style: italic;';
-            descDiv.textContent = truncateText(item.description, 50);
+            if (isInvReadable) {
+                // Enhanced book/scroll styling
+                const maxLen = 80;
+                const displayText = item.description.length > maxLen 
+                    ? item.description.substring(0, maxLen) + '...' 
+                    : item.description;
+                descDiv.style.cssText = 'color: #e8d4b8; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3; white-space: pre-wrap;';
+                descDiv.textContent = `📜 "${displayText}"`;
+            } else {
+                descDiv.style.cssText = 'color: var(--text-accent); font-size: 0.7rem; margin-top: 2px; font-style: italic;';
+                descDiv.textContent = truncateText(item.description, 50);
+            }
             inventoryItem.appendChild(descDiv);
         }
         
@@ -2782,6 +2853,14 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
                 capacityText += ` (${obj.accepts} only)`;
             }
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-accent);">${capacityText}</div>`;
+        }
+        // Show spell effect for spell scrolls
+        if (obj.category === 'spell_scrolls' && obj.effect) {
+            statsLine += `<div style="font-size: 0.75rem; color: #da77f2;">⚡ ${escapeHtml(obj.effect)}</div>`;
+        }
+        // Show enchantment effect for other enchanted items
+        else if (isEnchanted(obj) && obj.effect && isMagicalEffect(obj.effect)) {
+            statsLine += `<div style="font-size: 0.75rem; color: var(--text-accent);">⚡ ${escapeHtml(obj.effect)}</div>`;
         }
         
         card.innerHTML = `

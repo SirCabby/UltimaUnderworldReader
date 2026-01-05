@@ -947,6 +947,21 @@ body {
     margin-top: 4px;
 }
 
+/* Book/Scroll content styling in tooltips */
+.tooltip-book-content {
+    color: #e8d4b8;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    padding: 6px 8px;
+    background: rgba(232, 212, 184, 0.08);
+    border-left: 2px solid #e8d4b8;
+    border-radius: 2px;
+    font-style: italic;
+    white-space: pre-wrap;
+    max-width: 250px;
+    line-height: 1.4;
+}
+
 /* Footer */
 .app-footer {
     height: var(--footer-height);

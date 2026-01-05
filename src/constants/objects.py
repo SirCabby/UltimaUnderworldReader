@@ -71,6 +71,20 @@ ITEM_IDS = {
     'SPECIAL_TMAP_2': 0x16F,
 }
 
+# Text indices (from STRINGS.PAK block 3) that indicate quest books
+# These books are important to the game's main quest and should be categorized as quest items
+# Text index is calculated as: (quantity - 512) when is_quantity flag is set
+QUEST_BOOK_TEXT_INDICES: Set[int] = {
+    # Book of Honesty - contains philosophical text about the virtue of Honesty
+    # Required for the Abyss quest completion
+    22,  # "Honesty is scrupulous respect for truth..."
+}
+
+
+def is_quest_book(text_idx: int) -> bool:
+    """Check if a book's text index indicates it's a quest item."""
+    return text_idx in QUEST_BOOK_TEXT_INDICES
+
 # Items that use quantity for stacking (coins, arrows, etc.)
 # For these, the quantity field holds the actual count, not a link
 STACKABLE_ITEMS: Dict[int, str] = {

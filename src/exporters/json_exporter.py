@@ -244,10 +244,14 @@ class JsonExporter:
             if name and name.strip():
                 spell_names[i] = name.strip()
         
-        def get_item_description(item, object_id: int, is_quantity: bool, 
+        def get_item_description(item, object_id: int, is_enchanted: bool, is_quantity: bool, 
                                  quantity: int, quality: int, owner: int,
                                  special_link: int, level_num: int) -> str:
-            """Get item description based on type (books, scrolls, keys, wands, etc.)."""
+            """Get item description based on type (books, scrolls, keys, wands, etc.).
+            
+            Note: Spell scrolls (enchanted books/scrolls) don't have readable text -
+            they cast spells instead. Only non-enchanted books/scrolls have readable content.
+            """
             link_value = quantity if is_quantity else special_link
             
             # Keys (0x100-0x10E)
@@ -260,16 +264,22 @@ class JsonExporter:
                     return "A lockpick"
                 return ""
             
-            # Books (0x130-0x137)
+            # Books (0x130-0x137) - only readable if NOT enchanted (spell scrolls don't have text)
             if 0x130 <= object_id <= 0x137:
+                # Spell scrolls (enchanted) cast spells, they don't have readable text
+                if is_enchanted:
+                    return ""
                 if is_quantity and link_value >= 512:
                     text_idx = link_value - 512
                     if text_idx < len(block3) and block3[text_idx]:
                         return block3[text_idx].strip()
                 return ""
             
-            # Scrolls (0x138-0x13F, except 0x13B map)
+            # Scrolls (0x138-0x13F, except 0x13B map) - only readable if NOT enchanted
             if 0x138 <= object_id <= 0x13F and object_id != 0x13B:
+                # Spell scrolls (enchanted) cast spells, they don't have readable text
+                if is_enchanted:
+                    return ""
                 if is_quantity and link_value >= 512:
                     text_idx = link_value - 512
                     if text_idx < len(block3) and block3[text_idx]:
@@ -527,6 +537,7 @@ class JsonExporter:
             'book': 'books',
             'readable_scroll': 'scrolls',
             'readable_book': 'books',
+            'quest_book': 'quest',  # Quest books like Book of Honesty
             'spell_scroll': 'spell_scrolls',
             'map': 'books',  # Maps shown with books
             # Light sources
@@ -675,9 +686,17 @@ class JsonExporter:
                         detailed_cat = item_dict.get('detailed_category', '')
                         obj_class = item_dict.get('object_class', 'unknown')
                         
+                        # Check if this is a quest book (e.g., Book of Honesty) in container
+                        cont_category = category_map.get(detailed_cat, category_map.get(obj_class, 'misc'))
+                        if 0x130 <= item.object_id <= 0x137 and item.is_quantity and item.quantity >= 512:
+                            from ..constants import is_quest_book
+                            text_idx = item.quantity - 512
+                            if is_quest_book(text_idx):
+                                cont_category = 'quest'
+                        
                         # Get rich description and effect for this item
                         item_desc = get_item_description(
-                            item, item.object_id, item.is_quantity,
+                            item, item.object_id, item.is_enchanted, item.is_quantity,
                             item.quantity, item.quality, 
                             getattr(item, 'owner', 0),
                             item.special_link, level_num
@@ -698,7 +717,7 @@ class JsonExporter:
                         content_item = {
                             'object_id': item.object_id,
                             'name': item.name or get_item_name(item.object_id),
-                            'category': category_map.get(detailed_cat, category_map.get(obj_class, 'misc')),
+                            'category': cont_category,
                             'quantity': actual_quantity,
                         }
                         # Only include description and effect if they have meaningful values
@@ -787,8 +806,16 @@ class JsonExporter:
             # First try detailed category, then base category
             category = category_map.get(detailed_cat, category_map.get(obj_class, 'misc'))
             
-            # Get rich description and effect for this item
+            # Check if this is a quest book (e.g., Book of Honesty)
             obj_id = item.object_id
+            if 0x130 <= obj_id <= 0x137 and item.is_quantity and item.quantity >= 512:
+                from ..constants import is_quest_book
+                text_idx = item.quantity - 512
+                if is_quest_book(text_idx):
+                    category = 'quest'
+                    detailed_cat = 'quest_book'
+            
+            # Get rich description and effect for this item
             is_quantity = item.is_quantity
             quantity = item.quantity
             quality = item.quality
@@ -797,7 +824,7 @@ class JsonExporter:
             is_enchanted = item.is_enchanted
             
             item_desc = get_item_description(
-                item, obj_id, is_quantity, quantity, quality, owner, special_link, level
+                item, obj_id, is_enchanted, is_quantity, quantity, quality, owner, special_link, level
             )
             item_effect = get_item_effect(
                 item, obj_id, is_enchanted, is_quantity, quantity, quality, special_link, level

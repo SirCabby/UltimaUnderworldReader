@@ -38,6 +38,7 @@ from .objects import (
     ITEM_IDS,
     POTION_EFFECTS,
     SPECIAL_WANDS,
+    QUEST_BOOK_TEXT_INDICES,
     get_category,
     get_detailed_category,
     get_potion_effect,
@@ -48,6 +49,7 @@ from .objects import (
     is_container,
     is_static_container,
     is_carryable_container,
+    is_quest_book,
     get_tmap_info,
     get_special_wand_info,
 )
@@ -161,6 +163,7 @@ __all__ = [
     'ITEM_IDS',
     'POTION_EFFECTS',
     'SPECIAL_WANDS',
+    'QUEST_BOOK_TEXT_INDICES',
     'get_category',
     'get_detailed_category',
     'get_potion_effect',
@@ -168,6 +171,7 @@ __all__ = [
     'is_locked_door',
     'is_secret_door',
     'is_special_tmap',
+    'is_quest_book',
     'get_tmap_info',
     'get_special_wand_info',
     # Traps and Triggers
