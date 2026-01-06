@@ -1885,6 +1885,22 @@ function showSecretTooltip(e, secret) {
         if (secret.details.new_tile_type) {
             html += `<div class="tooltip-info" style="font-size: 0.8rem; color: var(--text-muted);">Reveals: ${secret.details.new_tile_type}</div>`;
         }
+        // Show lock information for locked secret doors
+        if (secret.details.is_locked) {
+            const lockId = secret.details.lock_id;
+            const lockType = secret.details.lock_type;
+            const isPickable = secret.details.is_pickable;
+            let lockText = '';
+            if (lockType === 'special') {
+                lockText = '🔒 Special Lock (trigger-opened)';
+            } else {
+                lockText = `🔒 Locked (lock #${lockId})`;
+                if (isPickable) {
+                    lockText += ' - ⛏️ Pickable';
+                }
+            }
+            html += `<div class="tooltip-info" style="color: #ff6b6b; font-size: 0.85rem;">${lockText}</div>`;
+        }
     }
     
     html += `<div class="tooltip-position">Tile: (${secret.tile_x}, ${secret.tile_y})</div>`;
@@ -1959,6 +1975,27 @@ function renderSecretDetails(secret) {
                 <div class="detail-row">
                     <span class="detail-label">Floor Height</span>
                     <span class="detail-value">${secret.details.new_floor_height}</span>
+                </div>
+            `;
+        }
+        // Show lock information for locked secret doors
+        if (secret.details.is_locked) {
+            const lockId = secret.details.lock_id;
+            const lockType = secret.details.lock_type;
+            const isPickable = secret.details.is_pickable;
+            let lockText = '';
+            if (lockType === 'special') {
+                lockText = '🔒 Special Lock (trigger-opened)';
+            } else {
+                lockText = `🔒 Locked (lock #${lockId})`;
+                if (isPickable) {
+                    lockText += ' - ⛏️ Pickable';
+                }
+            }
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Lock Status</span>
+                    <span class="detail-value" style="color: #ff6b6b;">${lockText}</span>
                 </div>
             `;
         }
@@ -2658,6 +2695,24 @@ function renderVisibleObjectsPane() {
                 icon = item.type === 'illusory_wall' ? '🔮' : '🚪';
                 displayName = item.type === 'illusory_wall' ? 'Illusory Wall' : 'Secret Door';
                 subtitle = `(${item.tile_x}, ${item.tile_y})`;
+                // Show lock info for locked secret doors
+                if (item.type === 'secret_door' && item.details && item.details.is_locked) {
+                    const lockId = item.details.lock_id;
+                    const lockType = item.details.lock_type;
+                    const isPickable = item.details.is_pickable;
+                    let lockText = '';
+                    if (lockType === 'special') {
+                        lockText = '🔒 Special Lock';
+                    } else if (lockId !== undefined) {
+                        lockText = `🔒 Lock #${lockId}`;
+                        if (isPickable) {
+                            lockText += ' ⛏️';  // Can be picked
+                        }
+                    } else {
+                        lockText = '🔒 Locked';
+                    }
+                    enchantLine = `<div style="color: #ff6b6b; font-size: 0.7rem; margin-top: 2px;">${lockText}</div>`;
+                }
             } else if (isNpc) {
                 const isUnique = hasUniqueName(item);
                 icon = isUnique ? '⭐' : '👤';
@@ -3731,6 +3786,24 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         const typeLabel = secret.type === 'illusory_wall' ? '🔮 Illusory Wall' : '🚪 Secret Door';
         const typeColor = secret.type === 'illusory_wall' ? '#ff00ff' : '#ffff00';
         
+        // Check for lock info (secret doors)
+        let lockInfo = '';
+        if (secret.type === 'secret_door' && secret.details && secret.details.is_locked) {
+            const lockId = secret.details.lock_id;
+            const lockType = secret.details.lock_type;
+            const isPickable = secret.details.is_pickable;
+            if (lockType === 'special') {
+                lockInfo = '🔒 Special';
+            } else if (lockId !== undefined) {
+                lockInfo = `🔒 Lock #${lockId}`;
+                if (isPickable) {
+                    lockInfo += ' ⛏️';  // Can be picked
+                }
+            } else {
+                lockInfo = '🔒 Locked';
+            }
+        }
+        
         const card = document.createElement('div');
         card.className = 'detail-card location-item';
         card.style.cssText = `border-left: 3px solid ${typeColor}; cursor: pointer;`;
@@ -3739,7 +3812,7 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         }
         
         card.innerHTML = `
-            <div class="detail-name" style="font-size: 0.9rem; color: ${typeColor};">${typeLabel}</div>
+            <div class="detail-name" style="font-size: 0.9rem; color: ${typeColor};">${typeLabel}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${secret.description || 'Hidden passage'}</div>
         `;
         

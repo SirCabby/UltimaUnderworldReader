@@ -291,6 +291,50 @@ class SecretFinder:
         """Find all secret doors."""
         for idx, obj in level.objects.items():
             if obj.item_id == self.SECRET_DOOR_ID:
+                # Extract lock information similar to item_extractor
+                # A door is locked if:
+                # 1. It has a non-zero special_link (pointing to a lock object 0x10F), OR
+                # 2. It has a non-zero owner (for template doors at 0,0)
+                special_link = obj.quantity_or_link if not obj.is_quantity else 0
+                is_locked = special_link != 0 or obj.owner != 0
+                
+                details = {
+                    'quality': obj.quality,
+                    'is_locked': is_locked
+                }
+                
+                if is_locked:
+                    # The real lock ID is stored in the lock object's quantity field
+                    # lock.quantity - 512 = lock_id that matches key.owner
+                    lock_id = None
+                    lock_quality = None
+                    if special_link != 0:
+                        lock_obj = level.objects.get(special_link)
+                        if lock_obj and lock_obj.item_id == 0x10F:  # Lock object
+                            # Lock ID is stored as quantity - 512
+                            lock_quantity = lock_obj.quantity_or_link if lock_obj.is_quantity else 0
+                            if lock_quantity >= 512:
+                                lock_id = lock_quantity - 512
+                            lock_quality = lock_obj.quality
+                    
+                    # Fallback to owner for template doors at (0,0)
+                    if lock_id is None and obj.owner != 0:
+                        lock_id = obj.owner
+                    
+                    if lock_id is not None:
+                        details['lock_id'] = lock_id
+                        details['lock_type'] = 'keyed'  # Needs key with owner=lock_id
+                    else:
+                        # No lock ID found - might be trigger-opened
+                        details['lock_type'] = 'special'
+                    
+                    # Check if lock is pickable based on lock quality
+                    # Quality 40 = pickable, Quality 63 = special/not pickable
+                    if lock_quality is not None:
+                        details['is_pickable'] = lock_quality == 40
+                    else:
+                        details['is_pickable'] = False
+                
                 self.secrets.append(Secret(
                     secret_type="secret_door",
                     level=level_num,
@@ -298,10 +342,7 @@ class SecretFinder:
                     tile_y=obj.tile_y,
                     description="Secret door",
                     object_id=obj.item_id,
-                    details={
-                        'quality': obj.quality,
-                        'is_locked': obj.quantity_or_link != 0 if not obj.is_quantity else False
-                    }
+                    details=details
                 ))
     
     def _find_illusory_walls(self, level_num: int, level) -> None:
