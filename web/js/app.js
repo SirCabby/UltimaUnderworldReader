@@ -1343,7 +1343,7 @@ function showStackedTooltip(e, items, tileX, tileY) {
  * Select an item from a stacked badge (no visible marker)
  */
 function selectStackedItem(item, isNpc, tileX, tileY) {
-    // Clear previous selection
+    // Clear previous selection (individual markers)
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
         if (m.dataset.isStarMarker === 'true') {
@@ -1353,11 +1353,18 @@ function selectStackedItem(item, isNpc, tileX, tileY) {
             m.setAttribute('r', origR);
         }
     });
+    
+    // Clear previous selection (stacked marker groups) - also reset inline styles
+    document.querySelectorAll('.marker-stack.selected').forEach(g => {
+        g.classList.remove('selected');
+        clearStackedMarkerStyles(g);
+    });
+    
     state.selectedMarker = null;
     
-    // Find and select the corresponding marker on the map
-    // Use the same approach as selectLocationItem - iterate to find matching marker
+    // First try to find an individual marker (for single-item tiles)
     const markers = document.querySelectorAll('.marker');
+    let foundMarker = false;
     for (const marker of markers) {
         if (marker.dataset.id === String(item.id) && 
             marker.dataset.isNpc === String(isNpc)) {
@@ -1369,7 +1376,23 @@ function selectStackedItem(item, isNpc, tileX, tileY) {
                 marker.setAttribute('r', origR * 1.8);
             }
             state.selectedMarker = marker;
+            foundMarker = true;
             break;
+        }
+    }
+    
+    // If no individual marker found, look for the stacked marker group at this tile
+    if (!foundMarker) {
+        const stackedGroups = document.querySelectorAll('.marker-stack');
+        for (const group of stackedGroups) {
+            if (group.dataset.tileX === String(tileX) && 
+                group.dataset.tileY === String(tileY)) {
+                group.classList.add('selected');
+                // Apply inline styles for selection (more reliable than CSS for SVG)
+                applyStackedMarkerSelectionStyles(group);
+                state.selectedMarker = group;
+                break;
+            }
         }
     }
     
@@ -1872,10 +1895,17 @@ function showSecretTooltip(e, secret) {
  * Select a secret and show its details
  */
 function selectSecret(secret) {
-    // Clear previous selection
+    // Clear previous selection (individual markers)
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
     });
+    
+    // Clear stacked marker groups (also reset inline styles)
+    document.querySelectorAll('.marker-stack.selected').forEach(g => {
+        g.classList.remove('selected');
+        clearStackedMarkerStyles(g);
+    });
+    
     state.selectedMarker = null;
     
     // Ensure selection pane layout is rendered
@@ -2196,7 +2226,7 @@ function setupTooltipHoverTracking() {
 // ============================================================================
 
 function selectItem(item, isNpc, markerElement) {
-    // Clear previous selection and restore original size
+    // Clear previous selection and restore original size (individual markers)
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
         if (m.dataset.isStarMarker === 'true') {
@@ -2205,6 +2235,12 @@ function selectItem(item, isNpc, markerElement) {
             const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
             m.setAttribute('r', origR);
         }
+    });
+    
+    // Clear stacked marker groups (also reset inline styles)
+    document.querySelectorAll('.marker-stack.selected').forEach(g => {
+        g.classList.remove('selected');
+        clearStackedMarkerStyles(g);
     });
     
     // Mark new selection and increase size
@@ -2229,7 +2265,66 @@ function selectItem(item, isNpc, markerElement) {
     updateUrlHash();
 }
 
+/**
+ * Apply visual selection styles to a stacked marker group
+ * Matches the style of individual marker selection (enlarge + glow)
+ */
+function applyStackedMarkerSelectionStyles(group) {
+    const countBadge = group.querySelector('.count-badge');
+    
+    if (countBadge) {
+        const circle = countBadge.querySelector('circle');
+        const text = countBadge.querySelector('text');
+        
+        if (circle) {
+            // Store original radius if not already stored
+            if (!circle.dataset.originalRadius) {
+                circle.dataset.originalRadius = circle.getAttribute('r');
+            }
+            // Scale up radius by 1.8x (matching individual markers)
+            const origR = parseFloat(circle.dataset.originalRadius);
+            circle.setAttribute('r', origR * 1.8);
+            // Apply glow filter to the circle
+            circle.style.filter = 'brightness(1.4) drop-shadow(0 0 8px rgba(212, 168, 85, 0.9))';
+        }
+        
+        if (text) {
+            // Store original font size if not already stored
+            if (!text.dataset.originalFontSize) {
+                text.dataset.originalFontSize = text.getAttribute('font-size');
+            }
+            // Scale up font size by 1.8x
+            const origSize = parseFloat(text.dataset.originalFontSize);
+            text.setAttribute('font-size', origSize * 1.8);
+        }
+    }
+}
+
+/**
+ * Clear visual selection styles from a stacked marker group
+ */
+function clearStackedMarkerStyles(group) {
+    const countBadge = group.querySelector('.count-badge');
+    
+    if (countBadge) {
+        const circle = countBadge.querySelector('circle');
+        const text = countBadge.querySelector('text');
+        
+        if (circle && circle.dataset.originalRadius) {
+            // Restore original radius
+            circle.setAttribute('r', circle.dataset.originalRadius);
+            circle.style.filter = '';
+        }
+        
+        if (text && text.dataset.originalFontSize) {
+            // Restore original font size
+            text.setAttribute('font-size', text.dataset.originalFontSize);
+        }
+    }
+}
+
 function clearSelection() {
+    // Clear individual markers
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
         if (m.dataset.isStarMarker === 'true') {
@@ -2239,6 +2334,13 @@ function clearSelection() {
             m.setAttribute('r', origR);
         }
     });
+    
+    // Clear stacked marker groups (also reset inline styles)
+    document.querySelectorAll('.marker-stack.selected').forEach(g => {
+        g.classList.remove('selected');
+        clearStackedMarkerStyles(g);
+    });
+    
     state.selectedMarker = null;
     
     // Show all visible objects list view
@@ -3648,7 +3750,7 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
         }
     }
     
-    // Clear previous marker selection
+    // Clear previous marker selection (individual markers)
     document.querySelectorAll('.marker.selected').forEach(m => {
         m.classList.remove('selected');
         if (m.dataset.isStarMarker === 'true') {
@@ -3657,6 +3759,12 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
             const origR = parseFloat(m.dataset.originalRadius) || CONFIG.marker.radius;
             m.setAttribute('r', origR);
         }
+    });
+    
+    // Clear stacked marker groups (also reset inline styles)
+    document.querySelectorAll('.marker-stack.selected').forEach(g => {
+        g.classList.remove('selected');
+        clearStackedMarkerStyles(g);
     });
     
     // If marker exists, select it visually
@@ -3670,7 +3778,22 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
         }
         state.selectedMarker = markerElement;
     } else {
-        state.selectedMarker = null;
+        // No individual marker found - check for stacked marker group
+        const stackedGroups = document.querySelectorAll('.marker-stack');
+        let foundStack = false;
+        for (const group of stackedGroups) {
+            if (group.dataset.tileX === String(tileX) && 
+                group.dataset.tileY === String(tileY)) {
+                group.classList.add('selected');
+                applyStackedMarkerSelectionStyles(group);
+                state.selectedMarker = group;
+                foundStack = true;
+                break;
+            }
+        }
+        if (!foundStack) {
+            state.selectedMarker = null;
+        }
     }
     
     // Ensure selection pane layout exists (it should, but re-render to be safe)

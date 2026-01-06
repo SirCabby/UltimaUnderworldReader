@@ -672,6 +672,39 @@ body {
     filter: drop-shadow(0 0 4px rgba(212, 168, 85, 0.8));
 }
 
+/* Selected state for stacked marker groups */
+.markers-layer .marker-stack.selected .count-badge circle {
+    fill: #fff !important;
+    filter: drop-shadow(0 0 8px rgba(212, 168, 85, 1)) drop-shadow(0 0 12px rgba(212, 168, 85, 0.7)) !important;
+    stroke: var(--text-accent) !important;
+    stroke-width: 2 !important;
+}
+
+.markers-layer .marker-stack.selected .count-badge text {
+    fill: var(--text-accent) !important;
+    font-weight: bold;
+}
+
+/* Add pulsing ring around selected stacked marker */
+.markers-layer .marker-stack.selected .tile-hover-area {
+    fill: rgba(212, 168, 85, 0.15);
+    stroke: var(--text-accent);
+    stroke-width: 2;
+    stroke-dasharray: 4 2;
+    animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+    0%, 100% {
+        opacity: 0.8;
+        stroke-width: 2;
+    }
+    50% {
+        opacity: 1;
+        stroke-width: 3;
+    }
+}
+
 /* Bridge markers - full tile wooden rectangles */
 .markers-layer .bridge-rect {
     transition: filter 0.15s ease, opacity 0.15s ease;
