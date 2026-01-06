@@ -666,6 +666,31 @@ class JsonExporter:
             invalid_names = {'an excellent deal...', 'excellent deal'}
             return name.lower() not in invalid_names and not name.lower().startswith('an excellent deal')
         
+        def get_owner_name(owner_value: int, object_id: int) -> str:
+            """Get the name of the NPC who owns an item.
+            
+            Args:
+                owner_value: The owner field value (0-63), represents conversation slot
+                object_id: The item's object ID (to exclude keys which use owner for lock ID)
+            
+            Returns:
+                NPC name if found, empty string if no owner or if it's a key
+            """
+            # Keys use owner field for lock ID, not NPC ownership
+            if 0x100 <= object_id <= 0x10E:
+                return ""
+            
+            # No owner
+            if owner_value <= 0:
+                return ""
+            
+            # Look up NPC name from conversation slot
+            if owner_value in npc_names:
+                return npc_names[owner_value]
+            
+            # Fallback for unknown owner
+            return f"NPC #{owner_value}"
+        
         def get_container_contents(level_num: int, container_link: int, 
                                    visited: set = None) -> List[Dict]:
             """Follow the object chain to get container contents."""
@@ -725,6 +750,14 @@ class JsonExporter:
                             content_item['description'] = item_desc
                         if item_effect:
                             content_item['effect'] = item_effect
+                        
+                        # Add owner information for items inside containers
+                        item_owner = getattr(item, 'owner', 0)
+                        if item_owner > 0 and not (0x100 <= item.object_id <= 0x10E):
+                            content_item['owner'] = item_owner
+                            cont_owner_name = get_owner_name(item_owner, item.object_id)
+                            if cont_owner_name:
+                                content_item['owner_name'] = cont_owner_name
                         
                         # Add item stats (weapon damage, armor stats, weight, nutrition, intoxication) for contained items
                         cont_item_stats = get_item_stats(item.object_id)
@@ -847,6 +880,14 @@ class JsonExporter:
                 web_obj['description'] = item_desc
             if item_effect:
                 web_obj['effect'] = item_effect
+            
+            # Add owner information (for items that belong to NPCs)
+            # Keys use owner for lock ID, which is already shown in effect/description
+            if owner > 0 and not (0x100 <= obj_id <= 0x10E):
+                web_obj['owner'] = owner
+                owner_name = get_owner_name(owner, obj_id)
+                if owner_name:
+                    web_obj['owner_name'] = owner_name
             
             # Include extra_info for special object types (potions, doors, etc.)
             extra_info = item_dict.get('extra_info', {})

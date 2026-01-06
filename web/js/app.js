@@ -2512,6 +2512,17 @@ function renderObjectDetails(item, isNpc) {
                 </div>
             `;
         }
+        
+        // Show owner information (item belongs to an NPC - taking it is stealing)
+        if (item.owner && item.owner > 0) {
+            const ownerName = item.owner_name || `NPC #${item.owner}`;
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Owned By</span>
+                    <span class="detail-value" style="color: #fab005;">⚠️ ${escapeHtml(ownerName)}</span>
+                </div>
+            `;
+        }
     }
     
     html += `
@@ -2664,6 +2675,15 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
             contentItem.appendChild(capDiv);
         }
         
+        // Show owner information (item belongs to an NPC - taking it is stealing)
+        if (item.owner && item.owner > 0) {
+            const ownerDiv = document.createElement('div');
+            ownerDiv.style.cssText = 'color: #fab005; font-size: 0.7rem; margin-top: 2px;';
+            const ownerName = item.owner_name || `NPC #${item.owner}`;
+            ownerDiv.textContent = `⚠️ Owned by: ${ownerName}`;
+            contentItem.appendChild(ownerDiv);
+        }
+        
         // Add hover effects
         contentItem.addEventListener('mouseenter', () => {
             contentItem.style.background = 'var(--bg-elevated)';
@@ -2811,6 +2831,15 @@ function renderNpcInventory(inventory, parentNpc = null) {
             inventoryItem.appendChild(capDiv);
         }
         
+        // Show owner information (item belongs to an NPC - taking it is stealing)
+        if (item.owner && item.owner > 0) {
+            const ownerDiv = document.createElement('div');
+            ownerDiv.style.cssText = 'color: #fab005; font-size: 0.7rem; margin-top: 2px;';
+            const ownerName = item.owner_name || `NPC #${item.owner}`;
+            ownerDiv.textContent = `⚠️ Owned by: ${ownerName}`;
+            inventoryItem.appendChild(ownerDiv);
+        }
+        
         // Add hover effects
         inventoryItem.addEventListener('mouseenter', () => {
             inventoryItem.style.background = 'var(--bg-elevated)';
@@ -2895,6 +2924,17 @@ function selectInventoryItem(item, parentNpc = null) {
             <div class="detail-effect">
                 <div class="detail-label" style="margin-bottom: 4px;">✨ Enchantment</div>
                 <div class="effect-text">${escapeHtml(item.effect)}</div>
+            </div>
+        `;
+    }
+    
+    // Show owner information (item belongs to an NPC - taking it is stealing)
+    if (item.owner && item.owner > 0) {
+        const ownerName = item.owner_name || `NPC #${item.owner}`;
+        html += `
+            <div class="detail-row">
+                <span class="detail-label">Owned By</span>
+                <span class="detail-value" style="color: #fab005;">⚠️ ${escapeHtml(ownerName)}</span>
             </div>
         `;
     }
@@ -3015,6 +3055,17 @@ function selectContainerItem(item, parentContainer = null) {
             <div class="detail-effect">
                 <div class="detail-label" style="margin-bottom: 4px;">✨ Enchantment</div>
                 <div class="effect-text">${escapeHtml(item.effect)}</div>
+            </div>
+        `;
+    }
+    
+    // Show owner information (item belongs to an NPC - taking it is stealing)
+    if (item.owner && item.owner > 0) {
+        const ownerName = item.owner_name || `NPC #${item.owner}`;
+        html += `
+            <div class="detail-row">
+                <span class="detail-label">Owned By</span>
+                <span class="detail-value" style="color: #fab005;">⚠️ ${escapeHtml(ownerName)}</span>
             </div>
         `;
     }
