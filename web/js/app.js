@@ -338,8 +338,9 @@ function selectLevel(levelNum) {
         updateCategoryCounts();
     };
     
-    // Reset view
-    resetView();
+    // Reset pan only (preserve zoom level)
+    state.pan = { x: 0, y: 0 };
+    updateMapTransform();
     clearSelection();
 }
 
