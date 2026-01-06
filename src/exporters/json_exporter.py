@@ -882,9 +882,14 @@ class JsonExporter:
             if item_effect:
                 web_obj['effect'] = item_effect
             
-            # Add quantity for coins (0xA0) - the quantity IS the gold amount
-            if obj_id == 0xA0 and is_quantity:
+            # Add quantity for stackable items (coins, ammo, candles, torches, etc.)
+            # is_quantity flag means the quantity_or_link field holds a count
+            # quantity >= 512 means it's enchantment data, not a real quantity
+            if is_quantity and quantity > 0 and quantity < 512:
                 web_obj['quantity'] = quantity
+            # Coins (0xA0) and gold coins (0xA1) always have quantity - default to 1
+            elif obj_id in (0xA0, 0xA1):
+                web_obj['quantity'] = 1
             
             # Add owner information (for items that belong to NPCs)
             # Keys use owner for lock ID, which is already shown in effect/description
