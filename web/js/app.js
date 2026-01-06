@@ -32,12 +32,26 @@ const CONFIG = {
         strokeWidth: 1,
     },
     
+    // Bridge settings
+    bridge: {
+        objectId: 356,           // Object ID for bridge (0x164)
+        color: '#8B5A2B',        // Wooden brown color (SaddleBrown-like)
+        strokeColor: '#5D3A1A',  // Darker brown for border
+    },
+    
     // Paths
     paths: {
         data: 'data/web_map_data.json',
         maps: 'maps/level{n}.png',  // Using PNG for better quality
     }
 };
+
+/**
+ * Check if an item is a bridge object
+ */
+function isBridge(item) {
+    return item && item.object_id === CONFIG.bridge.objectId;
+}
 
 // ============================================================================
 // Application State
@@ -691,6 +705,7 @@ function renderMarkers() {
  * Render stacked markers for tiles with multiple items
  * Shows a single count badge that replaces individual markers
  * The entire tile area is hoverable for better UX
+ * Bridges are rendered as a full-tile background with other items on top
  */
 function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     // Tile boundaries (top-left corner of tile in pixel coordinates)
@@ -701,20 +716,40 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     const centerX = tileLeft + pxPerTileX / 2;
     const centerY = tileTop + pxPerTileY / 2;
     
+    // Separate bridges from other items
+    const bridges = items.filter(itemData => isBridge(itemData.item));
+    const nonBridgeItems = items.filter(itemData => !isBridge(itemData.item));
+    
     // Create a group for the stacked marker
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('marker-stack');
+    if (bridges.length > 0) group.classList.add('has-bridge');
     group.dataset.tileX = tileX;
     group.dataset.tileY = tileY;
     group.dataset.count = items.length;
     
-    // Sort items: NPCs first, then by category for consistent ordering
-    items.sort((a, b) => {
+    // Render bridge(s) first as background layer
+    if (bridges.length > 0) {
+        const bridgeRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        bridgeRect.setAttribute('x', tileLeft);
+        bridgeRect.setAttribute('y', tileTop);
+        bridgeRect.setAttribute('width', pxPerTileX);
+        bridgeRect.setAttribute('height', pxPerTileY);
+        bridgeRect.setAttribute('fill', CONFIG.bridge.color);
+        bridgeRect.setAttribute('stroke', CONFIG.bridge.strokeColor);
+        bridgeRect.setAttribute('stroke-width', '0.5');
+        bridgeRect.classList.add('bridge-rect', 'bridge-background');
+        bridgeRect.style.pointerEvents = 'none';
+        group.appendChild(bridgeRect);
+    }
+    
+    // Sort non-bridge items: NPCs first, then by category for consistent ordering
+    nonBridgeItems.sort((a, b) => {
         if (a.isNpc !== b.isNpc) return a.isNpc ? -1 : 1;
         return 0;
     });
     
-    // Create invisible tile-sized hover area (added first so badge renders on top)
+    // Create invisible tile-sized hover area (added after bridge so it captures events)
     const hoverArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     hoverArea.setAttribute('x', tileLeft);
     hoverArea.setAttribute('y', tileTop);
@@ -740,8 +775,8 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     });
     hoverArea.addEventListener('click', () => {
         hideTooltip();
-        // Select the first item when clicking the tile
-        const firstItem = items[0];
+        // Select the first non-bridge item if available, otherwise first item
+        const firstItem = nonBridgeItems.length > 0 ? nonBridgeItems[0] : items[0];
         if (firstItem.isSecret) {
             selectSecret(firstItem.item);
         } else {
@@ -751,9 +786,17 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     
     group.appendChild(hoverArea);
     
-    // Show a single count badge centered in the tile (visual only, no events)
-    const badge = createCountBadge(centerX, centerY, items.length, tileX, tileY, items);
-    group.appendChild(badge);
+    // If there are non-bridge items, show a count badge for them
+    if (nonBridgeItems.length > 0) {
+        // Show count badge for non-bridge items (visual only, no events)
+        const badge = createCountBadge(centerX, centerY, nonBridgeItems.length, tileX, tileY, nonBridgeItems);
+        group.appendChild(badge);
+    } else if (bridges.length > 1) {
+        // If only bridges, show count for multiple bridges
+        const badge = createCountBadge(centerX, centerY, bridges.length, tileX, tileY, bridges);
+        group.appendChild(badge);
+    }
+    // If only one bridge and no other items, the bridge rect is enough (no badge needed)
     
     elements.markersLayer.appendChild(group);
 }
@@ -1319,11 +1362,16 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     // Check if this is a named NPC (should use star shape)
     const isNamedNpc = isNpc && hasUniqueName(item);
     
+    // Check if this is a bridge
+    const itemIsBridge = isBridge(item);
+    
     // Create a group to hold both hover area and marker
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('marker-group');
+    if (itemIsBridge) group.classList.add('bridge-marker');
     group.dataset.id = item.id;
     group.dataset.isNpc = isNpc;
+    group.dataset.isBridge = itemIsBridge;
     group.dataset.tileX = item.tile_x;
     group.dataset.tileY = item.tile_y;
     
@@ -1336,9 +1384,20 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     hoverArea.setAttribute('fill', 'transparent');
     hoverArea.classList.add('tile-hover-area');
     
-    // Create the visual marker (star for named NPCs, circle otherwise)
+    // Create the visual marker
     let marker;
-    if (isNamedNpc) {
+    if (itemIsBridge) {
+        // Create full-tile rectangle for bridges
+        marker = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        marker.setAttribute('x', tileLeft);
+        marker.setAttribute('y', tileTop);
+        marker.setAttribute('width', pxPerTileX);
+        marker.setAttribute('height', pxPerTileY);
+        marker.setAttribute('fill', CONFIG.bridge.color);
+        marker.setAttribute('stroke', CONFIG.bridge.strokeColor);
+        marker.setAttribute('stroke-width', '0.5');
+        marker.classList.add('marker', 'bridge-rect');
+    } else if (isNamedNpc) {
         // Create star-shaped marker for named NPCs
         marker = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const starPath = createStarPath(px, py, radius * 1.2);
@@ -1364,6 +1423,7 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     // Store item data on marker for selection
     marker.dataset.id = item.id;
     marker.dataset.isNpc = isNpc;
+    marker.dataset.isBridge = itemIsBridge;
     marker.dataset.tileX = item.tile_x;
     marker.dataset.tileY = item.tile_y;
     marker.dataset.originalRadius = radius;
@@ -1371,20 +1431,22 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     marker.dataset.centerX = px;
     marker.dataset.centerY = py;
     
-    // Hover radius for visual feedback
+    // Hover radius for visual feedback (not used for bridges)
     const hoverRadius = Math.min(radius * 1.3, 4);
     
     // Event listeners on the tile hover area
     hoverArea.addEventListener('mouseenter', (e) => {
-        if (isNamedNpc) {
-            marker.style.transform = 'scale(1.3)';
-        } else {
-            marker.setAttribute('r', hoverRadius);
+        if (!itemIsBridge) {
+            if (isNamedNpc) {
+                marker.style.transform = 'scale(1.3)';
+            } else {
+                marker.setAttribute('r', hoverRadius);
+            }
         }
         showTooltip(e, item, isNpc);
     });
     hoverArea.addEventListener('mouseleave', () => {
-        if (!marker.classList.contains('selected')) {
+        if (!marker.classList.contains('selected') && !itemIsBridge) {
             if (isNamedNpc) {
                 marker.style.transform = 'scale(1)';
             } else {

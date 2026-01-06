@@ -672,6 +672,21 @@ body {
     filter: drop-shadow(0 0 4px rgba(212, 168, 85, 0.8));
 }
 
+/* Bridge markers - full tile wooden rectangles */
+.markers-layer .bridge-rect {
+    transition: filter 0.15s ease, opacity 0.15s ease;
+}
+
+.markers-layer .bridge-marker:hover .bridge-rect,
+.markers-layer .marker-stack.has-bridge:hover .bridge-background {
+    filter: brightness(1.15);
+}
+
+.markers-layer .bridge-rect.selected,
+.markers-layer .bridge-marker.selected .bridge-rect {
+    filter: brightness(1.2) drop-shadow(0 0 3px rgba(212, 168, 85, 0.6));
+}
+
 /* Zoom Controls */
 .zoom-controls {
     position: absolute;
