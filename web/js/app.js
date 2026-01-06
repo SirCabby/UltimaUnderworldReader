@@ -2030,7 +2030,7 @@ function showTooltip(e, item, isNpc) {
             } else {
                 lockText = `🔒 Locked (lock #${lockId})`;
                 if (isPickable) {
-                    lockText += ' - 🪝 Pickable';
+                    lockText += ' - ⛏️ Pickable';
                 }
             }
             html += `<div class="tooltip-info" style="color: #ff6b6b; font-size: 0.85rem;">${lockText}</div>`;
@@ -2582,7 +2582,7 @@ function renderVisibleObjectsPane() {
                     } else if (lockId !== undefined) {
                         lockText = `🔒 Lock #${lockId}`;
                         if (isPickable) {
-                            lockText += ' 🪝';  // Can be picked
+                            lockText += ' ⛏️';  // Can be picked
                         }
                     } else {
                         lockText = '🔒 Locked';
@@ -3527,7 +3527,7 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             } else if (lockId !== undefined) {
                 lockInfo = `🔒 Lock #${lockId}`;
                 if (isPickable) {
-                    lockInfo += ' 🪝';  // Can be picked
+                    lockInfo += ' ⛏️';  // Can be picked
                 }
             } else {
                 lockInfo = '🔒 Locked';
@@ -4025,7 +4025,7 @@ function getTypeSpecificDetails(item) {
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Pickable</span>
-                        <span class="detail-value" style="color: ${isPickable ? '#69db7c' : '#ff6b6b'};">${isPickable ? '🪝 Yes - can use lockpicks' : '🚫 No'}</span>
+                        <span class="detail-value" style="color: ${isPickable ? '#69db7c' : '#ff6b6b'};">${isPickable ? '⛏️ Yes - can use lockpicks' : '🚫 No'}</span>
                     </div>
                 `;
             }
