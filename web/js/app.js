@@ -3977,8 +3977,8 @@ function getTypeSpecificDetails(item) {
             if (match) {
                 html += `
                     <div class="detail-row">
-                        <span class="detail-label">Opens Lock</span>
-                        <span class="detail-value" style="color: #fab005;">🔑 Lock ID ${match[1]}</span>
+                        <span class="detail-label">Key ID</span>
+                        <span class="detail-value" style="color: #fab005;">🔑 ${match[1]}</span>
                     </div>
                 `;
             }
@@ -4001,31 +4001,19 @@ function getTypeSpecificDetails(item) {
             if (lockType === 'special') {
                 html += `
                     <div class="detail-row">
-                        <span class="detail-label">Status</span>
-                        <span class="detail-value" style="color: #ff6b6b;">🔒 Special Lock</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Opens With</span>
-                        <span class="detail-value" style="color: #fab005;">Trigger/mechanism</span>
+                        <span class="detail-label">Lock</span>
+                        <span class="detail-value" style="color: #ff6b6b;">🔒 Special (trigger)</span>
                     </div>
                 `;
             } else {
                 html += `
                     <div class="detail-row">
-                        <span class="detail-label">Status</span>
-                        <span class="detail-value" style="color: #ff6b6b;">🔒 Locked</span>
-                    </div>
-                    <div class="detail-row">
                         <span class="detail-label">Lock ID</span>
-                        <span class="detail-value" style="color: #fab005;">${lockId}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Opens With</span>
-                        <span class="detail-value" style="color: #fab005;">Key with owner = ${lockId}</span>
+                        <span class="detail-value" style="color: #fab005;">🔒 ${lockId}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Pickable</span>
-                        <span class="detail-value" style="color: ${isPickable ? '#69db7c' : '#ff6b6b'};">${isPickable ? '⛏️ Yes - can use lockpicks' : '🚫 No'}</span>
+                        <span class="detail-value" style="color: ${isPickable ? '#69db7c' : '#ff6b6b'};">${isPickable ? '⛏️ Yes' : 'No'}</span>
                     </div>
                 `;
             }
