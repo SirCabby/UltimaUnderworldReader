@@ -882,6 +882,10 @@ class JsonExporter:
             if item_effect:
                 web_obj['effect'] = item_effect
             
+            # Add quantity for coins (0xA0) - the quantity IS the gold amount
+            if obj_id == 0xA0 and is_quantity:
+                web_obj['quantity'] = quantity
+            
             # Add owner information (for items that belong to NPCs)
             # Keys use owner for lock ID, which is already shown in effect/description
             if owner > 0 and not (0x100 <= obj_id <= 0x10E):

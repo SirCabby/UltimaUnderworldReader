@@ -1221,7 +1221,7 @@ function showStackedTooltip(e, items, tileX, tileY) {
             displayName = item.name || 'Unknown';
         } else {
             icon = '•';
-            displayName = item.name || 'Unknown';
+            displayName = getItemDisplayName(item);
         }
         const enchantIcon = (!isSecret && isEnchanted(item)) ? ' ✨' : '';
         
@@ -1963,7 +1963,8 @@ function showTooltip(e, item, isNpc) {
     const tooltip = elements.tooltip;
     
     const uniqueIndicator = isNpc && hasUniqueName(item) ? '⭐ ' : '';
-    let html = `<div class="tooltip-name">${uniqueIndicator}${item.name || (isNpc ? 'Unknown NPC' : 'Unknown Object')}</div>`;
+    const displayName = isNpc ? (item.name || 'Unknown NPC') : getItemDisplayName(item);
+    let html = `<div class="tooltip-name">${uniqueIndicator}${displayName}</div>`;
     
     if (isNpc) {
         // Show creature type if different from name (already indicated by ⭐ but add context)
@@ -2551,7 +2552,7 @@ function renderVisibleObjectsPane() {
             } else {
                 const itemEnchanted = isEnchanted(item);
                 icon = itemEnchanted ? '✨' : '•';
-                displayName = item.name || 'Unknown';
+                displayName = getItemDisplayName(item);
                 subtitle = `(${item.tile_x}, ${item.tile_y})`;
                 // Show enchantment effect for enchanted items (including spell scrolls)
                 // Also show effect for spell_scrolls category directly (they always have spell effects)
@@ -2700,7 +2701,8 @@ function renderVisibleObjectsPane() {
 function renderObjectDetails(item, isNpc) {
     let html = '<div class="detail-card">';
     const uniqueIndicator = isNpc && hasUniqueName(item) ? '⭐ ' : '';
-    html += `<div class="detail-name">${uniqueIndicator}${item.name || (isNpc ? 'Unknown NPC' : 'Unknown Object')}</div>`;
+    const displayName = isNpc ? (item.name || 'Unknown NPC') : getItemDisplayName(item);
+    html += `<div class="detail-name">${uniqueIndicator}${displayName}</div>`;
     
     if (isNpc) {
         const npcCategory = getNpcCategory(item);
@@ -2860,7 +2862,9 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
     
     contents.forEach(item => {
         const catColor = getCategoryColor(item.category);
-        const qty = item.quantity > 1 ? ` (×${item.quantity})` : '';
+        const objId = item.object_id || 0;
+        // For coins, quantity is already in the display name; for others, show (×qty) suffix
+        const qty = (objId !== 0xA0 && item.quantity > 1) ? ` (×${item.quantity})` : '';
         const hasEffect = isMagicalEffect(item.effect) ? ' ✨' : '';
         const hasContents = item.contents && item.contents.length > 0;
         
@@ -2880,7 +2884,7 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
         
         const nameDiv = document.createElement('div');
         nameDiv.style.color = 'var(--text-primary)';
-        nameDiv.textContent = `${item.name || 'Unknown'}${qty}${hasEffect}${hasContents ? ' 📦' : ''}`;
+        nameDiv.textContent = `${getItemDisplayName(item)}${qty}${hasEffect}${hasContents ? ' 📦' : ''}`;
         
         // Build info line with category and optional effect preview (only for magical effects)
         let infoText = formatCategory(item.category);
@@ -3016,7 +3020,9 @@ function renderNpcInventory(inventory, parentNpc = null) {
     
     inventory.forEach(item => {
         const catColor = getCategoryColor(item.category);
-        const qty = item.quantity > 1 ? ` (×${item.quantity})` : '';
+        const objId = item.object_id || 0;
+        // For coins, quantity is already in the display name; for others, show (×qty) suffix
+        const qty = (objId !== 0xA0 && item.quantity > 1) ? ` (×${item.quantity})` : '';
         const hasEffect = isMagicalEffect(item.effect) ? ' ✨' : '';
         const hasContents = item.contents && item.contents.length > 0;
         
@@ -3036,7 +3042,7 @@ function renderNpcInventory(inventory, parentNpc = null) {
         
         const nameDiv = document.createElement('div');
         nameDiv.style.color = 'var(--text-primary)';
-        nameDiv.textContent = `${item.name || 'Unknown'}${qty}${hasEffect}${hasContents ? ' 📦' : ''}`;
+        nameDiv.textContent = `${getItemDisplayName(item)}${qty}${hasEffect}${hasContents ? ' 📦' : ''}`;
         
         // Build info line with category and optional effect preview (only for magical effects)
         let infoText = formatCategory(item.category);
@@ -3166,9 +3172,10 @@ function selectInventoryItem(item, parentNpc = null) {
     
     // Build details for the selected inventory item
     let html = '<div class="detail-card">';
-    html += `<div class="detail-name">${item.name || 'Unknown Object'}</div>`;
+    html += `<div class="detail-name">${getItemDisplayName(item)}</div>`;
     
     const catColor = getCategoryColor(item.category);
+    const objId = item.object_id || 0;
     html += `
         <div class="detail-row">
             <span class="detail-label">Category</span>
@@ -3176,8 +3183,8 @@ function selectInventoryItem(item, parentNpc = null) {
         </div>
     `;
     
-    // Show quantity only if > 1 (stackable items)
-    if (item.quantity && item.quantity > 1) {
+    // Show quantity only if > 1 (stackable items), but not for coins (already in name)
+    if (objId !== 0xA0 && item.quantity && item.quantity > 1) {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Quantity</span>
@@ -3297,9 +3304,10 @@ function selectContainerItem(item, parentContainer = null) {
     
     // Build details for the selected container item
     let html = '<div class="detail-card">';
-    html += `<div class="detail-name">${item.name || 'Unknown Object'}</div>`;
+    html += `<div class="detail-name">${getItemDisplayName(item)}</div>`;
     
     const catColor = getCategoryColor(item.category);
+    const objId = item.object_id || 0;
     html += `
         <div class="detail-row">
             <span class="detail-label">Category</span>
@@ -3307,8 +3315,8 @@ function selectContainerItem(item, parentContainer = null) {
         </div>
     `;
     
-    // Show quantity only if > 1 (stackable items)
-    if (item.quantity && item.quantity > 1) {
+    // Show quantity only if > 1 (stackable items), but not for coins (already in name)
+    if (objId !== 0xA0 && item.quantity && item.quantity > 1) {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Quantity</span>
@@ -4032,6 +4040,23 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+/**
+ * Get the display name for an item, with special handling for coins
+ * Coins (object_id 0xA0 = 160) show quantity as "X gold"
+ */
+function getItemDisplayName(item) {
+    const name = item.name || 'Unknown';
+    const objId = item.object_id || 0;
+    
+    // Coins (0xA0 = 160) - show quantity as gold amount
+    if (objId === 0xA0) {
+        const amount = item.quantity || 1;
+        return `${amount} gold`;
+    }
+    
+    return name;
 }
 
 /**
