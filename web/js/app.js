@@ -1363,6 +1363,21 @@ function selectStackedItem(item, isNpc, tileX, tileY) {
         clearStackedMarkerStyles(g);
     });
     
+    // Clear secret marker groups
+    document.querySelectorAll('.secret-marker.selected').forEach(g => {
+        g.classList.remove('selected');
+        // Reset transform
+        const visualGroup = g.querySelector('.secret-visual');
+        if (visualGroup) {
+            visualGroup.setAttribute('transform', `translate(${visualGroup.dataset.centerX}, ${visualGroup.dataset.centerY})`);
+        }
+        // Reset stroke widths
+        const lines = g.querySelectorAll('.secret-x');
+        lines.forEach(line => line.setAttribute('stroke-width', '2'));
+        const diamonds = g.querySelectorAll('.secret-diamond');
+        diamonds.forEach(diamond => diamond.setAttribute('stroke-width', '1'));
+    });
+    
     state.selectedMarker = null;
     
     // First try to find an individual marker (for single-item tiles)
@@ -1794,35 +1809,41 @@ function createSecretMarker(secret, color, pxPerTileX, pxPerTileY) {
     // Create visual marker based on secret type
     const size = 4;
     
+    // Create a transform group for the visual marker (for scaling when selected)
+    const visualGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    visualGroup.classList.add('secret-visual');
+    visualGroup.setAttribute('transform', `translate(${px}, ${py})`);
+    visualGroup.dataset.centerX = px;
+    visualGroup.dataset.centerY = py;
+    
     if (secret.type === 'illusory_wall') {
         // Draw an X for illusory walls (bright magenta)
         const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line1.setAttribute('x1', px - size);
-        line1.setAttribute('y1', py - size);
-        line1.setAttribute('x2', px + size);
-        line1.setAttribute('y2', py + size);
+        line1.setAttribute('x1', -size);
+        line1.setAttribute('y1', -size);
+        line1.setAttribute('x2', size);
+        line1.setAttribute('y2', size);
         line1.setAttribute('stroke', '#ff00ff');
         line1.setAttribute('stroke-width', '2');
         line1.classList.add('marker', 'secret-x');
         line1.style.pointerEvents = 'none';
         
         const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line2.setAttribute('x1', px + size);
-        line2.setAttribute('y1', py - size);
-        line2.setAttribute('x2', px - size);
-        line2.setAttribute('y2', py + size);
+        line2.setAttribute('x1', size);
+        line2.setAttribute('y1', -size);
+        line2.setAttribute('x2', -size);
+        line2.setAttribute('y2', size);
         line2.setAttribute('stroke', '#ff00ff');
         line2.setAttribute('stroke-width', '2');
         line2.classList.add('marker', 'secret-x');
         line2.style.pointerEvents = 'none';
         
-        group.appendChild(hoverArea);
-        group.appendChild(line1);
-        group.appendChild(line2);
+        visualGroup.appendChild(line1);
+        visualGroup.appendChild(line2);
     } else if (secret.type === 'secret_door') {
         // Draw a diamond for secret doors (bright yellow)
         const diamond = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        const points = `${px},${py - size} ${px + size},${py} ${px},${py + size} ${px - size},${py}`;
+        const points = `0,${-size} ${size},0 0,${size} ${-size},0`;
         diamond.setAttribute('points', points);
         diamond.setAttribute('fill', '#ffff00');
         diamond.setAttribute('stroke', '#ffffff');
@@ -1830,13 +1851,12 @@ function createSecretMarker(secret, color, pxPerTileX, pxPerTileY) {
         diamond.classList.add('marker', 'secret-diamond');
         diamond.style.pointerEvents = 'none';
         
-        group.appendChild(hoverArea);
-        group.appendChild(diamond);
+        visualGroup.appendChild(diamond);
     } else {
         // Default: circle marker
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', px);
-        circle.setAttribute('cy', py);
+        circle.setAttribute('cx', 0);
+        circle.setAttribute('cy', 0);
         circle.setAttribute('r', size);
         circle.setAttribute('fill', color);
         circle.setAttribute('stroke', '#ffffff');
@@ -1844,9 +1864,11 @@ function createSecretMarker(secret, color, pxPerTileX, pxPerTileY) {
         circle.classList.add('marker');
         circle.style.pointerEvents = 'none';
         
-        group.appendChild(hoverArea);
-        group.appendChild(circle);
+        visualGroup.appendChild(circle);
     }
+    
+    group.appendChild(hoverArea);
+    group.appendChild(visualGroup);
     
     // Event listeners
     hoverArea.addEventListener('mouseenter', (e) => {
@@ -1926,7 +1948,42 @@ function selectSecret(secret) {
         clearStackedMarkerStyles(g);
     });
     
+    // Clear secret marker groups
+    document.querySelectorAll('.secret-marker.selected').forEach(g => {
+        g.classList.remove('selected');
+        // Reset transform
+        const visualGroup = g.querySelector('.secret-visual');
+        if (visualGroup) {
+            visualGroup.setAttribute('transform', `translate(${visualGroup.dataset.centerX}, ${visualGroup.dataset.centerY})`);
+        }
+        // Reset stroke widths
+        const lines = g.querySelectorAll('.secret-x');
+        lines.forEach(line => line.setAttribute('stroke-width', '2'));
+        const diamonds = g.querySelectorAll('.secret-diamond');
+        diamonds.forEach(diamond => diamond.setAttribute('stroke-width', '1'));
+    });
+    
     state.selectedMarker = null;
+    
+    // Find and select the secret marker group
+    const markerGroups = document.querySelectorAll('.secret-marker');
+    for (const group of markerGroups) {
+        if (group.dataset.id === secret.id) {
+            group.classList.add('selected');
+            // Apply transform to the visual group
+            const visualGroup = group.querySelector('.secret-visual');
+            if (visualGroup) {
+                visualGroup.setAttribute('transform', `translate(${visualGroup.dataset.centerX}, ${visualGroup.dataset.centerY}) scale(1.8)`);
+            }
+            // Update stroke widths for better visibility
+            const lines = group.querySelectorAll('.secret-x');
+            lines.forEach(line => line.setAttribute('stroke-width', '3'));
+            const diamonds = group.querySelectorAll('.secret-diamond');
+            diamonds.forEach(diamond => diamond.setAttribute('stroke-width', '2'));
+            state.selectedMarker = group;
+            break;
+        }
+    }
     
     // Ensure selection pane layout is rendered
     renderSelectionPane();
@@ -1938,6 +1995,34 @@ function selectSecret(secret) {
     renderLocationObjects(secret.tile_x, secret.tile_y, secret.id);
     
     updateUrlHash();
+}
+
+/**
+ * Get the reveal method text for an illusory wall based on its trigger
+ */
+function getIllusoryWallRevealMethod(triggerString) {
+    if (!triggerString) {
+        return 'Cast the <strong>Reveal</strong> spell (ORT LOR)';
+    }
+    
+    // Extract trigger type from string (e.g., "move trigger at (8, 34)" -> "move trigger")
+    const triggerMatch = triggerString.match(/^([^a]+trigger)/i);
+    if (!triggerMatch) {
+        return 'Cast the <strong>Reveal</strong> spell (ORT LOR)';
+    }
+    
+    const triggerType = triggerMatch[1].trim().toLowerCase();
+    
+    if (triggerType.includes('look')) {
+        return 'Search';
+    } else if (triggerType.includes('move')) {
+        return 'Walk through';
+    } else if (triggerType.includes('use')) {
+        return 'Use';
+    } else {
+        // Fallback for other trigger types
+        return `Activate (${triggerType})`;
+    }
 }
 
 /**
@@ -1955,11 +2040,22 @@ function renderSecretDetails(secret) {
             <span class="detail-label">Type</span>
             <span class="detail-category" style="background: ${typeColor}22; color: ${typeColor};">Secret</span>
         </div>
-        <div class="detail-row">
-            <span class="detail-label">Description</span>
-            <span class="detail-value">${secret.description || 'Hidden passage'}</span>
-        </div>
     `;
+    
+    // For illusory walls, skip the redundant description if it's just "Illusory wall -> {type}"
+    // since we show "Reveals" separately below
+    const isRedundantDescription = secret.type === 'illusory_wall' && 
+                                    secret.description && 
+                                    secret.description.startsWith('Illusory wall ->');
+    
+    if (!isRedundantDescription) {
+        html += `
+            <div class="detail-row">
+                <span class="detail-label">Description</span>
+                <span class="detail-value">${secret.description || 'Hidden passage'}</span>
+            </div>
+        `;
+    }
     
     if (secret.details) {
         if (secret.details.new_tile_type) {
@@ -2010,10 +2106,12 @@ function renderSecretDetails(secret) {
     
     // Add hint about how to reveal
     if (secret.type === 'illusory_wall') {
+        const triggerString = secret.details && secret.details.trigger;
+        const revealMethod = getIllusoryWallRevealMethod(triggerString);
         html += `
             <div class="detail-description" style="margin-top: 12px;">
                 <div class="detail-label" style="margin-bottom: 4px;">How to Reveal</div>
-                <div class="description-text" style="color: var(--text-accent);">Cast the <strong>Reveal</strong> spell (ORT LOR) or walk through it.</div>
+                <div class="description-text" style="color: var(--text-accent);">${revealMethod}</div>
             </div>
         `;
     }
@@ -2284,6 +2382,21 @@ function selectItem(item, isNpc, markerElement) {
         clearStackedMarkerStyles(g);
     });
     
+    // Clear secret marker groups
+    document.querySelectorAll('.secret-marker.selected').forEach(g => {
+        g.classList.remove('selected');
+        // Reset transform
+        const visualGroup = g.querySelector('.secret-visual');
+        if (visualGroup) {
+            visualGroup.setAttribute('transform', `translate(${visualGroup.dataset.centerX}, ${visualGroup.dataset.centerY})`);
+        }
+        // Reset stroke widths
+        const lines = g.querySelectorAll('.secret-x');
+        lines.forEach(line => line.setAttribute('stroke-width', '2'));
+        const diamonds = g.querySelectorAll('.secret-diamond');
+        diamonds.forEach(diamond => diamond.setAttribute('stroke-width', '1'));
+    });
+    
     // Mark new selection and increase size
     markerElement.classList.add('selected');
     if (markerElement.dataset.isStarMarker === 'true') {
@@ -2380,6 +2493,21 @@ function clearSelection() {
     document.querySelectorAll('.marker-stack.selected').forEach(g => {
         g.classList.remove('selected');
         clearStackedMarkerStyles(g);
+    });
+    
+    // Clear secret marker groups
+    document.querySelectorAll('.secret-marker.selected').forEach(g => {
+        g.classList.remove('selected');
+        // Reset transform
+        const visualGroup = g.querySelector('.secret-visual');
+        if (visualGroup) {
+            visualGroup.setAttribute('transform', `translate(${visualGroup.dataset.centerX}, ${visualGroup.dataset.centerY})`);
+        }
+        // Reset stroke widths
+        const lines = g.querySelectorAll('.secret-x');
+        lines.forEach(line => line.setAttribute('stroke-width', '2'));
+        const diamonds = g.querySelectorAll('.secret-diamond');
+        diamonds.forEach(diamond => diamond.setAttribute('stroke-width', '1'));
     });
     
     state.selectedMarker = null;
@@ -2695,6 +2823,27 @@ function renderVisibleObjectsPane() {
                 icon = item.type === 'illusory_wall' ? '🔮' : '🚪';
                 displayName = item.type === 'illusory_wall' ? 'Illusory Wall' : 'Secret Door';
                 subtitle = `(${item.tile_x}, ${item.tile_y})`;
+                // Show "Reveals" info and reveal method for illusory walls
+                if (item.type === 'illusory_wall' && item.details) {
+                    let revealInfo = '';
+                    if (item.details.new_tile_type) {
+                        revealInfo = `Reveals: ${escapeHtml(item.details.new_tile_type)}`;
+                    }
+                    // Show reveal method
+                    const triggerString = item.details.trigger;
+                    const revealMethod = getIllusoryWallRevealMethod(triggerString);
+                    // Remove HTML tags for the list view
+                    const revealMethodText = revealMethod.replace(/<[^>]*>/g, '');
+                    revealInfo += revealInfo ? '<br>' : '';
+                    if (triggerString) {
+                        revealInfo += revealMethodText;
+                    } else {
+                        revealInfo += `✨ ${revealMethodText}`;
+                    }
+                    if (revealInfo) {
+                        enchantLine = `<div style="color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;">${revealInfo}</div>`;
+                    }
+                }
                 // Show lock info for locked secret doors
                 if (item.type === 'secret_door' && item.details && item.details.is_locked) {
                     const lockId = item.details.lock_id;
@@ -3811,9 +3960,28 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             card.classList.add('selected-location-item');
         }
         
+        // Build reveal method info for illusory walls
+        let revealMethodInfo = '';
+        if (secret.type === 'illusory_wall' && secret.details) {
+            const triggerString = secret.details.trigger;
+            const revealMethod = getIllusoryWallRevealMethod(triggerString);
+            // Remove HTML tags for the location view
+            const revealMethodText = revealMethod.replace(/<[^>]*>/g, '');
+            if (triggerString) {
+                revealMethodInfo = `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${revealMethodText}</div>`;
+            } else {
+                revealMethodInfo = `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">✨ ${revealMethodText}</div>`;
+            }
+            // Also show what it reveals
+            if (secret.details.new_tile_type) {
+                revealMethodInfo = `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">Reveals: ${escapeHtml(secret.details.new_tile_type)}</div>${revealMethodInfo}`;
+            }
+        }
+        
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem; color: ${typeColor};">${typeLabel}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${secret.description || 'Hidden passage'}</div>
+            ${revealMethodInfo}
         `;
         
         card.addEventListener('click', () => selectSecret(secret));
