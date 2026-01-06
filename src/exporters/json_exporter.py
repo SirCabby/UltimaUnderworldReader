@@ -337,6 +337,57 @@ class JsonExporter:
                     return f"Stack of {quantity}"
                 return ""
             
+            # Switches (0x170-0x17F) - follow link chain to describe effect
+            if 0x170 <= object_id <= 0x17F:
+                from ..constants.switches import describe_switch_effect
+                from ..constants.traps import is_trap, is_trigger
+                
+                # Get switch coordinates for finding nearby doors
+                switch_x = getattr(item, 'tile_x', 0)
+                switch_y = getattr(item, 'tile_y', 0)
+                
+                # Switches link to triggers which link to traps
+                # Chain: Switch -> Trigger -> Trap -> Effect
+                if special_link > 0 and levels:
+                    level = levels.get(level_num)
+                    if level and special_link in level.objects:
+                        target = level.objects[special_link]
+                        
+                        # Get object names for descriptions
+                        object_names_list = strings_parser.get_block(4) if strings_parser else None
+                        
+                        # Check if switch links directly to a trigger
+                        if is_trigger(target.item_id):
+                            # Follow trigger to its trap
+                            trap_link = target.quantity_or_link
+                            if trap_link > 0 and trap_link in level.objects:
+                                trap_obj = level.objects[trap_link]
+                                if is_trap(trap_obj.item_id):
+                                    # Get target object for create_object_trap
+                                    target_obj = None
+                                    target_link = trap_obj.quantity_or_link if not trap_obj.is_quantity else 0
+                                    if target_link > 0 and target_link in level.objects:
+                                        target_obj = level.objects[target_link]
+                                    
+                                    return describe_switch_effect(
+                                        trap_obj.item_id, trap_obj.quality, trap_obj.owner,
+                                        trap_obj.tile_x, trap_obj.tile_y, level_num,
+                                        object_names_list, target_obj,
+                                        switch_x, switch_y, level.objects
+                                    )
+                            return ""
+                        
+                        # Check if switch links directly to a trap
+                        elif is_trap(target.item_id):
+                            return describe_switch_effect(
+                                target.item_id, target.quality, target.owner,
+                                target.tile_x, target.tile_y, level_num,
+                                object_names_list, None,
+                                switch_x, switch_y, level.objects
+                            )
+                
+                return ""
+            
             # Traps (0x180-0x19F) - use detailed descriptions
             if 0x180 <= object_id <= 0x19F:
                 from ..constants.traps import describe_trap_effect

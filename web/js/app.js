@@ -2746,6 +2746,11 @@ function renderVisibleObjectsPane() {
                         : item.description;
                     enchantLine += `<div style="color: #e8d4b8; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3; white-space: pre-wrap;">📜 "${escapeHtml(displayText)}"</div>`;
                 }
+                // Show effect for switches, traps, and triggers
+                const isSwitchTrapTrigger = (objId >= 0x170 && objId <= 0x17F) || (objId >= 0x180 && objId <= 0x1BF);
+                if (isSwitchTrapTrigger && item.description && item.description.length > 0) {
+                    enchantLine += `<div style="color: #ffa94d; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(255, 169, 77, 0.1); border-left: 2px solid #ffa94d; border-radius: 2px; line-height: 1.3;">⚙️ ${escapeHtml(item.description)}</div>`;
+                }
                 // Show quantity for stackable items (only if > 1)
                 if (item.quantity && item.quantity > 1) {
                     enchantLine += `<div style="color: #fcc419; font-size: 0.7rem; margin-top: 2px;">📦 Qty: ${item.quantity}</div>`;
@@ -2886,17 +2891,17 @@ function renderObjectDetails(item, isNpc) {
         html += getTypeSpecificDetails(item);
         
         // Show description if available (books, scrolls, keys, potions, etc.)
-        // For triggers and traps, show the effect description inline without extra section
+        // For switches, triggers and traps, show the effect description inline without extra section
         if (item.description) {
             const objId = item.object_id || 0;
-            const isTrapOrTrigger = objId >= 0x180 && objId <= 0x1BF;
+            const isSwitchTrapOrTrigger = (objId >= 0x170 && objId <= 0x17F) || (objId >= 0x180 && objId <= 0x1BF);
             
-            if (isTrapOrTrigger) {
-                // Show trap/trigger effect inline as a detail row
+            if (isSwitchTrapOrTrigger) {
+                // Show switch/trap/trigger effect in a styled block
                 html += `
-                    <div class="detail-row">
-                        <span class="detail-label">Effect</span>
-                        <span class="detail-value" style="color: var(--color-traps);">${escapeHtml(item.description)}</span>
+                    <div class="detail-effect" style="margin-top: 12px;">
+                        <div class="detail-label" style="margin-bottom: 4px;">Effect</div>
+                        <div style="font-size: 0.85rem; color: var(--color-switches); padding: 8px 10px; background: rgba(255, 169, 77, 0.1); border-radius: 4px; border-left: 3px solid var(--color-switches);">⚙️ ${escapeHtml(item.description)}</div>
                     </div>
                 `;
             } else {
@@ -3695,6 +3700,11 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         // Show enchantment effect for other enchanted items
         else if (isEnchanted(obj) && obj.effect && isMagicalEffect(obj.effect)) {
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-accent);">⚡ ${escapeHtml(obj.effect)}</div>`;
+        }
+        // Show description/effect for switches, traps, and triggers
+        const isSwitchTrapTrigger = (objId >= 0x170 && objId <= 0x17F) || (objId >= 0x180 && objId <= 0x1BF);
+        if (isSwitchTrapTrigger && obj.description) {
+            statsLine += `<div style="font-size: 0.75rem; color: #ffa94d; margin-top: 2px;">⚙️ ${escapeHtml(obj.description)}</div>`;
         }
         // Show quantity for stackable items (only if > 1)
         if (obj.quantity && obj.quantity > 1) {

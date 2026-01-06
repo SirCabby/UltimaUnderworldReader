@@ -102,6 +102,17 @@ from .traps import (
     describe_trap_effect,
     is_level_transition_teleport,
 )
+from .switches import (
+    SWITCH_ID_MIN,
+    SWITCH_ID_MAX,
+    SWITCH_TYPES,
+    SwitchInfo,
+    is_switch,
+    get_switch_info,
+    get_switch_type,
+    get_switch_name,
+    describe_switch_effect,
+)
 
 __all__ = [
     # Runes
@@ -196,4 +207,14 @@ __all__ = [
     'describe_change_terrain',
     'describe_trap_effect',
     'is_level_transition_teleport',
+    # Switches
+    'SWITCH_ID_MIN',
+    'SWITCH_ID_MAX',
+    'SWITCH_TYPES',
+    'SwitchInfo',
+    'is_switch',
+    'get_switch_info',
+    'get_switch_type',
+    'get_switch_name',
+    'describe_switch_effect',
 ]
