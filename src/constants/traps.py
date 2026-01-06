@@ -376,9 +376,83 @@ def describe_change_terrain(quality: int, owner: int) -> str:
     return f"Changes to {type_name} height={new_height}{texture_info}"
 
 
+def _clean_object_name(raw_name: str) -> str:
+    """Clean object name by removing article prefix and plural suffix."""
+    if not raw_name:
+        return ""
+    # Remove article prefix (a_, an_, some_)
+    if raw_name.startswith("a_"):
+        name = raw_name[2:]
+    elif raw_name.startswith("an_"):
+        name = raw_name[3:]
+    elif raw_name.startswith("some_"):
+        name = raw_name[5:]
+    else:
+        name = raw_name
+    # Remove plural suffix
+    if "&" in name:
+        name = name.split("&")[0]
+    return name
+
+
+def _get_direction_name(direction: int) -> str:
+    """Get compass direction name from direction value (0-7).
+    
+    Values > 7 are modulo 8 to get valid direction.
+    """
+    directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+    return directions[direction % 8]
+
+
+# Known game variables and their meanings
+# These are internal state flags used by the game engine
+# Variable IDs are stored in the 'owner' field of set/check variable traps
+GAME_VARIABLES = {
+    0: "puzzle_state",      # General puzzle/mechanism state
+    6: "door_unlocked",     # Door unlock state (Level 3 mine area)
+    7: "lever_activated",   # Lever/switch activation flag
+    26: "quest_progress",   # Quest progress flag (Level 5)
+}
+
+
+def _get_variable_name(var_id: int) -> str:
+    """Get descriptive name for a game variable."""
+    if var_id in GAME_VARIABLES:
+        return GAME_VARIABLES[var_id]
+    return f"var_{var_id}"
+
+
+def _find_door_for_lock(level_objects: dict, lock_index: int, object_names: list = None) -> tuple:
+    """Find the door that links to a given lock object.
+    
+    Returns (door_obj, door_name) or (None, None) if not found.
+    """
+    if not level_objects or lock_index <= 0:
+        return None, None
+    
+    # Search all objects for a door (0x140-0x14F) that links to this lock
+    for idx, obj in level_objects.items():
+        if 0x140 <= obj.item_id <= 0x14F:
+            # Doors link to locks via quantity_or_link when is_quantity=False
+            if not obj.is_quantity and obj.quantity_or_link == lock_index:
+                door_name = "door"
+                if object_names and obj.item_id < len(object_names):
+                    door_name = _clean_object_name(object_names[obj.item_id])
+                return obj, door_name
+    
+    return None, None
+
+
 def describe_trap_effect(trap_id: int, quality: int, owner: int, z_pos: int = 0,
                          trap_x: int = -1, trap_y: int = -1,
-                         current_level: int = -1) -> str:
+                         current_level: int = -1,
+                         # Optional context for enhanced descriptions
+                         is_quantity: bool = False,
+                         quantity_or_link: int = 0,
+                         level_objects: dict = None,
+                         object_names: list = None,
+                         trap_messages: list = None,
+                         spell_names: list = None) -> str:
     """
     Generate a human-readable description of a trap's effect.
     
@@ -390,10 +464,28 @@ def describe_trap_effect(trap_id: int, quality: int, owner: int, z_pos: int = 0,
         trap_x: The trap's tile X coordinate
         trap_y: The trap's tile Y coordinate
         current_level: The level the trap is on (0-indexed)
+        is_quantity: Whether quantity_or_link is a quantity (True) or link (False)
+        quantity_or_link: The trap's quantity/link field
+        level_objects: Dict of object index -> GameObject for following links
+        object_names: List of object names from STRINGS.PAK block 4
+        trap_messages: List of trap messages from STRINGS.PAK block 9
+        spell_names: List of spell names from STRINGS.PAK block 6
     
     Returns:
         Human-readable effect description
     """
+    # Helper to follow link to get linked object
+    def get_linked_object():
+        if is_quantity or quantity_or_link <= 0 or not level_objects:
+            return None
+        return level_objects.get(quantity_or_link)
+    
+    # Helper to get object name from ID
+    def get_obj_name(item_id: int) -> str:
+        if object_names and item_id < len(object_names):
+            return _clean_object_name(object_names[item_id])
+        return f"object #{item_id}"
+    
     # Damage trap
     if trap_id == 0x180:
         return describe_damage(quality)
@@ -404,15 +496,21 @@ def describe_trap_effect(trap_id: int, quality: int, owner: int, z_pos: int = 0,
     
     # Arrow trap
     if trap_id == 0x182:
-        return f"Fires projectile (damage ~{quality})"
+        direction = _get_direction_name(owner)
+        if quality > 0:
+            return f"Fires arrow {direction} (damage ~{quality})"
+        return f"Fires arrow {direction}"
     
     # Do trap (executes actions)
     if trap_id == 0x183:
-        return f"Executes action sequence"
+        # quality encodes action type, owner is a parameter
+        if quality > 0 or owner > 0:
+            return f"Executes action (type={quality}, param={owner})"
+        return "Executes action sequence"
     
     # Pit trap
     if trap_id == 0x184:
-        return f"Opens pit trap"
+        return "Opens pit trap"
     
     # Change terrain trap
     if trap_id == 0x185:
@@ -420,47 +518,121 @@ def describe_trap_effect(trap_id: int, quality: int, owner: int, z_pos: int = 0,
     
     # Spell trap
     if trap_id == 0x186:
-        return f"Casts spell (power {quality})"
+        direction = _get_direction_name(owner)
+        # Try to look up spell name
+        if spell_names and quality < len(spell_names) and spell_names[quality]:
+            spell_name = spell_names[quality]
+            return f"Casts {spell_name} {direction}"
+        return f"Casts spell #{quality} {direction}"
     
     # Create object trap
     if trap_id == 0x187:
-        return f"Creates object"
+        linked = get_linked_object()
+        if linked:
+            obj_name = get_obj_name(linked.item_id)
+            return f"Creates {obj_name}"
+        return "Creates object"
     
     # Door trap
     if trap_id == 0x188:
-        return f"Opens/closes door"
+        operations = {0: "Closes", 1: "Opens", 2: "Toggles", 3: "Toggles"}
+        op = operations.get(quality, "Toggles")
+        
+        # door_trap links to a lock (0x10F) which is connected to a door
+        # We need to find the door that the lock controls
+        # Strategy 1: Find door that links to our linked lock object
+        linked = get_linked_object()
+        if linked and linked.item_id == 0x10F and level_objects:
+            # Search for a door that links to this lock index
+            for idx, obj in level_objects.items():
+                if 0x140 <= obj.item_id <= 0x14F and obj.tile_x > 0:
+                    if not obj.is_quantity and obj.quantity_or_link == quantity_or_link:
+                        door_name = get_obj_name(obj.item_id)
+                        return f"{op} {door_name} at ({obj.tile_x}, {obj.tile_y})"
+        
+        # Strategy 2: For traps at (0,0), search for nearest door to trigger location
+        # (trigger location should be passed as trap_x, trap_y when called from trigger context)
+        if trap_x > 0 and trap_y > 0 and level_objects:
+            nearest_door = None
+            min_distance = 999
+            for obj in level_objects.values():
+                if 0x140 <= obj.item_id <= 0x14F and obj.tile_x > 0:
+                    dx = abs(obj.tile_x - trap_x)
+                    dy = abs(obj.tile_y - trap_y)
+                    distance = dx + dy
+                    if distance < min_distance:
+                        min_distance = distance
+                        nearest_door = obj
+            
+            if nearest_door and min_distance <= 15:
+                door_name = get_obj_name(nearest_door.item_id)
+                return f"{op} {door_name} at ({nearest_door.tile_x}, {nearest_door.tile_y})"
+        
+        return f"{op} door"
     
     # Ward trap
     if trap_id == 0x189:
-        return f"Activates ward"
+        return f"Activates ward (power {quality})"
     
-    # Tell trap (message)
+    # Tell trap (message) - uses quality + owner*64 as message index
     if trap_id == 0x18A:
-        return f"Shows message"
+        msg_index = quality + owner * 64
+        if trap_messages and msg_index < len(trap_messages) and trap_messages[msg_index]:
+            msg = trap_messages[msg_index]
+            # Truncate long messages
+            if len(msg) > 60:
+                msg = msg[:57] + "..."
+            return f'Message: "{msg}"'
+        return f"Shows message #{msg_index}"
     
     # Delete object trap
     if trap_id == 0x18B:
-        return f"Removes object"
+        # quality=target_x, owner=target_y when is_quantity=True
+        # quantity_or_link points to the object to delete
+        linked = get_linked_object()
+        if linked:
+            obj_name = get_obj_name(linked.item_id)
+            return f"Removes {obj_name} at ({quality}, {owner})"
+        return f"Removes object at ({quality}, {owner})"
     
     # Inventory trap
     if trap_id == 0x18C:
-        return f"Modifies inventory"
+        return f"Modifies inventory (slot {quality})"
     
     # Set variable trap
     if trap_id == 0x18D:
-        return f"Sets game variable"
+        # owner = variable ID, quality = value to set
+        var_name = _get_variable_name(owner)
+        return f"Sets {var_name} = {quality}"
     
     # Check variable trap
     if trap_id == 0x18E:
-        return f"Checks condition"
+        # owner = variable ID, quality = expected value
+        var_name = _get_variable_name(owner)
+        return f"Checks {var_name} == {quality}"
     
     # Combination trap
     if trap_id == 0x18F:
-        return f"Multiple actions"
+        return "Multiple actions"
     
-    # Text string trap
+    # Text string trap - uses quality + owner*64 as message index
     if trap_id == 0x190:
-        return f"Shows text message"
+        msg_index = quality + owner * 64
+        if trap_messages and msg_index < len(trap_messages) and trap_messages[msg_index]:
+            msg = trap_messages[msg_index]
+            # Truncate long messages
+            if len(msg) > 60:
+                msg = msg[:57] + "..."
+            return f'Message: "{msg}"'
+        return f"Shows message #{msg_index}"
+    
+    # Camera trap
+    if trap_id == 0x196:
+        return f"Camera effect (param {quality})"
+    
+    # Platform trap
+    if trap_id == 0x197:
+        return f"Moving platform"
     
     # Unknown traps
     trap_name = get_trap_name(trap_id)

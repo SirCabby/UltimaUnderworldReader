@@ -235,8 +235,10 @@ class JsonExporter:
         
         # Get string blocks for rich descriptions
         block3 = strings_parser.get_block(3) or [] if strings_parser else []  # Book/scroll text
+        block4 = strings_parser.get_block(4) or [] if strings_parser else []  # Object names
         block5 = strings_parser.get_block(5) or [] if strings_parser else []  # Quality descriptions
         spell_names_list = strings_parser.get_block(6) or [] if strings_parser else []
+        block9 = strings_parser.get_block(9) or [] if strings_parser else []  # Trap messages
         
         # Build spell names dict for lookups
         spell_names = {}
@@ -353,9 +355,6 @@ class JsonExporter:
                     if level and special_link in level.objects:
                         target = level.objects[special_link]
                         
-                        # Get object names for descriptions
-                        object_names_list = strings_parser.get_block(4) if strings_parser else None
-                        
                         # Check if switch links directly to a trigger
                         if is_trigger(target.item_id):
                             # Follow trigger to its trap
@@ -372,18 +371,28 @@ class JsonExporter:
                                     return describe_switch_effect(
                                         trap_obj.item_id, trap_obj.quality, trap_obj.owner,
                                         trap_obj.tile_x, trap_obj.tile_y, level_num,
-                                        object_names_list, target_obj,
-                                        switch_x, switch_y, level.objects
+                                        block4, target_obj,
+                                        switch_x, switch_y, level.objects,
+                                        trap_messages=block9,
+                                        spell_names=spell_names_list
                                     )
                             return ""
                         
                         # Check if switch links directly to a trap
                         elif is_trap(target.item_id):
+                            # Get target object for delete_object_trap or create_object_trap
+                            target_obj = None
+                            target_link = target.quantity_or_link if not target.is_quantity else 0
+                            if target_link > 0 and target_link in level.objects:
+                                target_obj = level.objects[target_link]
+                            
                             return describe_switch_effect(
                                 target.item_id, target.quality, target.owner,
                                 target.tile_x, target.tile_y, level_num,
-                                object_names_list, None,
-                                switch_x, switch_y, level.objects
+                                block4, target_obj,
+                                switch_x, switch_y, level.objects,
+                                trap_messages=block9,
+                                spell_names=spell_names_list
                             )
                 
                 return ""
@@ -391,11 +400,24 @@ class JsonExporter:
             # Traps (0x180-0x19F) - use detailed descriptions
             if 0x180 <= object_id <= 0x19F:
                 from ..constants.traps import describe_trap_effect
+                # Get level objects for following links
+                level_objs = None
+                if levels:
+                    level = levels.get(level_num)
+                    if level:
+                        level_objs = level.objects
+                
                 return describe_trap_effect(
                     object_id, quality, owner, 
                     getattr(item, 'z_pos', 0) if hasattr(item, 'z_pos') else item.to_dict().get('position', {}).get('z', 0),
                     getattr(item, 'tile_x', 0), getattr(item, 'tile_y', 0),
-                    level_num
+                    level_num,
+                    is_quantity=is_quantity,
+                    quantity_or_link=special_link if not is_quantity else quantity,
+                    level_objects=level_objs,
+                    object_names=block4,
+                    trap_messages=block9,
+                    spell_names=spell_names_list
                 )
             
             # Triggers (0x1A0-0x1BF) - show what trap they link to
@@ -412,10 +434,21 @@ class JsonExporter:
                         target = level.objects[special_link]
                         if is_trap(target.item_id):
                             trap_name = get_trap_name(target.item_id)
+                            # For door traps at (0,0), use trigger coordinates for proximity search
+                            trigger_x = getattr(item, 'tile_x', 0)
+                            trigger_y = getattr(item, 'tile_y', 0)
+                            use_x = target.tile_x if target.tile_x > 0 else trigger_x
+                            use_y = target.tile_y if target.tile_y > 0 else trigger_y
                             effect = describe_trap_effect(
                                 target.item_id, target.quality, target.owner,
-                                target.z_pos, target.tile_x, target.tile_y,
-                                level_num
+                                target.z_pos, use_x, use_y,
+                                level_num,
+                                is_quantity=target.is_quantity,
+                                quantity_or_link=target.quantity_or_link,
+                                level_objects=level.objects,
+                                object_names=block4,
+                                trap_messages=block9,
+                                spell_names=spell_names_list
                             )
                             return f"-> {trap_name}: {effect}"
                 
