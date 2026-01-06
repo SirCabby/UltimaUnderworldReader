@@ -1104,10 +1104,13 @@ function createStackedMarker(item, color, px, py, isNpc, isPrimary) {
     // Event listeners - limit hover expansion to stay within tile
     const hoverRadius = Math.min(radius * 1.3, 4);
     marker.addEventListener('mouseenter', (e) => {
-        if (isNamedNpc) {
-            marker.style.transform = 'scale(1.3)';
-        } else {
-            marker.setAttribute('r', hoverRadius);
+        // Don't shrink if already selected (selected = 1.8x, hover = 1.3x)
+        if (!marker.classList.contains('selected')) {
+            if (isNamedNpc) {
+                marker.style.transform = 'scale(1.3)';
+            } else {
+                marker.setAttribute('r', hoverRadius);
+            }
         }
         showTooltip(e, item, isNpc);
     });
@@ -1726,7 +1729,8 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     
     // Event listeners on the tile hover area
     hoverArea.addEventListener('mouseenter', (e) => {
-        if (!itemIsBridge) {
+        // Don't shrink if already selected (selected = 1.8x, hover = 1.3x)
+        if (!marker.classList.contains('selected') && !itemIsBridge) {
             if (isNamedNpc) {
                 marker.style.transform = 'scale(1.3)';
             } else {
