@@ -760,11 +760,6 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     
     // Add hover events to the tile area
     hoverArea.addEventListener('mouseenter', (e) => {
-        // Cancel any pending hide
-        if (state.tooltipHideTimeout) {
-            clearTimeout(state.tooltipHideTimeout);
-            state.tooltipHideTimeout = null;
-        }
         showStackedTooltip(e, items, tileX, tileY);
     });
     hoverArea.addEventListener('mouseleave', () => {
@@ -920,6 +915,12 @@ function createCountBadge(centerX, centerY, count, tileX, tileY, items) {
  * Items are clickable to select them
  */
 function showStackedTooltip(e, items, tileX, tileY) {
+    // Cancel any pending tooltip hide from a previous hover area
+    if (state.tooltipHideTimeout) {
+        clearTimeout(state.tooltipHideTimeout);
+        state.tooltipHideTimeout = null;
+    }
+    
     const tooltip = elements.tooltip;
     
     // Clear previous content
@@ -1573,6 +1574,12 @@ function createSecretMarker(secret, color, pxPerTileX, pxPerTileY) {
  * Show tooltip for a secret
  */
 function showSecretTooltip(e, secret) {
+    // Cancel any pending tooltip hide from a previous hover area
+    if (state.tooltipHideTimeout) {
+        clearTimeout(state.tooltipHideTimeout);
+        state.tooltipHideTimeout = null;
+    }
+    
     const tooltip = elements.tooltip;
     
     const typeLabel = secret.type === 'illusory_wall' ? '🔮 Illusory Wall' : '🚪 Secret Door';
@@ -1687,6 +1694,12 @@ function getCategoryColor(categoryId) {
 // ============================================================================
 
 function showTooltip(e, item, isNpc) {
+    // Cancel any pending tooltip hide from a previous hover area
+    if (state.tooltipHideTimeout) {
+        clearTimeout(state.tooltipHideTimeout);
+        state.tooltipHideTimeout = null;
+    }
+    
     const tooltip = elements.tooltip;
     
     const uniqueIndicator = isNpc && hasUniqueName(item) ? '⭐ ' : '';
