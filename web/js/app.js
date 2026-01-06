@@ -995,7 +995,7 @@ function showStackedTooltip(e, items, tileX, tileY) {
             }
             
             // Weapon durability (melee and ranged)
-            if (objId <= 0x1F && item.durability !== undefined) {
+            if (objId <= 0x1F && item.max_durability !== undefined) {
                 const durDiv = document.createElement('div');
                 durDiv.style.cssText = `font-size: 0.7rem; font-family: var(--font-mono); color: #fab005; margin-top: 2px;`;
                 durDiv.textContent = formatDurability(item);
@@ -1003,7 +1003,7 @@ function showStackedTooltip(e, items, tileX, tileY) {
             }
             
             // Armor stats
-            if (isArmor(item) && (item.protection !== undefined || item.durability !== undefined)) {
+            if (isArmor(item) && (item.protection !== undefined || item.max_durability !== undefined)) {
                 const armorDiv = document.createElement('div');
                 armorDiv.style.cssText = `font-size: 0.7rem; font-family: var(--font-mono); color: #5c7cfa; margin-top: 2px;`;
                 armorDiv.textContent = formatArmor(item);
@@ -1726,11 +1726,11 @@ function showTooltip(e, item, isNpc) {
             html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: #e03131;">${formatDamage(item)}</div>`;
         }
         // Show durability for weapons (melee 0x00-0x0F and ranged 0x10-0x1F)
-        if (objId <= 0x1F && item.durability !== undefined) {
+        if (objId <= 0x1F && item.max_durability !== undefined) {
             html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: #fab005;">${formatDurability(item)}</div>`;
         }
         // Show protection/durability for armor
-        if (isArmor(item) && (item.protection !== undefined || item.durability !== undefined)) {
+        if (isArmor(item) && (item.protection !== undefined || item.max_durability !== undefined)) {
             html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: #5c7cfa;">${formatArmor(item)}</div>`;
         }
         // Show weight for items that have it
@@ -2326,11 +2326,11 @@ function renderVisibleObjectsPane() {
                     enchantLine += `<div style="color: #e03131; font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">${formatDamage(item)}</div>`;
                 }
                 // Show durability for weapons (melee and ranged)
-                if (objId <= 0x1F && item.durability !== undefined) {
+                if (objId <= 0x1F && item.max_durability !== undefined) {
                     enchantLine += `<div style="color: #fab005; font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">${formatDurability(item)}</div>`;
                 }
                 // Show protection/durability for armor
-                if (isArmor(item) && (item.protection !== undefined || item.durability !== undefined)) {
+                if (isArmor(item) && (item.protection !== undefined || item.max_durability !== undefined)) {
                     enchantLine += `<div style="color: #5c7cfa; font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">${formatArmor(item)}</div>`;
                 }
                 // Show weight for items that have it
@@ -3260,10 +3260,10 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             statsLine = `<div style="font-size: 0.75rem; color: #e03131; font-family: var(--font-mono);">${formatDamage(obj)}</div>`;
         }
         // Show durability for weapons (melee and ranged)
-        if (objId <= 0x1F && obj.durability !== undefined) {
+        if (objId <= 0x1F && obj.max_durability !== undefined) {
             statsLine += `<div style="font-size: 0.75rem; color: #fab005; font-family: var(--font-mono);">${formatDurability(obj)}</div>`;
         }
-        if (isArmor(obj) && (obj.protection !== undefined || obj.durability !== undefined)) {
+        if (isArmor(obj) && (obj.protection !== undefined || obj.max_durability !== undefined)) {
             statsLine += `<div style="font-size: 0.75rem; color: #5c7cfa; font-family: var(--font-mono);">${formatArmor(obj)}</div>`;
         }
         if (obj.weight !== undefined && obj.weight > 0) {
@@ -3485,7 +3485,7 @@ function getTypeSpecificDetails(item) {
             `;
         }
         // Show durability for melee weapons
-        if (item.durability !== undefined) {
+        if (item.max_durability !== undefined) {
             html += `
                 <div class="detail-row">
                     <span class="detail-label">Durability</span>
@@ -3508,7 +3508,7 @@ function getTypeSpecificDetails(item) {
     // Ranged Weapons (0x10-0x1F) - show durability and weight
     if (objId >= 0x10 && objId <= 0x1F) {
         // Show durability for ranged weapons
-        if (item.durability !== undefined) {
+        if (item.max_durability !== undefined) {
             html += `
                 <div class="detail-row">
                     <span class="detail-label">Durability</span>
@@ -3529,8 +3529,8 @@ function getTypeSpecificDetails(item) {
     
     // Armor (0x20-0x3F) - show protection, durability, and weight
     if (objId >= 0x20 && objId <= 0x3F) {
-        if (item.protection !== undefined || item.durability !== undefined) {
-            const durStr = item.durability !== undefined ? formatDurability(item) : '';
+        if (item.protection !== undefined || item.max_durability !== undefined) {
+            const durStr = item.max_durability !== undefined ? formatDurability(item) : '';
             html += `
                 <div class="detail-row">
                     <span class="detail-label">Stats</span>
@@ -3789,7 +3789,7 @@ function formatDamage(item) {
  * Format armor stats (protection and durability) as a compact string
  */
 function formatArmor(item) {
-    if (item.protection === undefined && item.durability === undefined) {
+    if (item.protection === undefined && item.max_durability === undefined) {
         return '';
     }
     const durabilityStr = formatDurability(item);
@@ -3797,36 +3797,48 @@ function formatArmor(item) {
 }
 
 /**
- * Format durability as current/total
- * In UW1: quality field = current durability remaining
- *         durability from OBJECTS.DAT = max durability
- * However, the values appear swapped in the data, so we display durability/quality
- * Items with 255 durability are indestructible
+ * Format durability as current/max
+ * 
+ * Data sources (from uw-formats.txt documentation):
+ * - max_durability: from OBJECTS.DAT - the item type's max durability (e.g., leather vest = 8)
+ * - quality: from placed object data, bits 0-5 of word 2 (range 0-63)
+ *            This is the item's current condition (0=destroyed, 63=pristine)
+ * 
+ * The quality is scaled to the item's max durability for display:
+ *   current = round((quality / 63) * max_durability)
+ * 
+ * Items with max_durability=255 are indestructible.
  */
 function formatDurability(item) {
-    if (item.durability === undefined) {
+    if (item.max_durability === undefined) {
         return '';
     }
     // 255 durability = indestructible
-    if (item.durability === 255) {
+    if (item.max_durability === 255) {
         return '🔧∞';
     }
-    const current = item.current_durability !== undefined ? item.current_durability : item.durability;
-    // Swap order: durability (smaller base value) / current_durability (quality, larger value)
-    return `🔧${item.durability}/${current}`;
+    const maxDur = item.max_durability;
+    if (item.quality !== undefined) {
+        // Scale quality (0-63) to the item's actual durability range
+        // quality=63 means 100% of max durability, quality=0 means 0%
+        const scaledCurrent = Math.round((item.quality / 63) * maxDur);
+        return `🔧${scaledCurrent}/${maxDur}`;
+    }
+    // No quality data, just show max (item assumed to be pristine)
+    return `🔧${maxDur}/${maxDur}`;
 }
 
 /**
  * Get tooltip text for durability
  */
 function getDurabilityTooltip(item) {
-    if (item.durability === undefined) {
+    if (item.max_durability === undefined) {
         return 'Durability';
     }
-    if (item.durability === 255) {
+    if (item.max_durability === 255) {
         return 'Indestructible';
     }
-    return 'Durability';
+    return 'Durability (current/max)';
 }
 
 /**

@@ -771,10 +771,11 @@ class JsonExporter:
                             if 'protection' in cont_item_stats:
                                 content_item['protection'] = cont_item_stats['protection']
                             if 'durability' in cont_item_stats:
-                                content_item['durability'] = cont_item_stats['durability']
-                                # Add current durability (quality) for weapons and armor
-                                if item.object_id <= 0x3F:
-                                    content_item['current_durability'] = item.quality
+                                # max_durability: from OBJECTS.DAT - the item type's maximum durability
+                                content_item['max_durability'] = cont_item_stats['durability']
+                                # quality: from placed object data (bits 0-5 of word 2, range 0-63)
+                                if item.object_id <= 0x3F:  # Weapons and Armor
+                                    content_item['quality'] = item.quality
                             if 'weight' in cont_item_stats:
                                 content_item['weight'] = cont_item_stats['weight']
                             if 'nutrition' in cont_item_stats:
@@ -906,11 +907,12 @@ class JsonExporter:
                 if 'protection' in item_stats:
                     web_obj['protection'] = item_stats['protection']
                 if 'durability' in item_stats:
-                    web_obj['durability'] = item_stats['durability']
-                    # Add current durability (quality) for weapons and armor
-                    # Quality represents the current condition of the item
+                    # max_durability: from OBJECTS.DAT - the item type's maximum durability
+                    web_obj['max_durability'] = item_stats['durability']
+                    # quality: from placed object data (bits 0-5 of word 2, range 0-63)
+                    # This represents the item's current condition as a percentage (0=destroyed, 63=pristine)
                     if obj_id <= 0x3F:  # Weapons (0x00-0x1F) and Armor (0x20-0x3F)
-                        web_obj['current_durability'] = quality
+                        web_obj['quality'] = quality
                 if 'weight' in item_stats:
                     web_obj['weight'] = item_stats['weight']
                 if 'capacity' in item_stats:
