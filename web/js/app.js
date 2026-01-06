@@ -3978,9 +3978,18 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             }
         }
         
+        // For illusory walls, skip the redundant description if it's just "Illusory wall -> {type}"
+        // since we show "Reveals" separately below
+        const isRedundantDescription = secret.type === 'illusory_wall' && 
+                                        secret.description && 
+                                        secret.description.startsWith('Illusory wall ->');
+        const descriptionHtml = (!isRedundantDescription && secret.description) 
+            ? `<div style="font-size: 0.8rem; color: var(--text-muted);">${secret.description}</div>`
+            : '';
+        
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem; color: ${typeColor};">${typeLabel}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">${secret.description || 'Hidden passage'}</div>
+            ${descriptionHtml}
             ${revealMethodInfo}
         `;
         
