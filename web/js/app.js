@@ -70,10 +70,244 @@ const state = {
         enchantedOnly: false,   // Show only enchanted items
     },
     selectedMarker: null,
+    pendingSelection: null,    // For restoring selection after page load
     tooltipHideTimeout: null,  // For delayed tooltip hiding
     isTooltipHovered: false,   // Track if tooltip is being hovered
     collapsedCategories: new Set(),  // Tracks which categories are collapsed in visible objects list
 };
+
+// ============================================================================
+// State Persistence
+// ============================================================================
+
+const STORAGE_KEY = 'uw_map_filters';
+
+/**
+ * Serialize navigation state to URL hash
+ */
+function serializeUrlState() {
+    const params = new URLSearchParams();
+    params.set('level', state.currentLevel + 1);
+    params.set('zoom', state.zoom.toFixed(2));
+    params.set('pan', `${Math.round(state.pan.x)},${Math.round(state.pan.y)}`);
+    // Store selected marker as "id:isNpc" (e.g., "123:true" or "456:false")
+    if (state.selectedMarker && state.selectedMarker.dataset) {
+        const id = state.selectedMarker.dataset.id;
+        const isNpc = state.selectedMarker.dataset.isNpc;
+        if (id) {
+            params.set('selected', `${id}:${isNpc}`);
+        }
+    }
+    return params.toString();
+}
+
+/**
+ * Update the URL hash with current navigation state
+ */
+function updateUrlHash() {
+    const hash = serializeUrlState();
+    history.replaceState(null, '', '#' + hash);
+}
+
+/**
+ * Save filter preferences to localStorage
+ */
+function saveFiltersToStorage() {
+    const filters = {
+        categories: Array.from(state.filters.categories),
+        search: state.filters.search,
+        enchantedOnly: state.filters.enchantedOnly,
+        collapsedCategories: Array.from(state.collapsedCategories)
+    };
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
+    } catch (e) {
+        console.warn('Failed to save filters to localStorage:', e);
+    }
+}
+
+/**
+ * Load filter preferences from localStorage
+ */
+function loadFiltersFromStorage() {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (e) {
+        console.warn('Failed to load filters from localStorage:', e);
+    }
+    return null;
+}
+
+/**
+ * Parse navigation state from URL hash
+ */
+function parseUrlState() {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return null;
+    
+    const params = new URLSearchParams(hash);
+    const result = {};
+    
+    // Parse level (1-9 in URL, 0-8 internally)
+    if (params.has('level')) {
+        const level = parseInt(params.get('level'), 10);
+        if (!isNaN(level) && level >= 1 && level <= 9) {
+            result.level = level - 1;
+        }
+    }
+    
+    // Parse zoom
+    if (params.has('zoom')) {
+        const zoom = parseFloat(params.get('zoom'));
+        if (!isNaN(zoom) && zoom >= CONFIG.zoom.min && zoom <= CONFIG.zoom.max) {
+            result.zoom = zoom;
+        }
+    }
+    
+    // Parse pan
+    if (params.has('pan')) {
+        const panParts = params.get('pan').split(',');
+        if (panParts.length === 2) {
+            const x = parseInt(panParts[0], 10);
+            const y = parseInt(panParts[1], 10);
+            if (!isNaN(x) && !isNaN(y)) {
+                result.pan = { x, y };
+            }
+        }
+    }
+    
+    // Parse selected marker (format: "id:isNpc")
+    if (params.has('selected')) {
+        const selectedParts = params.get('selected').split(':');
+        if (selectedParts.length === 2) {
+            result.selectedId = selectedParts[0];
+            result.selectedIsNpc = selectedParts[1];
+        }
+    }
+    
+    return Object.keys(result).length > 0 ? result : null;
+}
+
+/**
+ * Restore state from URL hash and localStorage
+ * Call this after data is loaded but before UI is rendered
+ */
+function restoreState() {
+    // Restore filters from localStorage
+    const storedFilters = loadFiltersFromStorage();
+    if (storedFilters) {
+        // Restore categories (validate they exist in data)
+        if (storedFilters.categories && Array.isArray(storedFilters.categories)) {
+            state.filters.categories.clear();
+            storedFilters.categories.forEach(catId => {
+                state.filters.categories.add(catId);
+            });
+        }
+        
+        // Restore search
+        if (typeof storedFilters.search === 'string') {
+            state.filters.search = storedFilters.search;
+        }
+        
+        // Restore enchanted filter
+        if (typeof storedFilters.enchantedOnly === 'boolean') {
+            state.filters.enchantedOnly = storedFilters.enchantedOnly;
+        }
+        
+        // Restore collapsed categories
+        if (storedFilters.collapsedCategories && Array.isArray(storedFilters.collapsedCategories)) {
+            state.collapsedCategories.clear();
+            storedFilters.collapsedCategories.forEach(catId => {
+                state.collapsedCategories.add(catId);
+            });
+        }
+    }
+    
+    // Restore navigation from URL hash
+    const urlState = parseUrlState();
+    if (urlState) {
+        if (typeof urlState.level === 'number') {
+            state.currentLevel = urlState.level;
+        }
+        if (typeof urlState.zoom === 'number') {
+            state.zoom = urlState.zoom;
+        }
+        if (urlState.pan) {
+            state.pan = urlState.pan;
+        }
+        // Store pending selection to restore after markers render
+        if (urlState.selectedId) {
+            state.pendingSelection = {
+                id: urlState.selectedId,
+                isNpc: urlState.selectedIsNpc
+            };
+        }
+    }
+}
+
+/**
+ * Restore a pending selection after markers have been rendered
+ * Call this after renderMarkers() completes
+ */
+function restorePendingSelection() {
+    if (!state.pendingSelection) {
+        // No selection to restore - make sure visible objects pane is shown
+        renderVisibleObjectsPane();
+        return;
+    }
+    
+    const { id, isNpc } = state.pendingSelection;
+    state.pendingSelection = null;
+    
+    // Find the marker with matching id and isNpc
+    const markers = document.querySelectorAll('.marker');
+    for (const marker of markers) {
+        if (marker.dataset.id === id && marker.dataset.isNpc === isNpc) {
+            // Find the item data
+            const level = state.data.levels[state.currentLevel];
+            if (!level) return;
+            
+            let item = null;
+            let itemIsNpc = isNpc === 'true';
+            
+            if (itemIsNpc) {
+                item = level.npcs.find(npc => String(npc.id) === id);
+            } else {
+                item = level.objects.find(obj => String(obj.id) === id);
+            }
+            
+            if (item) {
+                // Select the item (reusing existing selection logic)
+                selectItem(item, itemIsNpc, marker);
+            }
+            return;
+        }
+    }
+}
+
+/**
+ * Apply restored state to UI elements
+ * Call this after cacheElements and before rendering
+ */
+function applyRestoredStateToUI() {
+    // Apply search text to input
+    if (state.filters.search && elements.searchInput) {
+        elements.searchInput.value = state.filters.search;
+    }
+    
+    // Apply enchanted filter checkbox
+    if (elements.enchantedFilter) {
+        elements.enchantedFilter.checked = state.filters.enchantedOnly;
+    }
+    
+    // Apply zoom level display
+    if (elements.zoomLevel) {
+        elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
+    }
+}
 
 // ============================================================================
 // DOM Elements
@@ -122,13 +356,24 @@ async function init() {
     try {
         await loadData();
         
+        // Restore state from URL hash and localStorage
+        restoreState();
+        
+        // Apply restored state to UI elements (search input, checkboxes, etc.)
+        applyRestoredStateToUI();
+        
         // Initialize UI
         renderLevelTabs();
         renderCategoryFilters();
         
-        // Load first level and immediately update counts
-        selectLevel(0);
+        // Load the restored level (or first level if none saved), preserving pan/zoom from URL
+        selectLevel(state.currentLevel, true);
         updateCategoryCounts();
+        
+        // Set initial URL hash if not already set
+        if (!window.location.hash) {
+            updateUrlHash();
+        }
         
         // Hide loading overlay
         elements.loadingOverlay.classList.add('hidden');
@@ -220,6 +465,7 @@ function handleEnchantedFilter(e) {
     renderMarkers();
     updateStats();
     refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
 }
 
 function handleWheel(e) {
@@ -245,6 +491,7 @@ function handlePanMove(e) {
 function handlePanEnd() {
     state.isDragging = false;
     elements.mapWrapper.style.cursor = 'grab';
+    updateUrlHash();
 }
 
 function handleCoordinateTracking(e) {
@@ -295,6 +542,7 @@ function handleSearch(e) {
     state.filters.search = e.target.value.toLowerCase();
     renderMarkers();
     refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
 }
 
 function handleKeyboard(e) {
@@ -326,7 +574,7 @@ function renderLevelTabs() {
     }
 }
 
-function selectLevel(levelNum) {
+function selectLevel(levelNum, preservePan = false) {
     state.currentLevel = levelNum;
     
     // Update tab states
@@ -343,6 +591,7 @@ function selectLevel(levelNum) {
         renderMarkers();
         updateStats();
         updateCategoryCounts();
+        restorePendingSelection();
     }
     
     elements.mapImage.onload = () => {
@@ -350,12 +599,16 @@ function selectLevel(levelNum) {
         renderMarkers();
         updateStats();
         updateCategoryCounts();
+        restorePendingSelection();
     };
     
-    // Reset pan only (preserve zoom level)
-    state.pan = { x: 0, y: 0 };
+    // Reset pan only (preserve zoom level) unless restoring from URL
+    if (!preservePan) {
+        state.pan = { x: 0, y: 0 };
+        clearSelection();
+    }
     updateMapTransform();
-    clearSelection();
+    updateUrlHash();
 }
 
 // ============================================================================
@@ -413,6 +666,7 @@ function createCategoryFilter(cat) {
         renderMarkers();
         updateStats();
         refreshVisibleObjectsIfNoSelection();
+        saveFiltersToStorage();
     });
     
     const colorDot = document.createElement('span');
@@ -564,6 +818,7 @@ function selectAllCategories() {
     renderMarkers();
     updateStats();
     refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
 }
 
 function deselectAllCategories() {
@@ -578,6 +833,7 @@ function deselectAllCategories() {
     renderMarkers();
     updateStats();
     refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
 }
 
 
@@ -1117,6 +1373,8 @@ function selectStackedItem(item, isNpc, tileX, tileY) {
     
     // Show all items at this location
     renderLocationObjects(tileX, tileY, item.id);
+    
+    updateUrlHash();
 }
 
 /**
@@ -1620,6 +1878,8 @@ function selectSecret(secret) {
     
     // Show location info
     renderLocationObjects(secret.tile_x, secret.tile_y, secret.id);
+    
+    updateUrlHash();
 }
 
 /**
@@ -1956,6 +2216,8 @@ function selectItem(item, isNpc, markerElement) {
     
     // Find all items at same tile, passing the selected item id
     renderLocationObjects(item.tile_x, item.tile_y, item.id);
+    
+    updateUrlHash();
 }
 
 function clearSelection() {
@@ -1972,6 +2234,7 @@ function clearSelection() {
     
     // Show all visible objects list view
     renderVisibleObjectsPane();
+    updateUrlHash();
 }
 
 /**
@@ -2174,6 +2437,7 @@ function renderVisibleObjectsPane() {
     header.querySelector('#expand-all-categories').addEventListener('click', () => {
         state.collapsedCategories.clear();
         renderVisibleObjectsPane();
+        saveFiltersToStorage();
     });
     header.querySelector('#collapse-all-categories').addEventListener('click', () => {
         // Collapse ALL possible categories, not just those on the current level
@@ -2182,6 +2446,7 @@ function renderVisibleObjectsPane() {
             state.collapsedCategories.add(categoryId);
         });
         renderVisibleObjectsPane();
+        saveFiltersToStorage();
     });
     
     // Render each category group
@@ -2236,6 +2501,7 @@ function renderVisibleObjectsPane() {
                 state.collapsedCategories.add(categoryId);
             }
             renderVisibleObjectsPane();
+            saveFiltersToStorage();
         });
         
         // Hover effect
@@ -3385,6 +3651,8 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
     
     // Re-render location objects to show selection
     renderLocationObjects(tileX, tileY, item.id);
+    
+    updateUrlHash();
 }
 
 // ============================================================================
@@ -3395,6 +3663,7 @@ function adjustZoom(delta) {
     state.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, state.zoom + delta));
     updateMapTransform();
     elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
+    updateUrlHash();
 }
 
 function resetView() {
@@ -3402,6 +3671,7 @@ function resetView() {
     state.pan = { x: 0, y: 0 };
     updateMapTransform();
     elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
+    updateUrlHash();
 }
 
 function updateMapTransform() {
