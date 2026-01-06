@@ -2176,7 +2176,9 @@ function renderVisibleObjectsPane() {
         renderVisibleObjectsPane();
     });
     header.querySelector('#collapse-all-categories').addEventListener('click', () => {
-        groupedItems.forEach((_, categoryId) => {
+        // Collapse ALL possible categories, not just those on the current level
+        // This ensures consistent collapsed state when switching levels
+        categoryOrder.forEach((_, categoryId) => {
             state.collapsedCategories.add(categoryId);
         });
         renderVisibleObjectsPane();
