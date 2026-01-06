@@ -422,8 +422,7 @@ class JsonExporter:
             
             # Triggers (0x1A0-0x1BF) - show what trap they link to
             if 0x1A0 <= object_id <= 0x1BF:
-                from ..constants.traps import get_trigger_name, get_trap_name, describe_trap_effect, is_trap
-                trigger_name = get_trigger_name(object_id)
+                from ..constants.traps import get_trigger_name, describe_trap_effect, is_trap
                 
                 # Check if trigger links to a trap
                 # Note: For triggers, special_link is always the trap link
@@ -433,7 +432,6 @@ class JsonExporter:
                     if level and special_link in level.objects:
                         target = level.objects[special_link]
                         if is_trap(target.item_id):
-                            trap_name = get_trap_name(target.item_id)
                             # For door traps at (0,0), use trigger coordinates for proximity search
                             trigger_x = getattr(item, 'tile_x', 0)
                             trigger_y = getattr(item, 'tile_y', 0)
@@ -450,7 +448,8 @@ class JsonExporter:
                                 trap_messages=block9,
                                 spell_names=spell_names_list
                             )
-                            return f"-> {trap_name}: {effect}"
+                            # Return just the effect description without trap type prefix
+                            return effect
                 
                 # For move_trigger with no linked trap, show destination
                 if object_id == 0x1A0:
