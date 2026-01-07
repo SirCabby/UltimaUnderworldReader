@@ -983,7 +983,10 @@ class JsonExporter:
             
             # Add owner information (for items that belong to NPCs)
             # Keys use owner for lock ID, which is already shown in effect/description
-            if owner > 0 and not (0x100 <= obj_id <= 0x10E):
+            # Texture map objects, traps, and triggers should not have ownership attributes
+            from ..constants import is_special_tmap
+            from ..constants.traps import is_trap, is_trigger
+            if owner > 0 and not (0x100 <= obj_id <= 0x10E) and not is_special_tmap(obj_id) and not is_trap(obj_id) and not is_trigger(obj_id):
                 web_obj['owner'] = owner
                 owner_name = get_owner_name(owner, obj_id)
                 if owner_name:
@@ -1012,9 +1015,13 @@ class JsonExporter:
                     # This represents the item's current condition as a percentage (0=destroyed, 63=pristine)
                     if obj_id <= 0x3F:  # Weapons (0x00-0x1F) and Armor (0x20-0x3F)
                         web_obj['quality'] = quality
-                if 'weight' in item_stats:
+                # Don't add weight or capacity for storage items (barrels, chests, urns, cauldrons, tables)
+                # Storage items should not display these stats in the UI
+                from ..constants import STATIC_CONTAINERS
+                is_storage = obj_id in STATIC_CONTAINERS
+                if 'weight' in item_stats and not is_storage:
                     web_obj['weight'] = item_stats['weight']
-                if 'capacity' in item_stats:
+                if 'capacity' in item_stats and not is_storage:
                     web_obj['capacity'] = item_stats['capacity']
                 if 'accepts' in item_stats:
                     web_obj['accepts'] = item_stats['accepts']

@@ -3098,6 +3098,25 @@ function renderObjectDetails(item, isNpc) {
         // Show type-specific details based on category/object_id
         html += getTypeSpecificDetails(item);
         
+        // Show contents indicator for storage items in the stats section
+        if (item.category === 'storage') {
+            if (item.contents && item.contents.length > 0) {
+                html += `
+                    <div class="detail-row">
+                        <span class="detail-label">Contents</span>
+                        <span class="detail-value" style="color: var(--text-accent);">📦 ${item.contents.length} item${item.contents.length > 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="detail-row">
+                        <span class="detail-label">Contents</span>
+                        <span class="detail-value" style="color: var(--text-muted);">Empty</span>
+                    </div>
+                `;
+            }
+        }
+        
         // Show description if available (books, scrolls, keys, potions, etc.)
         // For switches, triggers and traps, show the effect description inline without extra section
         if (item.description) {
@@ -3877,7 +3896,10 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         if (isArmor(obj) && (obj.protection !== undefined || obj.max_durability !== undefined)) {
             statsLine += `<div style="font-size: 0.75rem; color: #5c7cfa; font-family: var(--font-mono);">${formatArmor(obj)}</div>`;
         }
-        if (obj.weight !== undefined && obj.weight > 0) {
+        // Don't show weight for scenery items (0xC0-0xDF), campfire (0x12A), fountain (0x12E), or storage items
+        const isStorage = obj.category === 'storage';
+        // Exclude weight for storage items - they should never show weight
+        if (obj.weight !== undefined && obj.weight > 0 && !isStorage && !(objId >= 0xC0 && objId <= 0xDF) && objId !== 0x12A && objId !== 0x12E) {
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-muted);">⚖️ ${formatWeight(obj.weight)}</div>`;
         }
         // Show nutrition for food items (0xB0-0xB9, 0xBD water)
@@ -3893,8 +3915,8 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
                                obj.intoxication >= 50 ? '#ffa94d' : '#fcc419';
             statsLine += `<div style="font-size: 0.75rem; color: ${intoxColor};">🍺 Intoxication: ${obj.intoxication}</div>`;
         }
-        // Show container capacity
-        if (obj.capacity !== undefined) {
+        // Show container capacity (but not for storage items - they should never show capacity)
+        if (!isStorage && obj.capacity !== undefined && obj.capacity !== null) {
             let capacityText = `📦 Capacity: ${obj.capacity} stone${obj.capacity !== 1 ? 's' : ''}`;
             if (obj.accepts && obj.accepts !== 'any') {
                 capacityText += ` (${obj.accepts} only)`;
@@ -3919,11 +3941,23 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             statsLine += `<div style="font-size: 0.75rem; color: #fcc419;">📦 Qty: ${obj.quantity}</div>`;
         }
         
+        // For storage items, always show contents count (even if empty)
+        let contentsInfo = '';
+        if (isStorage) {
+            if (hasContents) {
+                contentsInfo = `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">📦 ${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>`;
+            } else {
+                contentsInfo = `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">📦 Empty</div>`;
+            }
+        } else if (hasContents) {
+            contentsInfo = `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>`;
+        }
+        
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem;">${getItemDisplayName(obj)}${hasContents ? ' 📦' : ''}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
             ${statsLine}
-            ${hasContents ? `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>` : ''}
+            ${contentsInfo}
         `;
         
         card.addEventListener('click', () => selectLocationItem(obj, false, tileX, tileY));
@@ -4243,6 +4277,30 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
+    // Storage items (barrels, chests, cauldron, etc.) - show capacity but not weight
+    if (item.category === 'storage') {
+        // Show capacity if available
+        if (item.capacity !== undefined) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Capacity</span>
+                    <span class="detail-value">${item.capacity} stone${item.capacity !== 1 ? 's' : ''}</span>
+                </div>
+            `;
+        }
+        // Show what the container accepts if not "any"
+        if (item.accepts && item.accepts !== 'any') {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Accepts</span>
+                    <span class="detail-value" style="text-transform: capitalize;">${item.accepts}</span>
+                </div>
+            `;
+        }
+        // Storage items don't show weight
+        return html;
+    }
+    
     // Containers (0x80-0x8F) - show capacity and weight
     if (objId >= 0x80 && objId <= 0x8F) {
         // Show capacity if available
@@ -4345,8 +4403,8 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Scenery (0xC0-0xDF) - no fields needed
-    if (objId >= 0xC0 && objId <= 0xDF) {
+    // Scenery (0xC0-0xDF), campfire (0x12A), and fountain (0x12E) - no fields needed
+    if ((objId >= 0xC0 && objId <= 0xDF) || objId === 0x12A || objId === 0x12E) {
         return html;
     }
     
@@ -4378,8 +4436,14 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Doors (0x140-0x17F) - show lock information
-    if (objId >= 0x140 && objId <= 0x17F) {
+    // Texture map objects (0x16E-0x16F) - no status needed
+    if (objId === 0x16E || objId === 0x16F) {
+        return html;
+    }
+    
+    // Doors (0x140-0x14F) - show lock information
+    // Only check actual door range, not the broader 0x140-0x17F range that includes furniture, decals, texture maps, and switches
+    if (objId >= 0x140 && objId <= 0x14F) {
         if (item.extra_info && item.extra_info.is_locked) {
             const lockId = item.extra_info.lock_id;
             const lockType = item.extra_info.lock_type;

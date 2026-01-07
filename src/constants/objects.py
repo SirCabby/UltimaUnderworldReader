@@ -145,11 +145,13 @@ CARRYABLE_CONTAINERS: Dict[int, str] = {
 # Static containers (non-carryable storage that can hold items)
 # Includes urn from container range and furniture items that store things
 # Note: nightstand (0x15E) is NOT a container - it's just furniture
+# Note: cauldron (0x12F) is NOT a container - it's just furniture (no items found in game data)
 STATIC_CONTAINERS: Dict[int, str] = {
     0x8C: "urn",        # In container range but not carryable
     0x158: "table",     # Tables can sometimes hold items
     0x15B: "barrel",
     0x15D: "chest",
+    # 0x12F: "cauldron",  # Not a container - just furniture (no items found in game)
     # 0x15E: "nightstand",  # Not a container - just furniture
 }
 
@@ -256,9 +258,17 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     """
     base_category = get_category(item_id)
     
-    # Special case: pile of wood chips goes to misc_item category
-    if item_id == 0x0DB:
+    # Special cases: these scenery items go to misc_item category
+    if item_id in (0x0CC, 0x0CD, 0x0DB):  # piece of wood (2 variants), pile of wood chips
         return 'misc_item'
+    
+    # Special cases: campfire (0x12A) and fountain (0x12E) should be categorized as scenery
+    if item_id in (0x12A, 0x12E):  # campfire, fountain
+        return 'scenery'
+    
+    # Special case: cauldron (0x12F) should be categorized as furniture (not storage - no items found in game)
+    if item_id == 0x12F:
+        return 'furniture'
     
     # Scenery items (0x0C0-0x0DF): split into scenery vs useless_item
     # Items that can be picked up are "useless_item", items that can't are "scenery"
@@ -358,7 +368,6 @@ def get_tmap_info(quality: int, owner: int) -> Dict[str, Any]:
     """
     info = {
         'texture_index': owner,
-        'quality_value': quality,
     }
     
     # Quality 40 is common for wall textures
