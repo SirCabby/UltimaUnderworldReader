@@ -339,8 +339,8 @@ class JsonExporter:
                     return f"Stack of {quantity}"
                 return ""
             
-            # Switches (0x170-0x17F) - follow link chain to describe effect
-            if 0x170 <= object_id <= 0x17F:
+            # Switches (0x170-0x17F) and lever 0x161 - follow link chain to describe effect
+            if (0x170 <= object_id <= 0x17F) or object_id == 0x161:
                 from ..constants.switches import describe_switch_effect
                 from ..constants.traps import is_trap, is_trigger
                 
@@ -1019,7 +1019,9 @@ class JsonExporter:
                 # Storage items should not display these stats in the UI
                 from ..constants import STATIC_CONTAINERS
                 is_storage = obj_id in STATIC_CONTAINERS
-                if 'weight' in item_stats and not is_storage:
+                # Don't add weight for scenery items (0xC0-0xDF), campfire (0x12A), or fountain (0x12E)
+                is_scenery = (0xC0 <= obj_id <= 0xDF) or obj_id in (0x12A, 0x12E)
+                if 'weight' in item_stats and not is_storage and not is_scenery:
                     web_obj['weight'] = item_stats['weight']
                 if 'capacity' in item_stats and not is_storage:
                     web_obj['capacity'] = item_stats['capacity']

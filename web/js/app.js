@@ -2954,8 +2954,8 @@ function renderVisibleObjectsPane() {
                         : item.description;
                     enchantLine += `<div style="color: #e8d4b8; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3; white-space: pre-wrap;">📜 "${escapeHtml(displayText)}"</div>`;
                 }
-                // Show effect for switches, traps, and triggers
-                const isSwitchTrapTrigger = (objId >= 0x170 && objId <= 0x17F) || (objId >= 0x180 && objId <= 0x1BF);
+                // Show effect for switches, traps, and triggers (including lever 0x161)
+                const isSwitchTrapTrigger = (objId >= 0x170 && objId <= 0x17F) || objId === 0x161 || (objId >= 0x180 && objId <= 0x1BF);
                 if (isSwitchTrapTrigger && item.description && item.description.length > 0) {
                     enchantLine += `<div style="color: #ffa94d; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(255, 169, 77, 0.1); border-left: 2px solid #ffa94d; border-radius: 2px; line-height: 1.3;">⚙️ ${escapeHtml(item.description)}</div>`;
                 }
@@ -3121,7 +3121,7 @@ function renderObjectDetails(item, isNpc) {
         // For switches, triggers and traps, show the effect description inline without extra section
         if (item.description) {
             const objId = item.object_id || 0;
-            const isSwitchTrapOrTrigger = (objId >= 0x170 && objId <= 0x17F) || (objId >= 0x180 && objId <= 0x1BF);
+            const isSwitchTrapOrTrigger = (objId >= 0x170 && objId <= 0x17F) || objId === 0x161 || (objId >= 0x180 && objId <= 0x1BF);
             
             if (isSwitchTrapOrTrigger) {
                 // Show switch/trap/trigger effect in a styled block
@@ -3931,8 +3931,8 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         else if (isEnchanted(obj) && obj.effect && isMagicalEffect(obj.effect)) {
             statsLine += `<div style="font-size: 0.75rem; color: var(--text-accent);">⚡ ${escapeHtml(obj.effect)}</div>`;
         }
-        // Show description/effect for switches, traps, and triggers
-        const isSwitchTrapTrigger = (objId >= 0x170 && objId <= 0x17F) || (objId >= 0x180 && objId <= 0x1BF);
+        // Show description/effect for switches, traps, and triggers (including lever 0x161)
+        const isSwitchTrapTrigger = (objId >= 0x170 && objId <= 0x17F) || objId === 0x161 || (objId >= 0x180 && objId <= 0x1BF);
         if (isSwitchTrapTrigger && obj.description) {
             statsLine += `<div style="font-size: 0.75rem; color: #ffa94d; margin-top: 2px;">⚙️ ${escapeHtml(obj.description)}</div>`;
         }

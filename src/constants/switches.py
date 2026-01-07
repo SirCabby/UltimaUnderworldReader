@@ -98,6 +98,11 @@ SWITCH_TYPES: Dict[int, SwitchInfo] = {
         description="A wall-mounted lever",
         visual_type="lever"
     ),
+    0x161: SwitchInfo(
+        name="lever",
+        description="A wall-mounted lever",
+        visual_type="lever"
+    ),
     0x17E: SwitchInfo(
         name="pull_chain",
         description="A hanging pull chain",
@@ -108,12 +113,18 @@ SWITCH_TYPES: Dict[int, SwitchInfo] = {
         description="A hanging pull chain",
         visual_type="pull_chain"
     ),
+    0x161: SwitchInfo(
+        name="dial",
+        description="A wall-mounted dial",
+        visual_type="dial"
+    ),
 }
 
 
 def is_switch(item_id: int) -> bool:
     """Check if an object ID is a switch."""
-    return SWITCH_ID_MIN <= item_id <= SWITCH_ID_MAX
+    # Include lever 0x161 which is in the decal range but functions as a switch
+    return (SWITCH_ID_MIN <= item_id <= SWITCH_ID_MAX) or item_id == 0x161
 
 
 def get_switch_info(item_id: int) -> Optional[SwitchInfo]:

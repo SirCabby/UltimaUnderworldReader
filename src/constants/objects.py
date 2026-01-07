@@ -259,7 +259,7 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     base_category = get_category(item_id)
     
     # Special cases: these scenery items go to misc_item category
-    if item_id in (0x0CC, 0x0CD, 0x0DB):  # piece of wood (2 variants), pile of wood chips
+    if item_id in (0x0CC, 0x0CD, 0x0DB, 0x0D8):  # piece of wood (2 variants), pile of wood chips, pole
         return 'misc_item'
     
     # Special cases: campfire (0x12A) and fountain (0x12E) should be categorized as scenery
@@ -269,6 +269,10 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     # Special case: cauldron (0x12F) should be categorized as furniture (not storage - no items found in game)
     if item_id == 0x12F:
         return 'furniture'
+    
+    # Special case: lever (0x161) should be categorized as switch (not decal/scenery)
+    if item_id == 0x161:
+        return 'switch'
     
     # Scenery items (0x0C0-0x0DF): split into scenery vs useless_item
     # Items that can be picked up are "useless_item", items that can't are "scenery"

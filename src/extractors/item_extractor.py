@@ -82,6 +82,12 @@ class ItemExtractor:
             raw_name = object_names[item_id] if item_id < len(object_names) else ""
             name, article, plural = parse_item_name(raw_name)
             
+            # Override name for dial (0x161) - game strings call it "lever" but it's actually a dial
+            if item_id == 0x161:
+                name = "dial"
+                article = "a"
+                plural = "dials"
+            
             # Get common properties
             common_props = self.common.get_object(item_id)
             
@@ -188,6 +194,10 @@ class ItemExtractor:
                 if obj.item_id < len(object_names):
                     raw_name = object_names[obj.item_id]
                     name, _, _ = parse_item_name(raw_name)
+                
+                # Override name for dial (0x161) - game strings call it "lever" but it's actually a dial
+                if obj.item_id == 0x161:
+                    name = "dial"
                 
                 # Determine quantity vs special_link
                 # For triggers (0x1A0-0x1BF), quantity_or_link ALWAYS contains
