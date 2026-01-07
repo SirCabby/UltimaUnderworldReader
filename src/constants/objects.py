@@ -85,6 +85,17 @@ def is_quest_book(text_idx: int) -> bool:
     """Check if a book's text index indicates it's a quest item."""
     return text_idx in QUEST_BOOK_TEXT_INDICES
 
+# Scenery items (0x0C0-0x0DF) that can be picked up by the player
+# The can_be_picked_up flag in COMOBJ.DAT is not reliable for scenery items,
+# so we use a manual list based on gameplay knowledge
+SCENERY_PICKUPABLE_ITEMS: Set[int] = {
+    0x0C2, 0x0C3,  # skulls
+    0x0C4, 0x0C5,  # bones
+    0x0C6, 0x0DC,  # pile of bones
+    0x0C8, 0x0C9, 0x0CA, 0x0CB,  # broken items (axe, sword, mace, shield)
+    # Note: 0x0DB (pile of wood chips) is handled separately as misc_item
+}
+
 # Items that use quantity for stacking (coins, arrows, etc.)
 # For these, the quantity field holds the actual count, not a link
 STACKABLE_ITEMS: Dict[int, str] = {
@@ -133,12 +144,13 @@ CARRYABLE_CONTAINERS: Dict[int, str] = {
 
 # Static containers (non-carryable storage that can hold items)
 # Includes urn from container range and furniture items that store things
+# Note: nightstand (0x15E) is NOT a container - it's just furniture
 STATIC_CONTAINERS: Dict[int, str] = {
     0x8C: "urn",        # In container range but not carryable
     0x158: "table",     # Tables can sometimes hold items
     0x15B: "barrel",
     0x15D: "chest",
-    0x15E: "nightstand",
+    # 0x15E: "nightstand",  # Not a container - just furniture
 }
 
 # All container-like item IDs (both carryable and static)
@@ -176,6 +188,7 @@ CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
     "drink": "Drink",
     "potion": "Potion",
     "scenery": "Scenery",
+    "useless_item": "Useless Item",
     "rune": "Runestone",
     "talisman": "Talisman",
     "key": "Key",
@@ -226,7 +239,8 @@ def get_category(item_id: int) -> str:
 
 
 def get_detailed_category(item_id: int, is_enchanted: bool = False, 
-                          owner: int = 0, special_link: int = 0) -> str:
+                          owner: int = 0, special_link: int = 0,
+                          can_be_picked_up: bool = False) -> str:
     """
     Get a more detailed category for an item based on its ID and properties.
     
@@ -235,11 +249,25 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
         is_enchanted: Whether the object has the enchanted flag set
         owner: The owner field (used for door lock status)
         special_link: The special_link field (used for door lock status)
+        can_be_picked_up: Whether the object can be picked up by the player
     
     Returns:
         A more specific category string
     """
     base_category = get_category(item_id)
+    
+    # Special case: pile of wood chips goes to misc_item category
+    if item_id == 0x0DB:
+        return 'misc_item'
+    
+    # Scenery items (0x0C0-0x0DF): split into scenery vs useless_item
+    # Items that can be picked up are "useless_item", items that can't are "scenery"
+    # Use manual list since COMOBJ.DAT flag is not reliable for scenery items
+    if base_category == 'scenery':
+        # Check manual list first, then fall back to flag
+        if item_id in SCENERY_PICKUPABLE_ITEMS or can_be_picked_up:
+            return 'useless_item'
+        return 'scenery'
     
     # Static containers (urn, barrel, chest, etc.) - categorize as "storage"
     if item_id in STATIC_CONTAINERS:

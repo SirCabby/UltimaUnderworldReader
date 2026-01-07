@@ -21,6 +21,9 @@ from ..constants import (
     get_tmap_info,
     is_door,
     is_secret_door,
+    is_container,
+    STATIC_CONTAINERS,
+    CARRYABLE_CONTAINERS,
 )
 from ..utils import parse_item_name
 
@@ -79,14 +82,15 @@ class ItemExtractor:
             raw_name = object_names[item_id] if item_id < len(object_names) else ""
             name, article, plural = parse_item_name(raw_name)
             
-            # Get category
-            category = get_category(item_id)
-            
             # Get common properties
             common_props = self.common.get_object(item_id)
             
             # Get class-specific properties
             properties = self._get_class_properties(item_id)
+            
+            # Get category using detailed category to handle scenery -> useless_item split
+            can_be_picked_up = common_props.can_be_picked_up if common_props else False
+            category = get_detailed_category(item_id, can_be_picked_up=can_be_picked_up)
             
             info = ItemInfo(
                 item_id=item_id,
@@ -201,11 +205,16 @@ class ItemExtractor:
                 
                 # Get base and detailed categories
                 base_category = get_category(obj.item_id)
+                # Look up can_be_picked_up from item type if available
+                can_be_picked_up = False
+                if obj.item_id in self.item_types:
+                    can_be_picked_up = self.item_types[obj.item_id].can_be_picked_up
                 detailed_cat = get_detailed_category(
                     obj.item_id,
                     is_enchanted=obj.is_enchanted,
                     owner=obj.owner,
-                    special_link=special_link
+                    special_link=special_link,
+                    can_be_picked_up=can_be_picked_up
                 )
                 
                 # Build extra info for special object types
@@ -304,6 +313,41 @@ class ItemExtractor:
                 else:
                     extra['is_pickable'] = False
             else:
+                extra['is_locked'] = False
+        
+        # Containers (chests, barrels, etc.) - check for locks
+        # Containers use the same lock mechanism as doors
+        if is_container(obj.item_id):
+            # A container is locked if it has a non-zero special_link pointing to a lock object (0x10F)
+            if special_link != 0 and level_objects:
+                lock_obj = level_objects.get(special_link)
+                if lock_obj and lock_obj.item_id == 0x10F:  # Lock object
+                    extra['is_locked'] = True
+                    
+                    # The lock ID is stored in the lock object's quantity field
+                    # lock.quantity - 512 = lock_id that matches key.owner
+                    lock_id = None
+                    lock_quality = lock_obj.quality
+                    lock_quantity = lock_obj.quantity_or_link if lock_obj.is_quantity else 0
+                    
+                    if lock_quantity >= 512:
+                        lock_id = lock_quantity - 512
+                    
+                    if lock_id is not None and lock_id > 0:
+                        extra['lock_id'] = lock_id
+                        extra['lock_type'] = 'keyed'  # Needs key with owner=lock_id
+                    else:
+                        # No lock ID found - might be trigger-opened or special
+                        extra['lock_type'] = 'special'
+                    
+                    # Check if lock is pickable based on lock quality
+                    # Quality 40 = pickable, Quality 63 = special/not pickable
+                    extra['is_pickable'] = lock_quality == 40
+                else:
+                    # special_link points to something else (probably contents), not locked
+                    extra['is_locked'] = False
+            else:
+                # No special_link, container is unlocked
                 extra['is_locked'] = False
         
         # Special tmap objects

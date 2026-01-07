@@ -652,6 +652,7 @@ class JsonExporter:
             'furniture': 'furniture',
             'decal': 'scenery',
             'scenery': 'scenery',
+            'useless_item': 'useless_item',
             'animation': 'animations',
             # Quest & misc
             'quest_item': 'quest',
@@ -790,6 +791,12 @@ class JsonExporter:
                 if level_num in items_by_level_index:
                     item = items_by_level_index[level_num].get(current_idx)
                     if item:
+                        # Skip lock objects (0x10F) - they're not container contents
+                        if item.object_id == 0x10F:
+                            # Lock object - follow its next_index to get actual contents
+                            current_idx = item.next_index
+                            continue
+                        
                         item_dict = item.to_dict()
                         detailed_cat = item_dict.get('detailed_category', '')
                         obj_class = item_dict.get('object_class', 'unknown')
@@ -1023,7 +1030,21 @@ class JsonExporter:
             from ..constants import STATIC_CONTAINERS, CARRYABLE_CONTAINERS
             is_container_item = (obj_id in CARRYABLE_CONTAINERS) or (obj_id in STATIC_CONTAINERS)
             if is_container_item and special_link > 0:
-                contents = get_container_contents(level, special_link)
+                # Check if special_link points to a lock object (0x10F) - if so, follow lock's next_index
+                if level in items_by_level_index:
+                    link_obj = items_by_level_index[level].get(special_link)
+                    if link_obj and link_obj.object_id == 0x10F:
+                        # special_link points to lock, contents are in lock's next_index chain
+                        if link_obj.next_index > 0:
+                            contents = get_container_contents(level, link_obj.next_index)
+                        else:
+                            contents = []
+                    else:
+                        # special_link points directly to contents
+                        contents = get_container_contents(level, special_link)
+                else:
+                    contents = get_container_contents(level, special_link)
+                
                 if contents:
                     web_obj['contents'] = contents
             
@@ -1133,6 +1154,7 @@ class JsonExporter:
                 {'id': 'texture_objects', 'name': 'Texture Map Objects', 'color': '#845ef7'},
                 {'id': 'furniture', 'name': 'Furniture', 'color': '#b197a8'},
                 {'id': 'scenery', 'name': 'Scenery', 'color': '#a9a9a9'},
+                {'id': 'useless_item', 'name': 'Useless Items', 'color': '#868e96'},
                 {'id': 'animations', 'name': 'Animations', 'color': '#20c997'},
                 {'id': 'quest', 'name': 'Quest Items', 'color': '#22b8cf'},
                 {'id': 'misc', 'name': 'Miscellaneous', 'color': '#868e96'},
