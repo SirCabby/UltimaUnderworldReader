@@ -238,6 +238,7 @@ class JsonExporter:
         block4 = strings_parser.get_block(4) or [] if strings_parser else []  # Object names
         block5 = strings_parser.get_block(5) or [] if strings_parser else []  # Quality descriptions
         spell_names_list = strings_parser.get_block(6) or [] if strings_parser else []
+        block8 = strings_parser.get_block(8) or [] if strings_parser else []  # Wall/sign text (for writing/gravestones)
         block9 = strings_parser.get_block(9) or [] if strings_parser else []  # Trap messages
         
         # Build spell names dict for lookups
@@ -286,6 +287,18 @@ class JsonExporter:
                     text_idx = link_value - 512
                     if text_idx < len(block3) and block3[text_idx]:
                         return block3[text_idx].strip()
+                return ""
+            
+            # Writing (0x166) and Gravestone (0x165) - use quantity or special_link offset by 512 as index into block 8 (wall/sign text)
+            # Writing/gravestones can have is_quantity=True with quantity >= 512, or is_quantity=False with special_link >= 512
+            if object_id in (0x165, 0x166):
+                if link_value > 0 and link_value >= 512:
+                    # Offset by 512 to get actual index into block 8 (wall/sign text, not block 3)
+                    text_idx = link_value - 512
+                    if text_idx >= 0 and text_idx < len(block8):
+                        desc = block8[text_idx]
+                        if desc and desc.strip():
+                            return desc.strip()
                 return ""
             
             # Wands (0x98-0x9B)
@@ -651,6 +664,7 @@ class JsonExporter:
             'switch': 'switches',
             'furniture': 'furniture',
             'decal': 'scenery',
+            'stationary_writing': 'stationary_writing',
             'scenery': 'scenery',
             'useless_item': 'useless_item',
             'animation': 'animations',
@@ -1143,6 +1157,7 @@ class JsonExporter:
                 {'id': 'books', 'name': 'Readable Books', 'color': '#e8d4b8'},
                 {'id': 'scrolls', 'name': 'Readable Scrolls', 'color': '#d4c4a8'},
                 {'id': 'spell_scrolls', 'name': 'Spell Scrolls', 'color': '#da77f2'},
+                {'id': 'stationary_writing', 'name': 'Stationary Writing', 'color': '#c4a484'},
                 # Magic Items - split by type
                 {'id': 'runes', 'name': 'Runestones', 'color': '#9775fa'},
                 {'id': 'wands', 'name': 'Wands', 'color': '#7950f2'},

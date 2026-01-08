@@ -87,9 +87,11 @@ const STORAGE_KEY = 'uw_map_filters';
  */
 function serializeUrlState() {
     const params = new URLSearchParams();
-    params.set('level', state.currentLevel + 1);
-    params.set('zoom', state.zoom.toFixed(2));
-    params.set('pan', `${Math.round(state.pan.x)},${Math.round(state.pan.y)}`);
+    params.set('level', (state.currentLevel || 0) + 1);
+    // Ensure zoom is a valid number before calling toFixed
+    const zoom = (typeof state.zoom === 'number' && !isNaN(state.zoom)) ? state.zoom : CONFIG.zoom.default;
+    params.set('zoom', zoom.toFixed(2));
+    // Explicitly do NOT save pan - always reset to center on page load
     // Store selected marker as "id:isNpc" (e.g., "123:true" or "456:false")
     if (state.selectedMarker && state.selectedMarker.dataset) {
         const id = state.selectedMarker.dataset.id;
@@ -98,6 +100,8 @@ function serializeUrlState() {
             params.set('selected', `${id}:${isNpc}`);
         }
     }
+    // Ensure pan is never in the URL (remove it if somehow present)
+    params.delete('pan');
     return params.toString();
 }
 
@@ -167,17 +171,7 @@ function parseUrlState() {
         }
     }
     
-    // Parse pan
-    if (params.has('pan')) {
-        const panParts = params.get('pan').split(',');
-        if (panParts.length === 2) {
-            const x = parseInt(panParts[0], 10);
-            const y = parseInt(panParts[1], 10);
-            if (!isNaN(x) && !isNaN(y)) {
-                result.pan = { x, y };
-            }
-        }
-    }
+    // Don't parse pan - always reset to center on page load
     
     // Parse selected marker (format: "id:isNpc")
     if (params.has('selected')) {
@@ -202,9 +196,35 @@ function restoreState() {
         // Restore categories (validate they exist in data)
         if (storedFilters.categories && Array.isArray(storedFilters.categories)) {
             state.filters.categories.clear();
+            
+            // Build set of valid category IDs
+            const validCategoryIds = new Set();
+            if (state.data && state.data.categories) {
+                state.data.categories.forEach(cat => {
+                    validCategoryIds.add(cat.id);
+                });
+            }
+            // Add special NPC categories
+            validCategoryIds.add('npcs_hostile');
+            validCategoryIds.add('npcs_friendly');
+            validCategoryIds.add('npcs_named');
+            
+            // Only restore categories that are valid
             storedFilters.categories.forEach(catId => {
-                state.filters.categories.add(catId);
+                if (validCategoryIds.has(catId)) {
+                    state.filters.categories.add(catId);
+                }
             });
+            
+            // If no valid categories were restored, enable all categories as fallback
+            if (state.filters.categories.size === 0 && state.data && state.data.categories) {
+                state.data.categories.forEach(cat => {
+                    state.filters.categories.add(cat.id);
+                });
+                state.filters.categories.add('npcs_hostile');
+                state.filters.categories.add('npcs_friendly');
+                state.filters.categories.add('npcs_named');
+            }
         }
         
         // Restore search
@@ -217,11 +237,25 @@ function restoreState() {
             state.filters.enchantedOnly = storedFilters.enchantedOnly;
         }
         
-        // Restore collapsed categories
+        // Restore collapsed categories (validate they exist)
         if (storedFilters.collapsedCategories && Array.isArray(storedFilters.collapsedCategories)) {
             state.collapsedCategories.clear();
+            
+            // Build set of valid category IDs for collapsed categories
+            const validCategoryIds = new Set();
+            if (state.data && state.data.categories) {
+                state.data.categories.forEach(cat => {
+                    validCategoryIds.add(cat.id);
+                });
+            }
+            validCategoryIds.add('npcs_hostile');
+            validCategoryIds.add('npcs_friendly');
+            validCategoryIds.add('npcs_named');
+            
             storedFilters.collapsedCategories.forEach(catId => {
-                state.collapsedCategories.add(catId);
+                if (validCategoryIds.has(catId)) {
+                    state.collapsedCategories.add(catId);
+                }
             });
         }
     }
@@ -232,12 +266,14 @@ function restoreState() {
         if (typeof urlState.level === 'number') {
             state.currentLevel = urlState.level;
         }
+        // Restore zoom if present, otherwise use default
         if (typeof urlState.zoom === 'number') {
             state.zoom = urlState.zoom;
+        } else {
+            state.zoom = CONFIG.zoom.default;
         }
-        if (urlState.pan) {
-            state.pan = urlState.pan;
-        }
+        // Always reset pan to center (don't restore pan position)
+        state.pan = { x: 0, y: 0 };
         // Store pending selection to restore after markers render
         if (urlState.selectedId) {
             state.pendingSelection = {
@@ -245,6 +281,10 @@ function restoreState() {
                 isNpc: urlState.selectedIsNpc
             };
         }
+    } else {
+        // No URL state - ensure defaults are set
+        state.zoom = CONFIG.zoom.default;
+        state.pan = { x: 0, y: 0 };
     }
 }
 
@@ -379,10 +419,12 @@ async function init() {
         elements.loadingOverlay.classList.add('hidden');
     } catch (error) {
         console.error('Failed to initialize:', error);
-        elements.loadingOverlay.innerHTML = `
-            <p style="color: #ff6b6b;">Error loading data</p>
-            <p style="font-size: 0.9rem; color: var(--text-muted);">${error.message}</p>
-        `;
+        if (elements.loadingOverlay) {
+            elements.loadingOverlay.innerHTML = `
+                <p style="color: #ff6b6b;">Error loading data</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">${error.message}</p>
+            `;
+        }
     }
 }
 
@@ -414,7 +456,13 @@ async function loadData() {
     }
     state.data = await response.json();
     
-    // Initialize filters with all categories enabled
+    // Validate data structure
+    if (!state.data || !state.data.categories || !Array.isArray(state.data.categories)) {
+        throw new Error('Invalid data format: missing or invalid categories array');
+    }
+    
+    // Initialize filters with all categories enabled (will be overridden by restoreState if saved filters exist)
+    state.filters.categories.clear();
     state.data.categories.forEach(cat => {
         state.filters.categories.add(cat.id);
     });
@@ -602,9 +650,9 @@ function selectLevel(levelNum, preservePan = false) {
         restorePendingSelection();
     };
     
-    // Reset pan only (preserve zoom level) unless restoring from URL
+    // Always reset pan to center (we don't preserve pan position anymore)
+    state.pan = { x: 0, y: 0 };
     if (!preservePan) {
-        state.pan = { x: 0, y: 0 };
         clearSelection();
     }
     updateMapTransform();
@@ -617,6 +665,12 @@ function selectLevel(levelNum, preservePan = false) {
 
 function renderCategoryFilters() {
     elements.categoryFilters.innerHTML = '';
+    
+    // Safety check: ensure data is loaded
+    if (!state.data || !state.data.categories || !Array.isArray(state.data.categories)) {
+        console.error('Cannot render category filters: data not loaded');
+        return;
+    }
     
     // Add NPC categories first (split by hostility and named status)
     const npcHostileFilter = createCategoryFilter({
@@ -1289,16 +1343,17 @@ function showStackedTooltip(e, items, tileX, tileY) {
                 itemEl.appendChild(capDiv);
             }
             
-            // Show book/scroll content for readable items
-            const isStackedReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B);
+            // Show book/scroll/writing/gravestone content for readable items
+            const isStackedReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B) || objId === 0x165 || objId === 0x166;
             if (isStackedReadable && item.description && item.description.length > 0) {
                 const descDiv = document.createElement('div');
                 const maxLen = 60;
                 const displayText = item.description.length > maxLen 
                     ? item.description.substring(0, maxLen) + '...' 
                     : item.description;
+                const icon = (objId === 0x165) ? '🪦' : (objId === 0x166) ? '📝' : '📜';
                 descDiv.style.cssText = `font-size: 0.7rem; color: #e8d4b8; margin-top: 4px; padding: 3px 5px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3;`;
-                descDiv.textContent = `📜 "${displayText}"`;
+                descDiv.textContent = `${icon} "${displayText}"`;
                 itemEl.appendChild(descDiv);
             }
         }
@@ -2215,17 +2270,19 @@ function showTooltip(e, item, isNpc) {
         if (isMagicalEffect(item.effect)) {
             html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">✨ ${escapeHtml(truncateText(item.effect, 50))}</div>`;
         }
-        // Show description for books/scrolls with enhanced formatting
+        // Show description for books/scrolls/writing/gravestones with enhanced formatting
         // Books: 0x130-0x137, Scrolls: 0x138-0x13F (excluding 0x13B map)
-        const isReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B);
+        // Writing: 0x166, Gravestone: 0x165
+        const isReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B) || objId === 0x165 || objId === 0x166;
         if (item.description && item.description.length > 0) {
             if (isReadable) {
-                // For readable books/scrolls, show longer text with book styling
+                // For readable items, show longer text with book styling
                 const maxLen = 200;
                 const displayText = item.description.length > maxLen 
                     ? item.description.substring(0, maxLen) + '...' 
                     : item.description;
-                html += `<div class="tooltip-book-content" style="color: #e8d4b8; font-size: 0.8rem; margin-top: 6px; padding: 6px 8px; background: rgba(232, 212, 184, 0.08); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; white-space: pre-wrap; max-width: 250px; line-height: 1.4;">📜 "${escapeHtml(displayText)}"</div>`;
+                const icon = (objId === 0x165) ? '🪦' : (objId === 0x166) ? '📝' : '📜';
+                html += `<div class="tooltip-book-content" style="color: #e8d4b8; font-size: 0.8rem; margin-top: 6px; padding: 6px 8px; background: rgba(232, 212, 184, 0.08); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; white-space: pre-wrap; max-width: 250px; line-height: 1.4;">${icon} "${escapeHtml(displayText)}"</div>`;
             } else {
                 // For other items (keys, etc.) show short preview
                 html += `<div class="tooltip-info" style="color: var(--text-accent); font-size: 0.8rem;">${escapeHtml(truncateText(item.description, 60))}</div>`;
@@ -3953,11 +4010,24 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             contentsInfo = `<div style="font-size: 0.75rem; color: var(--text-accent); margin-top: 4px;">${obj.contents.length} item${obj.contents.length > 1 ? 's' : ''} inside</div>`;
         }
         
+        // Show description for writing/gravestones in location cards
+        let descriptionHtml = '';
+        const isReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B) || objId === 0x165 || objId === 0x166;
+        if (isReadable && obj.description && obj.description.length > 0) {
+            const maxLen = 80;
+            const displayText = obj.description.length > maxLen 
+                ? obj.description.substring(0, maxLen) + '...' 
+                : obj.description;
+            const icon = (objId === 0x165) ? '🪦' : (objId === 0x166) ? '📝' : '📜';
+            descriptionHtml = `<div style="font-size: 0.75rem; color: #e8d4b8; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3;">${icon} "${escapeHtml(displayText)}"</div>`;
+        }
+        
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem;">${getItemDisplayName(obj)}${hasContents ? ' 📦' : ''}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
             ${statsLine}
             ${contentsInfo}
+            ${descriptionHtml}
         `;
         
         card.addEventListener('click', () => selectLocationItem(obj, false, tileX, tileY));

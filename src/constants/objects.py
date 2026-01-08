@@ -213,6 +213,7 @@ CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
     "secret_door": "Secret Door",
     "furniture": "Furniture",       # Non-container furniture
     "decal": "Decal",
+    "stationary_writing": "Stationary Writing",  # Writing and gravestones
     "special_tmap": "Texture Map Object",
     "switch": "Switch",
     "trap": "Trap",
@@ -273,6 +274,10 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     # Special case: lever (0x161) should be categorized as switch (not decal/scenery)
     if item_id == 0x161:
         return 'switch'
+    
+    # Special case: writing (0x166) and gravestone (0x165) should be categorized as stationary_writing
+    if item_id in (0x165, 0x166):
+        return 'stationary_writing'
     
     # Scenery items (0x0C0-0x0DF): split into scenery vs useless_item
     # Items that can be picked up are "useless_item", items that can't are "scenery"
