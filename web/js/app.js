@@ -2544,6 +2544,231 @@ function clearStackedMarkerStyles(group) {
     }
 }
 
+/**
+ * Apply hover scale effect to a marker (same as selection scale 1.8x)
+ * Used when hovering over items in the visible objects list
+ */
+function applyMarkerHoverEffect(markerElement) {
+    if (!markerElement) return;
+    
+    // Don't apply hover effect if already selected
+    if (markerElement.classList.contains('selected')) return;
+    
+    // Mark as hovered
+    markerElement.classList.add('hovered-from-list');
+    
+    if (markerElement.dataset.isStarMarker === 'true') {
+        markerElement.style.transform = 'scale(1.8)';
+    } else if (markerElement.tagName === 'circle') {
+        const origR = parseFloat(markerElement.dataset.originalRadius) || CONFIG.marker.radius;
+        markerElement.setAttribute('r', origR * 1.8);
+    }
+}
+
+/**
+ * Remove hover scale effect from a marker
+ */
+function removeMarkerHoverEffect(markerElement) {
+    if (!markerElement) return;
+    
+    // Only remove if we're the one that applied the hover effect
+    if (!markerElement.classList.contains('hovered-from-list')) return;
+    
+    // Don't remove if selected
+    if (markerElement.classList.contains('selected')) {
+        markerElement.classList.remove('hovered-from-list');
+        return;
+    }
+    
+    markerElement.classList.remove('hovered-from-list');
+    
+    if (markerElement.dataset.isStarMarker === 'true') {
+        markerElement.style.transform = 'scale(1)';
+    } else if (markerElement.tagName === 'circle') {
+        const origR = parseFloat(markerElement.dataset.originalRadius) || CONFIG.marker.radius;
+        markerElement.setAttribute('r', origR);
+    }
+}
+
+/**
+ * Apply hover scale effect to a stacked marker group
+ */
+function applyStackedMarkerHoverEffect(group) {
+    if (!group) return;
+    
+    // Don't apply hover effect if already selected
+    if (group.classList.contains('selected')) return;
+    
+    // Mark as hovered
+    group.classList.add('hovered-from-list');
+    
+    const countBadge = group.querySelector('.count-badge');
+    if (countBadge) {
+        const circle = countBadge.querySelector('circle');
+        const text = countBadge.querySelector('text');
+        
+        if (circle) {
+            // Store original radius if not already stored
+            if (!circle.dataset.originalRadius) {
+                circle.dataset.originalRadius = circle.getAttribute('r');
+            }
+            // Scale up radius by 1.8x (matching selection)
+            const origR = parseFloat(circle.dataset.originalRadius);
+            circle.setAttribute('r', origR * 1.8);
+        }
+        
+        if (text) {
+            // Store original font size if not already stored
+            if (!text.dataset.originalFontSize) {
+                text.dataset.originalFontSize = text.getAttribute('font-size');
+            }
+            // Scale up font size by 1.8x
+            const origSize = parseFloat(text.dataset.originalFontSize);
+            text.setAttribute('font-size', origSize * 1.8);
+        }
+    }
+}
+
+/**
+ * Remove hover scale effect from a stacked marker group
+ */
+function removeStackedMarkerHoverEffect(group) {
+    if (!group) return;
+    
+    // Only remove if we're the one that applied the hover effect
+    if (!group.classList.contains('hovered-from-list')) return;
+    
+    // Don't remove if selected
+    if (group.classList.contains('selected')) {
+        group.classList.remove('hovered-from-list');
+        return;
+    }
+    
+    group.classList.remove('hovered-from-list');
+    clearStackedMarkerStyles(group);
+}
+
+/**
+ * Apply hover scale effect to a secret marker group
+ */
+function applySecretMarkerHoverEffect(group) {
+    if (!group) return;
+    
+    // Don't apply hover effect if already selected
+    if (group.classList.contains('selected')) return;
+    
+    // Mark as hovered
+    group.classList.add('hovered-from-list');
+    
+    const visualGroup = group.querySelector('.secret-visual');
+    if (visualGroup && visualGroup.dataset.centerX && visualGroup.dataset.centerY) {
+        visualGroup.setAttribute('transform', `translate(${visualGroup.dataset.centerX}, ${visualGroup.dataset.centerY}) scale(1.8)`);
+    }
+}
+
+/**
+ * Remove hover scale effect from a secret marker group
+ */
+function removeSecretMarkerHoverEffect(group) {
+    if (!group) return;
+    
+    // Only remove if we're the one that applied the hover effect
+    if (!group.classList.contains('hovered-from-list')) return;
+    
+    // Don't remove if selected
+    if (group.classList.contains('selected')) {
+        group.classList.remove('hovered-from-list');
+        return;
+    }
+    
+    group.classList.remove('hovered-from-list');
+    
+    const visualGroup = group.querySelector('.secret-visual');
+    if (visualGroup && visualGroup.dataset.centerX && visualGroup.dataset.centerY) {
+        visualGroup.setAttribute('transform', `translate(${visualGroup.dataset.centerX}, ${visualGroup.dataset.centerY})`);
+    }
+}
+
+/**
+ * Find and apply hover effect to marker(s) on the map for a given item
+ */
+function applyHoverEffectToMapMarker(item, isNpc, isSecret) {
+    if (isSecret) {
+        // Find secret marker by ID
+        const secretGroups = document.querySelectorAll('.secret-marker');
+        for (const group of secretGroups) {
+            if (group.dataset.id === String(item.id)) {
+                applySecretMarkerHoverEffect(group);
+                break;
+            }
+        }
+    } else {
+        // First try to find an individual marker
+        const markers = document.querySelectorAll('.marker');
+        let foundMarker = false;
+        for (const marker of markers) {
+            if (marker.dataset.id === String(item.id) && 
+                marker.dataset.isNpc === String(isNpc)) {
+                applyMarkerHoverEffect(marker);
+                foundMarker = true;
+                break;
+            }
+        }
+        
+        // If no individual marker found, look for stacked marker group
+        if (!foundMarker) {
+            const stackedGroups = document.querySelectorAll('.marker-stack');
+            for (const group of stackedGroups) {
+                if (group.dataset.tileX === String(item.tile_x) && 
+                    group.dataset.tileY === String(item.tile_y)) {
+                    applyStackedMarkerHoverEffect(group);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Find and remove hover effect from marker(s) on the map for a given item
+ */
+function removeHoverEffectFromMapMarker(item, isNpc, isSecret) {
+    if (isSecret) {
+        // Find secret marker by ID
+        const secretGroups = document.querySelectorAll('.secret-marker');
+        for (const group of secretGroups) {
+            if (group.dataset.id === String(item.id)) {
+                removeSecretMarkerHoverEffect(group);
+                break;
+            }
+        }
+    } else {
+        // First try to find an individual marker
+        const markers = document.querySelectorAll('.marker');
+        let foundMarker = false;
+        for (const marker of markers) {
+            if (marker.dataset.id === String(item.id) && 
+                marker.dataset.isNpc === String(isNpc)) {
+                removeMarkerHoverEffect(marker);
+                foundMarker = true;
+                break;
+            }
+        }
+        
+        // If no individual marker found, look for stacked marker group
+        if (!foundMarker) {
+            const stackedGroups = document.querySelectorAll('.marker-stack');
+            for (const group of stackedGroups) {
+                if (group.dataset.tileX === String(item.tile_x) && 
+                    group.dataset.tileY === String(item.tile_y)) {
+                    removeStackedMarkerHoverEffect(group);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 function clearSelection() {
     // Clear individual markers
     document.querySelectorAll('.marker.selected').forEach(m => {
@@ -3061,10 +3286,14 @@ function renderVisibleObjectsPane() {
             itemEl.addEventListener('mouseenter', () => {
                 itemEl.style.background = 'var(--bg-elevated)';
                 itemEl.style.transform = 'translateX(2px)';
+                // Apply hover effect to corresponding map marker
+                applyHoverEffectToMapMarker(item, isNpc, isSecret);
             });
             itemEl.addEventListener('mouseleave', () => {
                 itemEl.style.background = 'var(--bg-tertiary)';
                 itemEl.style.transform = 'translateX(0)';
+                // Remove hover effect from corresponding map marker
+                removeHoverEffectFromMapMarker(item, isNpc, isSecret);
             });
             
             // Click to select
