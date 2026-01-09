@@ -28,6 +28,8 @@ web: extract maps
 
 # Start the web server
 start:
+	@echo "Checking for processes using port $(WEB_PORT)..."
+	@python web/kill_port.py $(WEB_PORT) || true
 	@echo "Starting web server at http://localhost:$(WEB_PORT)"
 	@echo "Press Ctrl+C to stop the server"
 	python -m http.server $(WEB_PORT) --bind 127.0.0.1 -d web

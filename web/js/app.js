@@ -1344,14 +1344,20 @@ function showStackedTooltip(e, items, tileX, tileY) {
             }
             
             // Show book/scroll/writing/gravestone content for readable items
-            const isStackedReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B) || objId === 0x165 || objId === 0x166;
-            if (isStackedReadable && item.description && item.description.length > 0) {
+            // Books/scrolls: 0x130-0x13F (excluding 0x13B map) = 304-319 (excluding 315)
+            // Gravestones: 0x165 = 357, Writings: 0x166 = 358
+            const objIdNumStack = Number(objId);
+            const isBookOrScroll = (objIdNumStack >= 304 && objIdNumStack <= 319 && objIdNumStack !== 315);
+            const isStationaryWriting = (objIdNumStack === 357 || objIdNumStack === 358);
+            const isStackedReadable = isBookOrScroll || isStationaryWriting;
+            const hasDescStack = item.description && String(item.description).trim().length > 0;
+            if (isStackedReadable && hasDescStack) {
                 const descDiv = document.createElement('div');
                 const maxLen = 60;
                 const displayText = item.description.length > maxLen 
                     ? item.description.substring(0, maxLen) + '...' 
                     : item.description;
-                const icon = (objId === 0x165) ? '🪦' : (objId === 0x166) ? '📝' : '📜';
+                const icon = (objIdNumStack === 357) ? '🪦' : (objIdNumStack === 358) ? '📝' : '📜';
                 descDiv.style.cssText = `font-size: 0.7rem; color: #e8d4b8; margin-top: 4px; padding: 3px 5px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3;`;
                 descDiv.textContent = `${icon} "${displayText}"`;
                 itemEl.appendChild(descDiv);
@@ -2271,17 +2277,21 @@ function showTooltip(e, item, isNpc) {
             html += `<div class="tooltip-info" style="color: #9775fa; font-size: 0.8rem;">✨ ${escapeHtml(truncateText(item.effect, 50))}</div>`;
         }
         // Show description for books/scrolls/writing/gravestones with enhanced formatting
-        // Books: 0x130-0x137, Scrolls: 0x138-0x13F (excluding 0x13B map)
-        // Writing: 0x166, Gravestone: 0x165
-        const isReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B) || objId === 0x165 || objId === 0x166;
-        if (item.description && item.description.length > 0) {
+        // Books/scrolls: 0x130-0x13F (excluding 0x13B map) = 304-319 (excluding 315)
+        // Gravestones: 0x165 = 357, Writings: 0x166 = 358
+        const objIdNum = Number(objId);
+        const isBookOrScroll = (objIdNum >= 304 && objIdNum <= 319 && objIdNum !== 315);
+        const isStationaryWriting = (objIdNum === 357 || objIdNum === 358);
+        const isReadable = isBookOrScroll || isStationaryWriting;
+        const hasDescDetail = item.description && String(item.description).trim().length > 0;
+        if (hasDescDetail) {
             if (isReadable) {
                 // For readable items, show longer text with book styling
                 const maxLen = 200;
                 const displayText = item.description.length > maxLen 
                     ? item.description.substring(0, maxLen) + '...' 
                     : item.description;
-                const icon = (objId === 0x165) ? '🪦' : (objId === 0x166) ? '📝' : '📜';
+                const icon = (objIdNum === 357) ? '🪦' : (objIdNum === 358) ? '📝' : '📜';
                 html += `<div class="tooltip-book-content" style="color: #e8d4b8; font-size: 0.8rem; margin-top: 6px; padding: 6px 8px; background: rgba(232, 212, 184, 0.08); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; white-space: pre-wrap; max-width: 250px; line-height: 1.4;">${icon} "${escapeHtml(displayText)}"</div>`;
             } else {
                 // For other items (keys, etc.) show short preview
@@ -3002,17 +3012,26 @@ function renderVisibleObjectsPane() {
                     }
                     enchantLine += `<div style="color: var(--text-accent); font-size: 0.7rem; margin-top: 2px;">${capacityText}</div>`;
                 }
-                // Show book/scroll content for readable items (0x130-0x13F excluding 0x13B map)
-                const isReadableItem = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B);
-                if (isReadableItem && item.description && item.description.length > 0) {
+                // Show book/scroll/writing/gravestone content for readable items
+                // Books/scrolls: 0x130-0x13F (excluding 0x13B map) = 304-319 (excluding 315)
+                // Gravestones: 0x165 = 357, Writings: 0x166 = 358
+                const objIdNum = Number(objId);
+                const isBookOrScroll = (objIdNum >= 304 && objIdNum <= 319 && objIdNum !== 315);
+                const isStationaryWriting = (objIdNum === 357 || objIdNum === 358); // 0x165 = 357, 0x166 = 358
+                const isReadableItem = isBookOrScroll || isStationaryWriting;
+                // Check for description - must exist and be non-empty
+                const hasDescription = item.description && String(item.description).trim().length > 0;
+                if (isReadableItem && hasDescription) {
                     const maxLen = 100;
                     const displayText = item.description.length > maxLen 
                         ? item.description.substring(0, maxLen) + '...' 
                         : item.description;
-                    enchantLine += `<div style="color: #e8d4b8; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3; white-space: pre-wrap;">📜 "${escapeHtml(displayText)}"</div>`;
+                    // Use appropriate icon: 🪦 for gravestone (357), 📝 for writing (358), 📜 for books/scrolls
+                    const icon = (objIdNum === 357) ? '🪦' : (objIdNum === 358) ? '📝' : '📜';
+                    enchantLine += `<div style="color: #e8d4b8; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3; white-space: pre-wrap;">${icon} "${escapeHtml(displayText)}"</div>`;
                 }
                 // Show effect for switches, traps, and triggers (including lever 0x161)
-                const isSwitchTrapTrigger = (objId >= 0x170 && objId <= 0x17F) || objId === 0x161 || (objId >= 0x180 && objId <= 0x1BF);
+                const isSwitchTrapTrigger = (objIdNum >= 0x170 && objIdNum <= 0x17F) || objIdNum === 0x161 || (objIdNum >= 0x180 && objIdNum <= 0x1BF);
                 if (isSwitchTrapTrigger && item.description && item.description.length > 0) {
                     enchantLine += `<div style="color: #ffa94d; font-size: 0.7rem; margin-top: 4px; padding: 4px 6px; background: rgba(255, 169, 77, 0.1); border-left: 2px solid #ffa94d; border-radius: 2px; line-height: 1.3;">⚙️ ${escapeHtml(item.description)}</div>`;
                 }
@@ -4011,14 +4030,20 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         }
         
         // Show description for writing/gravestones in location cards
+        // Books/scrolls: 0x130-0x13F (excluding 0x13B map) = 304-319 (excluding 315)
+        // Gravestones: 0x165 = 357, Writings: 0x166 = 358
         let descriptionHtml = '';
-        const isReadable = (objId >= 0x130 && objId <= 0x13F && objId !== 0x13B) || objId === 0x165 || objId === 0x166;
-        if (isReadable && obj.description && obj.description.length > 0) {
+        const objIdNum = Number(objId);
+        const isBookOrScroll = (objIdNum >= 304 && objIdNum <= 319 && objIdNum !== 315);
+        const isStationaryWriting = (objIdNum === 357 || objIdNum === 358); // 0x165 = 357, 0x166 = 358
+        const isReadable = isBookOrScroll || isStationaryWriting;
+        const hasDescLoc = obj.description && String(obj.description).trim().length > 0;
+        if (isReadable && hasDescLoc) {
             const maxLen = 80;
             const displayText = obj.description.length > maxLen 
                 ? obj.description.substring(0, maxLen) + '...' 
                 : obj.description;
-            const icon = (objId === 0x165) ? '🪦' : (objId === 0x166) ? '📝' : '📜';
+            const icon = (objIdNum === 357) ? '🪦' : (objIdNum === 358) ? '📝' : '📜';
             descriptionHtml = `<div style="font-size: 0.75rem; color: #e8d4b8; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3;">${icon} "${escapeHtml(displayText)}"</div>`;
         }
         
