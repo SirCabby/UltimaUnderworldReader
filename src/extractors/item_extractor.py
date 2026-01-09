@@ -204,14 +204,43 @@ class ItemExtractor:
                 # the link to the trap, regardless of is_quantity flag
                 is_trigger = 0x1A0 <= obj.item_id <= 0x1BF
                 
+                # Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems
+                # For these items, if is_quantity is True but quantity_or_link is 0, it means quantity is 1
+                quantity_capable_items = [
+                    0x0A2,  # Ruby
+                    0x0A3,  # Red gem
+                    0x0A4,  # Small blue gem (tiny blue gem)
+                    0x0A6,  # Sapphire
+                    0x0A7,  # Emerald
+                    # Add resilient spear object ID here when found
+                ]
+                can_have_quantity = obj.item_id in quantity_capable_items
+                
                 if is_trigger:
                     # Triggers always use quantity_or_link as a link
                     quantity = 0
                     special_link = obj.quantity_or_link
                 else:
                     # Normal items follow is_quantity flag
-                    quantity = obj.quantity_or_link if obj.is_quantity else 0
-                    special_link = obj.quantity_or_link if not obj.is_quantity else 0
+                    if obj.is_quantity:
+                        # If is_quantity is True, quantity_or_link contains the quantity
+                        quantity = obj.quantity_or_link
+                        special_link = 0
+                    else:
+                        # If is_quantity is False, quantity_or_link contains a special link
+                        quantity = 0
+                        special_link = obj.quantity_or_link
+                        
+                        # For quantity-capable items, if is_quantity is False and quantity_or_link is 0,
+                        # it means there's no link and the item has quantity 1 (default single item)
+                        if can_have_quantity and obj.quantity_or_link == 0:
+                            quantity = 1
+                            special_link = 0
+                    
+                    # For quantity-capable items, if quantity is 0 after processing, it means quantity is 1
+                    # This handles the case where is_quantity is True but quantity_or_link is 0
+                    if can_have_quantity and quantity == 0:
+                        quantity = 1
                 
                 # Get base and detailed categories
                 base_category = get_category(obj.item_id)

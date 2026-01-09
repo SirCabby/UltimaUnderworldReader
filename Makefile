@@ -32,7 +32,7 @@ start:
 	@python web/kill_port.py $(WEB_PORT) || true
 	@echo "Starting web server at http://localhost:$(WEB_PORT)"
 	@echo "Press Ctrl+C to stop the server"
-	python -m http.server $(WEB_PORT) --bind 127.0.0.1 -d web
+	python web/server.py $(WEB_PORT) 127.0.0.1
 
 # Open the web viewer in default browser (cross-platform)
 open:

@@ -990,11 +990,29 @@ class JsonExporter:
             # Add quantity for stackable items (coins, ammo, candles, torches, etc.)
             # is_quantity flag means the quantity_or_link field holds a count
             # quantity >= 512 means it's enchantment data, not a real quantity
+            
+            # Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems
+            quantity_capable_items = [
+                0x0A2,  # Ruby
+                0x0A3,  # Red gem
+                0x0A4,  # Small blue gem (tiny blue gem)
+                0x0A6,  # Sapphire
+                0x0A7,  # Emerald
+                # Add resilient spear object ID here when found
+            ]
+            can_have_quantity = obj_id in quantity_capable_items
+            
             if is_quantity and quantity > 0 and quantity < 512:
                 web_obj['quantity'] = quantity
             # Coins (0xA0) and gold coins (0xA1) always have quantity - default to 1
             elif obj_id in (0xA0, 0xA1):
                 web_obj['quantity'] = 1
+            # For quantity-capable items, always include quantity
+            # These items can have quantity even when is_quantity is False or quantity is 0/1
+            elif can_have_quantity:
+                # If quantity is 0, it means quantity is 1 (default single item)
+                # If quantity is already set (from item_extractor fix), use it
+                web_obj['quantity'] = quantity if quantity > 0 else 1
             
             # Add owner information (for items that belong to NPCs)
             # Keys use owner for lock ID, which is already shown in effect/description

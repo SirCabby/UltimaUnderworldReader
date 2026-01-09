@@ -3390,12 +3390,27 @@ function renderObjectDetails(item, isNpc) {
             </div>
         `;
         
-        // Show quantity for stackable items (only if > 1)
-        if (item.quantity && item.quantity > 1) {
+        // Show quantity for stackable items (always show in selected object view, even if 1)
+        // Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems, resilient spears
+        const objId = typeof item.object_id === 'string' ? parseInt(item.object_id, 16) : (item.object_id || 0);
+        const quantityItems = [0x0A2, 0x0A3, 0x0A4, 0x0A6, 0x0A7]; // Ruby (162), Red gem (163), Small blue gem (164), Sapphire (166), Emerald (167)
+        const canHaveQuantity = quantityItems.includes(objId);
+        
+        // Convert quantity to number, defaulting to 0 if not present
+        let quantity = 0;
+        if (item.quantity !== undefined && item.quantity !== null) {
+            quantity = typeof item.quantity === 'number' ? item.quantity : parseInt(item.quantity, 10);
+            if (isNaN(quantity)) quantity = 0;
+        }
+        
+        // Show quantity if:
+        // 1. Quantity is >= 1 (for all items), OR
+        // 2. Item can have quantity (always show quantity field for these items in selected view, even if 0)
+        if (quantity >= 1 || canHaveQuantity) {
             html += `
                 <div class="detail-row">
                     <span class="detail-label">Quantity</span>
-                    <span class="detail-value" style="color: #fcc419;">${item.quantity}</span>
+                    <span class="detail-value" style="color: #fcc419;">${quantity}</span>
                 </div>
             `;
         }
@@ -3843,12 +3858,27 @@ function selectInventoryItem(item, parentNpc = null) {
         </div>
     `;
     
-    // Show quantity for stackable items (only if > 1)
-    if (item.quantity && item.quantity > 1) {
+    // Show quantity for stackable items (always show in selected object view, even if 1)
+    // Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems, resilient spears
+    const objId = typeof item.object_id === 'string' ? parseInt(item.object_id, 16) : (item.object_id || 0);
+    const quantityItems = [0x0A2, 0x0A3, 0x0A4, 0x0A6, 0x0A7]; // Ruby (162), Red gem (163), Small blue gem (164), Sapphire (166), Emerald (167)
+    const canHaveQuantity = quantityItems.includes(objId);
+    
+    // Convert quantity to number, defaulting to 0 if not present
+    let quantity = 0;
+    if (item.quantity !== undefined && item.quantity !== null) {
+        quantity = typeof item.quantity === 'number' ? item.quantity : parseInt(item.quantity, 10);
+        if (isNaN(quantity)) quantity = 0;
+    }
+    
+    // Show quantity if:
+    // 1. Quantity is >= 1 (for all items), OR
+    // 2. Item can have quantity (always show quantity field for these items in selected view, even if 0)
+    if (quantity >= 1 || canHaveQuantity) {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Quantity</span>
-                <span class="detail-value" style="color: #fcc419;">${item.quantity}</span>
+                <span class="detail-value" style="color: #fcc419;">${quantity}</span>
             </div>
         `;
     }
@@ -3974,12 +4004,27 @@ function selectContainerItem(item, parentContainer = null) {
         </div>
     `;
     
-    // Show quantity for stackable items (only if > 1)
-    if (item.quantity && item.quantity > 1) {
+    // Show quantity for stackable items (always show in selected object view, even if 1)
+    // Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems, resilient spears
+    const objId = typeof item.object_id === 'string' ? parseInt(item.object_id, 16) : (item.object_id || 0);
+    const quantityItems = [0x0A2, 0x0A3, 0x0A4, 0x0A6, 0x0A7]; // Ruby (162), Red gem (163), Small blue gem (164), Sapphire (166), Emerald (167)
+    const canHaveQuantity = quantityItems.includes(objId);
+    
+    // Convert quantity to number, defaulting to 0 if not present
+    let quantity = 0;
+    if (item.quantity !== undefined && item.quantity !== null) {
+        quantity = typeof item.quantity === 'number' ? item.quantity : parseInt(item.quantity, 10);
+        if (isNaN(quantity)) quantity = 0;
+    }
+    
+    // Show quantity if:
+    // 1. Quantity is >= 1 (for all items), OR
+    // 2. Item can have quantity (always show quantity field for these items in selected view, even if 0)
+    if (quantity >= 1 || canHaveQuantity) {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Quantity</span>
-                <span class="detail-value" style="color: #fcc419;">${item.quantity}</span>
+                <span class="detail-value" style="color: #fcc419;">${quantity}</span>
             </div>
         `;
     }
