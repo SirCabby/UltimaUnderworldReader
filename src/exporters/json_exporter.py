@@ -33,9 +33,17 @@ class JsonExporter:
             json.dump(data, f, indent=2, ensure_ascii=False)
         return filepath
     
-    def export_items(self, item_types: Dict, placed_items: List) -> None:
+    def export_items(self, item_types: Dict, placed_items: List, image_paths: Dict[int, str] = None) -> None:
         """Export item data."""
         # Export item types
+        items_list = []
+        for item in item_types.values():
+            item_dict = item.to_dict()
+            # Add image path if available
+            if image_paths and item.item_id in image_paths:
+                item_dict['image_path'] = image_paths[item.item_id]
+            items_list.append(item_dict)
+        
         types_data = {
             'metadata': {
                 'type': 'item_types',
@@ -43,7 +51,7 @@ class JsonExporter:
                 'generated': datetime.now().isoformat(),
                 'count': len(item_types)
             },
-            'items': [item.to_dict() for item in item_types.values()]
+            'items': items_list
         }
         self._write_json('items.json', types_data)
         
@@ -215,7 +223,7 @@ class JsonExporter:
     def export_web_map_data(self, placed_items: List, npcs: List, npc_names: Dict, 
                             item_types: Dict = None, levels: Dict = None,
                             strings_parser = None, secrets: List = None,
-                            conversations: Dict = None) -> Path:
+                            conversations: Dict = None, image_paths: Dict[int, str] = None) -> Path:
         """Export optimized data for the interactive web map viewer.
         
         Creates a single JSON file with all placed objects and NPCs,
@@ -850,6 +858,9 @@ class JsonExporter:
                             'category': cont_category,
                             'quantity': actual_quantity,
                         }
+                        # Add image path if available
+                        if image_paths and item.object_id in image_paths:
+                            content_item['image_path'] = image_paths[item.object_id]
                         # Only include description and effect if they have meaningful values
                         if item_desc:
                             content_item['description'] = item_desc
@@ -981,6 +992,9 @@ class JsonExporter:
                 'object_class': obj_class,
                 'detailed_category': detailed_cat,
             }
+            # Add image path if available
+            if image_paths and obj_id in image_paths:
+                web_obj['image_path'] = image_paths[obj_id]
             # Only include description and effect if they have meaningful values
             if item_desc:
                 web_obj['description'] = item_desc

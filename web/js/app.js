@@ -3336,6 +3336,20 @@ function renderObjectDetails(item, isNpc) {
     const displayName = isNpc ? (item.name || 'Unknown NPC') : getItemDisplayName(item);
     html += `<div class="detail-name">${uniqueIndicator}${displayName}</div>`;
     
+    // Display object image if available
+    if (!isNpc && item.image_path) {
+        html += `
+            <div class="detail-image-container">
+                <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="detail-image-placeholder" style="display: none;">
+                    <span class="image-placeholder-icon">🖼️</span>
+                    <span class="image-placeholder-text">No image available</span>
+                </div>
+            </div>
+        `;
+    }
+    
     if (isNpc) {
         const npcCategory = getNpcCategory(item);
         const npcColor = npcCategory === 'npcs_hostile' ? '#ff4444' :

@@ -5,7 +5,7 @@ DATA_PATH = Input/UW1/DATA
 OUTPUT_PATH = Output
 WEB_PORT = 8080
 
-.PHONY: all extract xlsx clean help web maps start open
+.PHONY: all extract xlsx clean help web maps images start open
 
 # Default target - regenerate with xlsx
 all: xlsx
@@ -22,8 +22,12 @@ xlsx:
 maps:
 	python web/generate_maps.py
 
-# Prepare web viewer (extract data + generate maps)
-web: extract maps
+# Extract object images for web viewer
+images:
+	python web/generate_images.py
+
+# Prepare web viewer (extract data + generate maps + extract images)
+web: extract maps images
 	@echo "Web viewer data ready. Run 'make start' to start the server."
 
 # Start the web server
@@ -41,7 +45,7 @@ open:
 # Clean output files
 clean:
 	rm -rf $(OUTPUT_PATH)/*.json $(OUTPUT_PATH)/*.xlsx
-	rm -rf web/data/*.json web/maps/*.png
+	rm -rf web/data/*.json web/maps/*.png web/images/objects/*.png
 
 # Show help
 help:
@@ -50,7 +54,8 @@ help:
 	@echo "  make extract  - Extract all data to JSON only"
 	@echo "  make xlsx     - Extract all data and generate XLSX"
 	@echo "  make maps     - Generate map images for web viewer"
-	@echo "  make web      - Prepare web viewer (extract + maps)"
+	@echo "  make images   - Extract object images for web viewer"
+	@echo "  make web      - Prepare web viewer (extract + maps + images)"
 	@echo "  make start    - Start the web server on port $(WEB_PORT)"
 	@echo "  make open     - Open the web viewer in your browser"
 	@echo "  make clean    - Remove all generated files"

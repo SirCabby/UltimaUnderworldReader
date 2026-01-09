@@ -6,10 +6,12 @@ from .item_extractor import ItemExtractor
 from .npc_extractor import NPCExtractor
 from .spell_extractor import SpellExtractor
 from .secret_finder import SecretFinder
+from .image_extractor import ImageExtractor
 
 __all__ = [
     'ItemExtractor',
     'NPCExtractor',
     'SpellExtractor',
     'SecretFinder',
+    'ImageExtractor',
 ]

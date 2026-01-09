@@ -139,6 +139,20 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     
     # 8. Export web map viewer data
     print("[8/8] Exporting web map viewer data...")
+    # Try to load image paths if they exist (from make web)
+    image_paths = {}
+    web_images_dir = Path("web/images/objects")
+    if web_images_dir.exists():
+        # Scan for existing images and build path mapping
+        for img_file in web_images_dir.glob("object_*.png"):
+            # Extract object ID from filename (object_XXX.png)
+            try:
+                obj_id_str = img_file.stem.replace("object_", "")
+                obj_id = int(obj_id_str, 10)
+                image_paths[obj_id] = f"images/objects/{img_file.name}"
+            except ValueError:
+                continue
+    
     web_map_path = exporter.export_web_map_data(
         items.placed_items, 
         npcs.npcs, 
@@ -147,7 +161,8 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
         levels.levels,  # Pass levels for container content extraction
         strings,  # Pass strings for rich descriptions (books, scrolls, keys, spells)
         secrets.secrets,  # Pass secrets (illusory walls, secret doors)
-        convs.conversations  # Pass conversations to verify dialogue scripts exist
+        convs.conversations,  # Pass conversations to verify dialogue scripts exist
+        image_paths  # Pass image paths for object images
     )
     print(f"       Exported web map data to {web_map_path.name}")
     

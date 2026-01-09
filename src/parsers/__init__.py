@@ -74,4 +74,10 @@ __all__ = [
     'TerrainParser',
     'TerrainData',
     'TerrainType',
+    # Images
+    'GrFileParser',
+    'BitmapType',
+    'BitmapHeader',
+    'SpriteImage',
+    'PaletteParser',
 ]

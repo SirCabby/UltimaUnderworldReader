@@ -113,6 +113,7 @@ desktop.ini
 /Output/
 
 # Generated web viewer files - derived from game data
-# Regenerate with: python main.py (for data) and python web/generate_maps.py (for maps)
+# Regenerate with: python main.py (for data), python web/generate_maps.py (for maps), and python web/generate_images.py (for images)
 /web/data/
 /web/maps/
+/web/images/
