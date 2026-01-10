@@ -45,7 +45,7 @@ open:
 # Clean output files
 clean:
 	rm -rf $(OUTPUT_PATH)/*.json $(OUTPUT_PATH)/*.xlsx
-	rm -rf web/data/*.json web/maps/*.png web/images/objects/*.png
+	rm -rf web/data/*.json web/maps/*.png web/images/objects/*.png web/images/npcs/*.png
 
 # Show help
 help:

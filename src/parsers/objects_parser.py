@@ -110,6 +110,7 @@ class CritterProperties:
     object_id: int
     raw_data: bytes  # 48 bytes of creature data
     power: int
+    animation_index: int  # Animation index at byte offset 0 (maps to CrXXPAGE.NYY files)
     
     # More fields can be parsed from raw_data as needed
 
@@ -259,11 +260,13 @@ class ObjectsParser:
         for i in range(self.NUM_CRITTERS):
             offset = self.OFFSET_CRITTERS + i * self.SIZE_CRITTER
             raw = self._data[offset:offset + self.SIZE_CRITTER]
+            animation_index = raw[0] if len(raw) > 0 else 0  # Byte 0 = animation index
             power = raw[5] if len(raw) > 5 else 0
             self.critters[i + 0x40] = CritterProperties(
                 object_id=i + 0x40,
                 raw_data=raw,
-                power=power
+                power=power,
+                animation_index=animation_index
             )
         
         # Parse containers

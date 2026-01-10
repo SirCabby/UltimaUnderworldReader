@@ -33,6 +33,16 @@ from .terrain_parser import (
     TerrainData,
     TerrainType,
 )
+from .animation_parser import (
+    AnimationFileParser,
+    AnimationFrame,
+)
+from .image_parser import (
+    GrFileParser,
+    BitmapType,
+    BitmapHeader,
+    SpriteImage,
+)
 
 __all__ = [
     # Strings
@@ -80,4 +90,7 @@ __all__ = [
     'BitmapHeader',
     'SpriteImage',
     'PaletteParser',
+    # Animations
+    'AnimationFileParser',
+    'AnimationFrame',
 ]

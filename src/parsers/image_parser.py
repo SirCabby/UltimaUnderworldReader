@@ -325,7 +325,7 @@ class GrFileParser:
         return self.sprites
     
     def sprite_to_image(self, sprite: SpriteImage, palette: Optional[List[Tuple[int, int, int]]], 
-                       aux_palette_parser: Optional[Any] = None) -> Optional['Image.Image']:
+                       aux_palette_parser: Optional[Any] = None, flip_vertical: bool = True) -> Optional['Image.Image']:
         """
         Convert a sprite to a PIL Image.
         
@@ -334,6 +334,8 @@ class GrFileParser:
             palette: List of RGB tuples (256 colors for 8-bit)
                     Can be None, in which case a default palette is used
             aux_palette_parser: AuxPaletteParser instance for loading auxiliary palettes for 4-bit images
+            flip_vertical: If True, flip image vertically (bottom-to-top to top-to-bottom).
+                          Set to False for NPCs which may be stored differently.
         
         Returns:
             PIL Image or None if PIL is not available
@@ -356,12 +358,15 @@ class GrFileParser:
                 pixel_indices.extend([0] * (sprite.width * sprite.height - len(pixel_indices)))
             
             # Set pixels with palette colors, index 0 = transparent
-            # Try reversed rows (data stored bottom-to-top, but we display top-to-bottom)
             pixels = rgba.load()
             for y in range(sprite.height):
                 for x in range(sprite.width):
-                    # Data stored bottom-to-top: reverse the row index
-                    src_y = sprite.height - 1 - y
+                    if flip_vertical:
+                        # Data stored bottom-to-top: reverse the row index
+                        src_y = sprite.height - 1 - y
+                    else:
+                        # Data stored top-to-bottom: use direct mapping
+                        src_y = y
                     idx = pixel_indices[src_y * sprite.width + x] if (src_y * sprite.width + x) < len(pixel_indices) else 0
                     if idx == 0:
                         # Index 0 = transparent
@@ -401,11 +406,16 @@ class GrFileParser:
                 pixel_indices.extend([0] * (total_pixels - len(pixel_indices)))
             
             # Set pixels with auxiliary palette colors, index 0 = transparent
-            # Format is row-major, top-to-bottom, left-to-right
             pixels = rgba.load()
             for y in range(sprite.height):
                 for x in range(sprite.width):
-                    idx = pixel_indices[y * sprite.width + x]
+                    if flip_vertical:
+                        # Data stored bottom-to-top: reverse the row index
+                        src_y = sprite.height - 1 - y
+                    else:
+                        # Data stored top-to-bottom: use direct mapping
+                        src_y = y
+                    idx = pixel_indices[src_y * sprite.width + x] if (src_y * sprite.width + x) < len(pixel_indices) else 0
                     if idx == 0:
                         # Index 0 = transparent
                         pixels[x, y] = (0, 0, 0, 0)
@@ -522,11 +532,16 @@ class GrFileParser:
                 pixel_indices = pixel_indices[:total_pixels]
             
             # Set pixels with auxiliary palette colors, index 0 = transparent
-            # Format is row-major, top-to-bottom, left-to-right
             pixels = rgba.load()
             for y in range(sprite.height):
                 for x in range(sprite.width):
-                    idx = pixel_indices[y * sprite.width + x]
+                    if flip_vertical:
+                        # Data stored bottom-to-top: reverse the row index
+                        src_y = sprite.height - 1 - y
+                    else:
+                        # Data stored top-to-bottom: use direct mapping
+                        src_y = y
+                    idx = pixel_indices[src_y * sprite.width + x] if (src_y * sprite.width + x) < len(pixel_indices) else 0
                     if idx == 0:
                         # Index 0 = transparent
                         pixels[x, y] = (0, 0, 0, 0)

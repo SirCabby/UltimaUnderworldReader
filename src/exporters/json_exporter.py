@@ -223,7 +223,8 @@ class JsonExporter:
     def export_web_map_data(self, placed_items: List, npcs: List, npc_names: Dict, 
                             item_types: Dict = None, levels: Dict = None,
                             strings_parser = None, secrets: List = None,
-                            conversations: Dict = None, image_paths: Dict[int, str] = None) -> Path:
+                            conversations: Dict = None, image_paths: Dict[int, str] = None,
+                            npc_image_paths: Dict[int, str] = None) -> Path:
         """Export optimized data for the interactive web map viewer.
         
         Creates a single JSON file with all placed objects and NPCs,
@@ -238,6 +239,8 @@ class JsonExporter:
             strings_parser: StringsParser for looking up text (books, scrolls, keys, spells)
             secrets: List of Secret objects (illusory walls, secret doors, etc.)
             conversations: Dict of conversation slot -> Conversation (to verify dialogue exists)
+            image_paths: Dict mapping object_id -> image_path for object images
+            npc_image_paths: Dict mapping npc_object_id -> image_path for NPC images
         """
         from ..constants import SPELL_DESCRIPTIONS
         
@@ -1142,9 +1145,10 @@ class JsonExporter:
             else:
                 display_name = creature_type
             
+            obj_id = npc_dict.get('object_id', 0)
             web_npc = {
                 'id': npc_index,
-                'object_id': npc_dict.get('object_id', 0),
+                'object_id': obj_id,
                 'name': display_name,
                 'creature_type': creature_type,
                 'tile_x': tile_x,
@@ -1156,6 +1160,10 @@ class JsonExporter:
                 'has_conversation': conv_slot > 0 and (conversations is not None and conv_slot in conversations),
                 'conversation_slot': conv_slot,
             }
+            
+            # Add NPC image path if available
+            if npc_image_paths and obj_id in npc_image_paths:
+                web_npc['image_path'] = npc_image_paths[obj_id]
             
             # Add NPC inventory if they have items (using special_link)
             special_link = npc.special_link
