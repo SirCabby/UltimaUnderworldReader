@@ -3272,16 +3272,25 @@ function renderVisibleObjectsPane() {
             const extraIcon = hasContents ? ' 📦' : (hasInventory ? ' 🎒' : '');
             
             // Add image thumbnail for non-NPC, non-secret items
+            // Exclude images for writings, doors, and texture map objects
             let imageHtml = '';
             if (!isNpc && !isSecret && item.image_path) {
-                imageHtml = `
-                    <div class="list-item-image-container" style="flex-shrink: 0; width: 32px; height: 32px; margin-right: 8px;">
-                        <img src="${escapeHtml(item.image_path)}" alt="${escapeHtml(displayName)}" 
-                             class="list-item-image" 
-                             style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
-                             onerror="this.style.display='none';">
-                    </div>
-                `;
+                const objId = item.object_id || 0;
+                // Exclude: writings (0x166), doors (0x140-0x14F), texture map objects (0x16E-0x16F)
+                const isWriting = objId === 0x166;
+                const isDoor = (objId >= 0x140 && objId <= 0x14F);
+                const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
+                
+                if (!isWriting && !isDoor && !isTextureMap) {
+                    imageHtml = `
+                        <div class="list-item-image-container" style="flex-shrink: 0; width: 32px; height: 32px; margin-right: 8px;">
+                            <img src="${escapeHtml(item.image_path)}" alt="${escapeHtml(displayName)}" 
+                                 class="list-item-image" 
+                                 style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
+                                 onerror="this.style.display='none';">
+                        </div>
+                    `;
+                }
             }
             
             itemEl.innerHTML = `
@@ -3350,17 +3359,26 @@ function renderObjectDetails(item, isNpc) {
     html += `<div class="detail-name">${uniqueIndicator}${displayName}</div>`;
     
     // Display object image if available
+    // Exclude images for writings, doors, and texture map objects
     if (!isNpc && item.image_path) {
-        html += `
-            <div class="detail-image-container">
-                <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div class="detail-image-placeholder" style="display: none;">
-                    <span class="image-placeholder-icon">🖼️</span>
-                    <span class="image-placeholder-text">No image available</span>
+        const objId = item.object_id || 0;
+        // Exclude: writings (0x166), doors (0x140-0x14F), texture map objects (0x16E-0x16F)
+        const isWriting = objId === 0x166;
+        const isDoor = (objId >= 0x140 && objId <= 0x14F);
+        const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
+        
+        if (!isWriting && !isDoor && !isTextureMap) {
+            html += `
+                <div class="detail-image-container">
+                    <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="detail-image-placeholder" style="display: none;">
+                        <span class="image-placeholder-icon">🖼️</span>
+                        <span class="image-placeholder-text">No image available</span>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
     
     if (isNpc) {
@@ -4349,16 +4367,25 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         }
         
         // Add image thumbnail if available
+        // Exclude images for writings, doors, and texture map objects
         let locationImageHtml = '';
         if (obj.image_path) {
-            locationImageHtml = `
-                <div class="location-item-image-container" style="float: right; width: 40px; height: 40px; margin-left: 8px; margin-bottom: 4px;">
-                    <img src="${escapeHtml(obj.image_path)}" alt="${escapeHtml(getItemDisplayName(obj))}" 
-                         class="location-item-image" 
-                         style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
-                         onerror="this.style.display='none';">
-                </div>
-            `;
+            const objId = obj.object_id || 0;
+            // Exclude: writings (0x166), doors (0x140-0x14F), texture map objects (0x16E-0x16F)
+            const isWriting = objId === 0x166;
+            const isDoor = (objId >= 0x140 && objId <= 0x14F);
+            const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
+            
+            if (!isWriting && !isDoor && !isTextureMap) {
+                locationImageHtml = `
+                    <div class="location-item-image-container" style="float: right; width: 40px; height: 40px; margin-left: 8px; margin-bottom: 4px;">
+                        <img src="${escapeHtml(obj.image_path)}" alt="${escapeHtml(getItemDisplayName(obj))}" 
+                             class="location-item-image" 
+                             style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
+                             onerror="this.style.display='none';">
+                    </div>
+                `;
+            }
         }
         
         card.innerHTML = `
