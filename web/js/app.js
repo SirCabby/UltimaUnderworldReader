@@ -3271,8 +3271,21 @@ function renderVisibleObjectsPane() {
             const hasInventory = isNpc && item.inventory && item.inventory.length > 0;
             const extraIcon = hasContents ? ' 📦' : (hasInventory ? ' 🎒' : '');
             
+            // Add image thumbnail for non-NPC, non-secret items
+            let imageHtml = '';
+            if (!isNpc && !isSecret && item.image_path) {
+                imageHtml = `
+                    <div class="list-item-image-container" style="flex-shrink: 0; width: 32px; height: 32px; margin-right: 8px;">
+                        <img src="${escapeHtml(item.image_path)}" alt="${escapeHtml(displayName)}" 
+                             class="list-item-image" 
+                             style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
+                             onerror="this.style.display='none';">
+                    </div>
+                `;
+            }
+            
             itemEl.innerHTML = `
-                <span style="flex-shrink: 0;">${icon}</span>
+                ${imageHtml ? imageHtml : `<span style="flex-shrink: 0;">${icon}</span>`}
                 <div style="flex: 1; min-width: 0;">
                     <div style="color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${escapeHtml(displayName)}${extraIcon}
@@ -4335,7 +4348,21 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             descriptionHtml = `<div style="font-size: 0.75rem; color: #e8d4b8; margin-top: 4px; padding: 4px 6px; background: rgba(232, 212, 184, 0.1); border-left: 2px solid #e8d4b8; border-radius: 2px; font-style: italic; line-height: 1.3;">${icon} "${escapeHtml(displayText)}"</div>`;
         }
         
+        // Add image thumbnail if available
+        let locationImageHtml = '';
+        if (obj.image_path) {
+            locationImageHtml = `
+                <div class="location-item-image-container" style="float: right; width: 40px; height: 40px; margin-left: 8px; margin-bottom: 4px;">
+                    <img src="${escapeHtml(obj.image_path)}" alt="${escapeHtml(getItemDisplayName(obj))}" 
+                         class="location-item-image" 
+                         style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
+                         onerror="this.style.display='none';">
+                </div>
+            `;
+        }
+        
         card.innerHTML = `
+            ${locationImageHtml}
             <div class="detail-name" style="font-size: 0.9rem;">${getItemDisplayName(obj)}${hasContents ? ' 📦' : ''}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
             ${statsLine}

@@ -983,6 +983,36 @@ body {
     font-style: italic;
 }
 
+/* List item images (visible objects list) */
+.list-item-image-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.list-item-image {
+    display: block;
+}
+
+/* Location item images (objects at location list) */
+.location-item-image-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.location-item-image {
+    display: block;
+}
+
 .detail-row {
     display: flex;
     justify-content: space-between;
