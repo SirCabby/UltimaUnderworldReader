@@ -1125,38 +1125,151 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     hoverArea.setAttribute('fill', 'transparent');
     hoverArea.classList.add('tile-hover-area');
     
-    // Add hover events to the tile area
-    hoverArea.addEventListener('mouseenter', (e) => {
-        showStackedTooltip(e, items, tileX, tileY);
-    });
-    hoverArea.addEventListener('mouseleave', () => {
-        scheduleHideTooltip();
-    });
-    hoverArea.addEventListener('mousemove', (e) => {
-        updateTooltipPosition(e);
-    });
-    hoverArea.addEventListener('click', () => {
-        hideTooltip();
-        // Select the first non-bridge/stairs item if available, otherwise first item
-        const firstItem = nonBridgeStairsItems.length > 0 ? nonBridgeStairsItems[0] : items[0];
-        if (firstItem.isSecret) {
-            selectSecret(firstItem.item);
-        } else {
-            selectStackedItem(firstItem.item, firstItem.isNpc, tileX, tileY);
-        }
-    });
-    
     group.appendChild(hoverArea);
     
     // If there are non-bridge/stairs items, show a count badge for them
     if (nonBridgeStairsItems.length > 0) {
-        // Show count badge for non-bridge/stairs items (visual only, no events)
-        const badge = createCountBadge(centerX, centerY, nonBridgeStairsItems.length, tileX, tileY, nonBridgeStairsItems);
-        group.appendChild(badge);
+        // Special case: if there's exactly 1 non-bridge item, show it as a normal marker instead of a count badge
+        if (nonBridgeStairsItems.length === 1) {
+            const singleItem = nonBridgeStairsItems[0];
+            const { item, color, isNpc } = singleItem;
+            
+            // Calculate marker position (center of tile)
+            const px = centerX;
+            const py = centerY;
+            const radius = isNpc ? CONFIG.marker.radius + 0.5 : CONFIG.marker.radius;
+            const isNamedNpc = isNpc && hasUniqueName(item);
+            
+            // Create the marker visual element
+            let marker;
+            if (isNamedNpc) {
+                // Create star-shaped marker for named NPCs
+                marker = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const starPath = createStarPath(px, py, radius * 1.2);
+                marker.setAttribute('d', starPath);
+                marker.setAttribute('fill', color);
+                marker.setAttribute('stroke', '#fff');
+                marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
+                marker.classList.add('marker', 'star-marker');
+                marker.style.transformOrigin = `${px}px ${py}px`;
+            } else {
+                // Create circle marker for regular items/NPCs
+                marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                marker.setAttribute('cx', px);
+                marker.setAttribute('cy', py);
+                marker.setAttribute('r', radius);
+                marker.setAttribute('fill', color);
+                marker.setAttribute('stroke', isNpc ? '#fff' : 'rgba(0,0,0,0.5)');
+                marker.setAttribute('stroke-width', CONFIG.marker.strokeWidth);
+                marker.classList.add('marker');
+            }
+            marker.style.pointerEvents = 'none'; // Visual only
+            
+            // Store item data on marker
+            marker.dataset.id = item.id;
+            marker.dataset.isNpc = isNpc;
+            marker.dataset.tileX = item.tile_x;
+            marker.dataset.tileY = item.tile_y;
+            marker.dataset.originalRadius = radius;
+            marker.dataset.isStarMarker = isNamedNpc;
+            marker.dataset.centerX = px;
+            marker.dataset.centerY = py;
+            
+            group.appendChild(marker);
+            
+            // Set up hover events to show normal tooltip for the single item
+            const hoverRadius = Math.min(radius * 1.3, 4);
+            hoverArea.addEventListener('mouseenter', (e) => {
+                if (!marker.classList.contains('selected')) {
+                    if (isNamedNpc) {
+                        marker.style.transform = 'scale(1.3)';
+                    } else {
+                        marker.setAttribute('r', hoverRadius);
+                    }
+                }
+                showTooltip(e, item, isNpc);
+            });
+            hoverArea.addEventListener('mouseleave', () => {
+                if (!marker.classList.contains('selected')) {
+                    if (isNamedNpc) {
+                        marker.style.transform = 'scale(1)';
+                    } else {
+                        marker.setAttribute('r', radius);
+                    }
+                }
+                hideTooltip();
+            });
+            hoverArea.addEventListener('mousemove', (e) => {
+                updateTooltipPosition(e);
+            });
+            hoverArea.addEventListener('click', () => {
+                hideTooltip();
+                if (singleItem.isSecret) {
+                    selectSecret(item);
+                } else {
+                    selectStackedItem(item, isNpc, tileX, tileY);
+                }
+            });
+        } else {
+            // Multiple non-bridge items - show count badge
+            const badge = createCountBadge(centerX, centerY, nonBridgeStairsItems.length, tileX, tileY, nonBridgeStairsItems);
+            group.appendChild(badge);
+            
+            // Add hover events for stacked items (count badge)
+            hoverArea.addEventListener('mouseenter', (e) => {
+                showStackedTooltip(e, items, tileX, tileY);
+            });
+            hoverArea.addEventListener('mouseleave', () => {
+                scheduleHideTooltip();
+            });
+            hoverArea.addEventListener('mousemove', (e) => {
+                updateTooltipPosition(e);
+            });
+            hoverArea.addEventListener('click', () => {
+                hideTooltip();
+                // Select the first non-bridge/stairs item if available, otherwise first item
+                const firstItem = nonBridgeStairsItems.length > 0 ? nonBridgeStairsItems[0] : items[0];
+                if (firstItem.isSecret) {
+                    selectSecret(firstItem.item);
+                } else {
+                    selectStackedItem(firstItem.item, firstItem.isNpc, tileX, tileY);
+                }
+            });
+        }
     } else if (stairs.length > 1) {
         // If only stairs, show count for multiple stairs
         const badge = createCountBadge(centerX, centerY, stairs.length, tileX, tileY, stairs);
         group.appendChild(badge);
+        
+        // Add hover events for stacked stairs
+        hoverArea.addEventListener('mouseenter', (e) => {
+            showStackedTooltip(e, items, tileX, tileY);
+        });
+        hoverArea.addEventListener('mouseleave', () => {
+            scheduleHideTooltip();
+        });
+        hoverArea.addEventListener('mousemove', (e) => {
+            updateTooltipPosition(e);
+        });
+        hoverArea.addEventListener('click', () => {
+            hideTooltip();
+            selectStackedItem(items[0].item, items[0].isNpc, tileX, tileY);
+        });
+    } else {
+        // Only bridges (single or multiple) and no other items - add hover events for bridges
+        hoverArea.addEventListener('mouseenter', (e) => {
+            showStackedTooltip(e, items, tileX, tileY);
+        });
+        hoverArea.addEventListener('mouseleave', () => {
+            scheduleHideTooltip();
+        });
+        hoverArea.addEventListener('mousemove', (e) => {
+            updateTooltipPosition(e);
+        });
+        hoverArea.addEventListener('click', () => {
+            hideTooltip();
+            selectStackedItem(items[0].item, items[0].isNpc, tileX, tileY);
+        });
     }
     // If only bridges (single or multiple) and no other items, the rect is enough (no badge needed)
     
