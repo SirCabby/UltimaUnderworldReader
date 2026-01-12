@@ -256,6 +256,14 @@ class ItemExtractor:
                     can_be_picked_up=can_be_picked_up
                 )
                 
+                # Apply location-based category overrides
+                from ..constants import get_location_category_override
+                location_override = get_location_category_override(
+                    level_num, obj.tile_x, obj.tile_y, obj.item_id
+                )
+                if location_override:
+                    detailed_cat = location_override
+                
                 # Build extra info for special object types
                 extra_info = self._get_extra_info(obj, special_link, level.objects)
                 

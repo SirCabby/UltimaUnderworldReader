@@ -259,7 +259,14 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     Returns:
         A more specific category string
     """
+    # Import here to avoid circular imports
+    from .food import FOOD_IDS
+    
     base_category = get_category(item_id)
+    
+    # Check if item is food (including items like plants that are in FOOD_IDS but in scenery range)
+    if item_id in FOOD_IDS:
+        return 'food'
     
     # Special cases: these scenery items go to misc_item category
     if item_id in (0x0CC, 0x0CD, 0x0DB, 0x0D8):  # piece of wood (2 variants), pile of wood chips, pole
@@ -426,3 +433,39 @@ def get_special_wand_info(level: int, tile_x: int, tile_y: int) -> Optional[Dict
         Dictionary with wand info or None if not a special wand
     """
     return SPECIAL_WANDS.get((level, tile_x, tile_y))
+
+
+# Location-based category overrides
+# These override the normal category assignment for items at specific locations
+# Key: (level, tile_x, tile_y, item_id) -> category string
+# Note: item_id can be None to match any item at that location
+LOCATION_CATEGORY_OVERRIDES: Dict[Tuple[int, int, int, Optional[int]], str] = {
+    # Pile of debris on level 1 that should be categorized as useless_item
+    (0, 32, 9, None): 'useless_item',  # Level 1 (index 0), coordinates (32, 9) - pile of debris
+}
+
+
+def get_location_category_override(level: int, tile_x: int, tile_y: int, item_id: int) -> Optional[str]:
+    """
+    Get a category override for an item at a specific location.
+    
+    Args:
+        level: The level index (0-based)
+        tile_x: X coordinate on the tilemap
+        tile_y: Y coordinate on the tilemap
+        item_id: The object type ID
+    
+    Returns:
+        Override category string, or None if no override exists
+    """
+    # First try exact match with item_id
+    exact_key = (level, tile_x, tile_y, item_id)
+    if exact_key in LOCATION_CATEGORY_OVERRIDES:
+        return LOCATION_CATEGORY_OVERRIDES[exact_key]
+    
+    # Then try match without item_id (None matches any item at that location)
+    any_key = (level, tile_x, tile_y, None)
+    if any_key in LOCATION_CATEGORY_OVERRIDES:
+        return LOCATION_CATEGORY_OVERRIDES[any_key]
+    
+    return None

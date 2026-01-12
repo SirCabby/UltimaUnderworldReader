@@ -3467,6 +3467,10 @@ function renderObjectDetails(item, isNpc) {
                 <span class="detail-category" style="background: ${npcColorBg}; color: ${npcColor};">${npcLabel}</span>
             </div>
             <div class="detail-row">
+                <span class="detail-label">Object ID</span>
+                <span class="detail-value" style="font-family: var(--font-mono);">${item.object_id} (0x${(item.object_id || 0).toString(16).toUpperCase().padStart(3, '0')})</span>
+            </div>
+            <div class="detail-row">
                 <span class="detail-label">Creature</span>
                 <span class="detail-value">${item.creature_type || 'Unknown'}</span>
             </div>
@@ -3499,16 +3503,20 @@ function renderObjectDetails(item, isNpc) {
         }
     } else {
         const catColor = getCategoryColor(item.category);
+        const objId = typeof item.object_id === 'string' ? parseInt(item.object_id, 16) : (item.object_id || 0);
         html += `
             <div class="detail-row">
                 <span class="detail-label">Category</span>
                 <span class="detail-category" style="background: ${catColor}22; color: ${catColor};">${formatCategory(item.category)}</span>
             </div>
+            <div class="detail-row">
+                <span class="detail-label">Object ID</span>
+                <span class="detail-value" style="font-family: var(--font-mono);">${objId} (0x${objId.toString(16).toUpperCase().padStart(3, '0')})</span>
+            </div>
         `;
         
         // Show quantity for stackable items (always show in selected object view, even if 1)
         // Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems, resilient spears
-        const objId = typeof item.object_id === 'string' ? parseInt(item.object_id, 16) : (item.object_id || 0);
         const quantityItems = [0x0A2, 0x0A3, 0x0A4, 0x0A6, 0x0A7]; // Ruby (162), Red gem (163), Small blue gem (164), Sapphire (166), Emerald (167)
         const canHaveQuantity = quantityItems.includes(objId);
         

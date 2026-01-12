@@ -1100,7 +1100,8 @@ class JsonExporter:
                 from ..constants import STATIC_CONTAINERS
                 is_storage = obj_id in STATIC_CONTAINERS
                 # Don't add weight for scenery items (0xC0-0xDF), campfire (0x12A), or fountain (0x12E)
-                is_scenery = (0xC0 <= obj_id <= 0xDF) or obj_id in (0x12A, 0x12E)
+                # But allow weight for items categorized as useless_item (like pile of debris)
+                is_scenery = ((0xC0 <= obj_id <= 0xDF) or obj_id in (0x12A, 0x12E)) and detailed_cat != 'useless_item'
                 if 'weight' in item_stats and not is_storage and not is_scenery:
                     web_obj['weight'] = item_stats['weight']
                 if 'capacity' in item_stats and not is_storage:

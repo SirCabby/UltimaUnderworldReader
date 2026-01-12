@@ -52,6 +52,7 @@ from .objects import (
     is_quest_book,
     get_tmap_info,
     get_special_wand_info,
+    get_location_category_override,
 )
 from .mantras import COMPLETE_MANTRAS
 from .food import (
@@ -185,6 +186,7 @@ __all__ = [
     'is_quest_book',
     'get_tmap_info',
     'get_special_wand_info',
+    'get_location_category_override',
     # Traps and Triggers
     'TRAP_ID_MIN',
     'TRAP_ID_MAX',
