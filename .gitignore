@@ -117,3 +117,6 @@ desktop.ini
 /web/data/
 /web/maps/
 /web/images/
+# But keep stairs icons (they're manually extracted art assets)
+!/web/images/stairs/
+!/web/images/stairs/*.png

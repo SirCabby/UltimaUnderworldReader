@@ -41,8 +41,8 @@ const CONFIG = {
     
     // Stairs settings
     stairs: {
-        color: '#6c757d',        // Gray/stone color
-        strokeColor: '#495057',  // Darker gray for border
+        downImage: 'images/stairs/stairs_down.png',
+        upImage: 'images/stairs/stairs_up.png',
     },
     
     // Paths
@@ -67,48 +67,29 @@ function isStairs(item) {
 }
 
 /**
- * Create a simple D&D-style stairs icon SVG path
- * Returns a group element with the stairs pattern
+ * Create a stairs icon using the extracted image files
+ * Returns a group element with the stairs image
+ * 
+ * @param {number} x - X coordinate (left edge)
+ * @param {number} y - Y coordinate (top edge)
+ * @param {number} width - Tile width in pixels
+ * @param {number} height - Tile height in pixels
+ * @param {string} imagePath - Path to stairs image (up or down)
  */
-function createStairsIcon(x, y, width, height) {
+function createStairsIcon(x, y, width, height, imagePath) {
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     
-    // Create background rectangle
-    const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    bgRect.setAttribute('x', x);
-    bgRect.setAttribute('y', y);
-    bgRect.setAttribute('width', width);
-    bgRect.setAttribute('height', height);
-    bgRect.setAttribute('fill', CONFIG.stairs.color);
-    bgRect.setAttribute('stroke', CONFIG.stairs.strokeColor);
-    bgRect.setAttribute('stroke-width', '0.5');
-    group.appendChild(bgRect);
+    // Create SVG image element
+    const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imagePath);
+    img.setAttribute('x', x);
+    img.setAttribute('y', y);
+    img.setAttribute('width', width);
+    img.setAttribute('height', height);
+    img.setAttribute('preserveAspectRatio', 'none');
+    img.style.imageRendering = 'pixelated';
     
-    // Create simple stairs pattern (3 steps)
-    const stepHeight = height / 3;
-    const stepWidth = width / 3;
-    
-    // Draw step lines
-    for (let i = 1; i <= 2; i++) {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x);
-        line.setAttribute('y1', y + stepHeight * i);
-        line.setAttribute('x2', x + stepWidth * i);
-        line.setAttribute('y2', y + stepHeight * i);
-        line.setAttribute('stroke', CONFIG.stairs.strokeColor);
-        line.setAttribute('stroke-width', '0.5');
-        group.appendChild(line);
-        
-        const vertLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        vertLine.setAttribute('x1', x + stepWidth * i);
-        vertLine.setAttribute('y1', y + stepHeight * i);
-        vertLine.setAttribute('x2', x + stepWidth * i);
-        vertLine.setAttribute('y2', y);
-        vertLine.setAttribute('stroke', CONFIG.stairs.strokeColor);
-        vertLine.setAttribute('stroke-width', '0.5');
-        group.appendChild(vertLine);
-    }
-    
+    group.appendChild(img);
     return group;
 }
 
@@ -1101,7 +1082,14 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     
     // Render stairs first as background layer (under bridges if both exist)
     if (stairs.length > 0) {
-        const stairsRect = createStairsIcon(tileLeft, tileTop, pxPerTileX, pxPerTileY);
+        // Use first stairs item to determine direction (stairs in same tile should have same direction)
+        const firstStairs = stairs[0].item;
+        const destLevel = firstStairs.stairs_dest_level; // 1-indexed destination level
+        const currentLevel1Idx = state.currentLevel + 1; // Convert to 1-indexed (state.currentLevel is 0-indexed)
+        // If destination level is higher number (deeper), use stairs_down, otherwise stairs_up
+        // Level 1 is surface (highest), Level 9 is deepest
+        const stairsImage = (destLevel > currentLevel1Idx) ? CONFIG.stairs.downImage : CONFIG.stairs.upImage;
+        const stairsRect = createStairsIcon(tileLeft, tileTop, pxPerTileX, pxPerTileY, stairsImage);
         stairsRect.classList.add('stairs-rect', 'stairs-background');
         stairsRect.style.pointerEvents = 'none';
         group.appendChild(stairsRect);
@@ -1832,8 +1820,12 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     // Create the visual marker
     let marker;
     if (itemIsStairs) {
-        // Create stairs icon for stairs
-        marker = createStairsIcon(tileLeft, tileTop, pxPerTileX, pxPerTileY);
+        // Create stairs icon for stairs - determine up vs down based on destination level
+        const destLevel = item.stairs_dest_level; // 1-indexed destination level
+        const currentLevel1Idx = state.currentLevel + 1; // Convert to 1-indexed (state.currentLevel is 0-indexed)
+        // If destination level is higher number (deeper), use stairs_down, otherwise stairs_up
+        const stairsImage = (destLevel > currentLevel1Idx) ? CONFIG.stairs.downImage : CONFIG.stairs.upImage;
+        marker = createStairsIcon(tileLeft, tileTop, pxPerTileX, pxPerTileY, stairsImage);
         marker.classList.add('marker', 'stairs-rect');
     } else if (itemIsBridge) {
         // Create full-tile rectangle for bridges

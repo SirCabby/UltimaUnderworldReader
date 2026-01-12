@@ -977,6 +977,7 @@ class JsonExporter:
             is_enchanted = item.is_enchanted
             
             # Check if this is a move trigger that links to a level-changing teleport trap (stairs)
+            stairs_dest_level = None  # Will be set if this is a stairs trigger
             if obj_id == 0x1A0:  # move_trigger
                 from ..constants.traps import is_trap, is_level_transition_teleport
                 TELEPORT_TRAP_ID = 0x181  # teleport_trap
@@ -995,6 +996,9 @@ class JsonExporter:
                                 trap_x, trap_y
                             ):
                                 category = 'stairs'
+                                # Store destination level for stairs direction (1-indexed)
+                                # z_pos appears to encode destination level (1-indexed: 1-9)
+                                stairs_dest_level = target.z_pos if target.z_pos > 0 and target.z_pos <= 9 else level + 2
             
             item_desc = get_item_description(
                 item, obj_id, is_enchanted, is_quantity, quantity, quality, owner, special_link, level
@@ -1023,6 +1027,10 @@ class JsonExporter:
                 web_obj['description'] = item_desc
             if item_effect:
                 web_obj['effect'] = item_effect
+            
+            # Add stairs destination level if this is a stairs trigger
+            if category == 'stairs' and stairs_dest_level is not None:
+                web_obj['stairs_dest_level'] = stairs_dest_level  # 1-indexed
             
             # Add quantity for stackable items (coins, ammo, candles, torches, etc.)
             # is_quantity flag means the quantity_or_link field holds a count
