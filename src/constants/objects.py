@@ -329,6 +329,14 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
             return 'door_locked'
         return 'door_unlocked'
     
+    # Open doors: distinguish locked from unlocked based on lock capability
+    if base_category == 'open_door':
+        # An open door can be locked if it has lock information
+        # Check if it has a non-zero special_link (pointing to a lock object 0x10F) or owner
+        if special_link != 0 or owner != 0:
+            return 'door_locked'
+        return 'door_unlocked'
+    
     # Portcullis: distinguish locked from unlocked
     if base_category == 'portcullis':
         if owner != 0 or special_link != 0:

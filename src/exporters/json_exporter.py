@@ -665,8 +665,7 @@ class JsonExporter:
             'secret_door': 'secret_doors',
             'portcullis': 'doors_unlocked',  # Unlocked portcullis = unlocked door
             'portcullis_locked': 'doors_locked',
-            'open_door': 'doors_open',
-            'open_portcullis': 'doors_open',
+            'open_portcullis': 'doors_unlocked',  # Open portcullis defaults to unlocked
             # Traps & Triggers
             'trap': 'traps',
             'trigger': 'triggers',
@@ -1240,7 +1239,6 @@ class JsonExporter:
                 # Doors
                 {'id': 'doors_locked', 'name': 'Locked Doors', 'color': '#ff6b6b'},
                 {'id': 'doors_unlocked', 'name': 'Unlocked Doors', 'color': '#69db7c'},
-                {'id': 'doors_open', 'name': 'Open Doors', 'color': '#8ce99a'},
                 {'id': 'secret_doors', 'name': 'Secret Doors', 'color': '#ffd43b'},
                 # Mechanics
                 {'id': 'switches', 'name': 'Switches & Levers', 'color': '#ffa94d'},
