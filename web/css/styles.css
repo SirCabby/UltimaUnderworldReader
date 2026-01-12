@@ -740,6 +740,21 @@ body {
     filter: brightness(1.2) drop-shadow(0 0 3px rgba(212, 168, 85, 0.6));
 }
 
+/* Stairs markers - full tile stairs icons */
+.markers-layer .stairs-rect {
+    transition: filter 0.15s ease, opacity 0.15s ease;
+}
+
+.markers-layer .stairs-marker:hover .stairs-rect,
+.markers-layer .marker-stack.has-stairs:hover .stairs-background {
+    filter: brightness(1.15);
+}
+
+.markers-layer .stairs-rect.selected,
+.markers-layer .stairs-marker.selected .stairs-rect {
+    filter: brightness(1.2) drop-shadow(0 0 3px rgba(108, 117, 125, 0.6));
+}
+
 /* Zoom Controls */
 .zoom-controls {
     position: absolute;

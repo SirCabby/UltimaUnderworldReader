@@ -39,6 +39,12 @@ const CONFIG = {
         strokeColor: '#5D3A1A',  // Darker brown for border
     },
     
+    // Stairs settings
+    stairs: {
+        color: '#6c757d',        // Gray/stone color
+        strokeColor: '#495057',  // Darker gray for border
+    },
+    
     // Paths
     paths: {
         data: 'data/web_map_data.json',
@@ -51,6 +57,59 @@ const CONFIG = {
  */
 function isBridge(item) {
     return item && item.object_id === CONFIG.bridge.objectId;
+}
+
+/**
+ * Check if an item is a stairs object (move trigger that changes level)
+ */
+function isStairs(item) {
+    return item && item.category === 'stairs';
+}
+
+/**
+ * Create a simple D&D-style stairs icon SVG path
+ * Returns a group element with the stairs pattern
+ */
+function createStairsIcon(x, y, width, height) {
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    
+    // Create background rectangle
+    const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bgRect.setAttribute('x', x);
+    bgRect.setAttribute('y', y);
+    bgRect.setAttribute('width', width);
+    bgRect.setAttribute('height', height);
+    bgRect.setAttribute('fill', CONFIG.stairs.color);
+    bgRect.setAttribute('stroke', CONFIG.stairs.strokeColor);
+    bgRect.setAttribute('stroke-width', '0.5');
+    group.appendChild(bgRect);
+    
+    // Create simple stairs pattern (3 steps)
+    const stepHeight = height / 3;
+    const stepWidth = width / 3;
+    
+    // Draw step lines
+    for (let i = 1; i <= 2; i++) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('y1', y + stepHeight * i);
+        line.setAttribute('x2', x + stepWidth * i);
+        line.setAttribute('y2', y + stepHeight * i);
+        line.setAttribute('stroke', CONFIG.stairs.strokeColor);
+        line.setAttribute('stroke-width', '0.5');
+        group.appendChild(line);
+        
+        const vertLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        vertLine.setAttribute('x1', x + stepWidth * i);
+        vertLine.setAttribute('y1', y + stepHeight * i);
+        vertLine.setAttribute('x2', x + stepWidth * i);
+        vertLine.setAttribute('y2', y);
+        vertLine.setAttribute('stroke', CONFIG.stairs.strokeColor);
+        vertLine.setAttribute('stroke-width', '0.5');
+        group.appendChild(vertLine);
+    }
+    
+    return group;
 }
 
 // ============================================================================
@@ -1026,19 +1085,29 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     const centerX = tileLeft + pxPerTileX / 2;
     const centerY = tileTop + pxPerTileY / 2;
     
-    // Separate bridges from other items
+    // Separate bridges and stairs from other items
     const bridges = items.filter(itemData => isBridge(itemData.item));
-    const nonBridgeItems = items.filter(itemData => !isBridge(itemData.item));
+    const stairs = items.filter(itemData => isStairs(itemData.item));
+    const nonBridgeStairsItems = items.filter(itemData => !isBridge(itemData.item) && !isStairs(itemData.item));
     
     // Create a group for the stacked marker
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('marker-stack');
     if (bridges.length > 0) group.classList.add('has-bridge');
+    if (stairs.length > 0) group.classList.add('has-stairs');
     group.dataset.tileX = tileX;
     group.dataset.tileY = tileY;
     group.dataset.count = items.length;
     
-    // Render bridge(s) first as background layer
+    // Render stairs first as background layer (under bridges if both exist)
+    if (stairs.length > 0) {
+        const stairsRect = createStairsIcon(tileLeft, tileTop, pxPerTileX, pxPerTileY);
+        stairsRect.classList.add('stairs-rect', 'stairs-background');
+        stairsRect.style.pointerEvents = 'none';
+        group.appendChild(stairsRect);
+    }
+    
+    // Render bridge(s) next as background layer
     if (bridges.length > 0) {
         const bridgeRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         bridgeRect.setAttribute('x', tileLeft);
@@ -1053,8 +1122,8 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
         group.appendChild(bridgeRect);
     }
     
-    // Sort non-bridge items: NPCs first, then by category for consistent ordering
-    nonBridgeItems.sort((a, b) => {
+    // Sort non-bridge/stairs items: NPCs first, then by category for consistent ordering
+    nonBridgeStairsItems.sort((a, b) => {
         if (a.isNpc !== b.isNpc) return a.isNpc ? -1 : 1;
         return 0;
     });
@@ -1080,8 +1149,8 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     });
     hoverArea.addEventListener('click', () => {
         hideTooltip();
-        // Select the first non-bridge item if available, otherwise first item
-        const firstItem = nonBridgeItems.length > 0 ? nonBridgeItems[0] : items[0];
+        // Select the first non-bridge/stairs item if available, otherwise first item
+        const firstItem = nonBridgeStairsItems.length > 0 ? nonBridgeStairsItems[0] : items[0];
         if (firstItem.isSecret) {
             selectSecret(firstItem.item);
         } else {
@@ -1091,17 +1160,21 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     
     group.appendChild(hoverArea);
     
-    // If there are non-bridge items, show a count badge for them
-    if (nonBridgeItems.length > 0) {
-        // Show count badge for non-bridge items (visual only, no events)
-        const badge = createCountBadge(centerX, centerY, nonBridgeItems.length, tileX, tileY, nonBridgeItems);
+    // If there are non-bridge/stairs items, show a count badge for them
+    if (nonBridgeStairsItems.length > 0) {
+        // Show count badge for non-bridge/stairs items (visual only, no events)
+        const badge = createCountBadge(centerX, centerY, nonBridgeStairsItems.length, tileX, tileY, nonBridgeStairsItems);
         group.appendChild(badge);
     } else if (bridges.length > 1) {
         // If only bridges, show count for multiple bridges
         const badge = createCountBadge(centerX, centerY, bridges.length, tileX, tileY, bridges);
         group.appendChild(badge);
+    } else if (stairs.length > 1) {
+        // If only stairs, show count for multiple stairs
+        const badge = createCountBadge(centerX, centerY, stairs.length, tileX, tileY, stairs);
+        group.appendChild(badge);
     }
-    // If only one bridge and no other items, the bridge rect is enough (no badge needed)
+    // If only one bridge/stairs and no other items, the rect is enough (no badge needed)
     
     elements.markersLayer.appendChild(group);
 }
@@ -1731,16 +1804,19 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     // Check if this is a named NPC (should use star shape)
     const isNamedNpc = isNpc && hasUniqueName(item);
     
-    // Check if this is a bridge
+    // Check if this is a bridge or stairs
     const itemIsBridge = isBridge(item);
+    const itemIsStairs = isStairs(item);
     
     // Create a group to hold both hover area and marker
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('marker-group');
     if (itemIsBridge) group.classList.add('bridge-marker');
+    if (itemIsStairs) group.classList.add('stairs-marker');
     group.dataset.id = item.id;
     group.dataset.isNpc = isNpc;
     group.dataset.isBridge = itemIsBridge;
+    group.dataset.isStairs = itemIsStairs;
     group.dataset.tileX = item.tile_x;
     group.dataset.tileY = item.tile_y;
     
@@ -1755,7 +1831,11 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     
     // Create the visual marker
     let marker;
-    if (itemIsBridge) {
+    if (itemIsStairs) {
+        // Create stairs icon for stairs
+        marker = createStairsIcon(tileLeft, tileTop, pxPerTileX, pxPerTileY);
+        marker.classList.add('marker', 'stairs-rect');
+    } else if (itemIsBridge) {
         // Create full-tile rectangle for bridges
         marker = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         marker.setAttribute('x', tileLeft);
@@ -1793,20 +1873,23 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     marker.dataset.id = item.id;
     marker.dataset.isNpc = isNpc;
     marker.dataset.isBridge = itemIsBridge;
+    marker.dataset.isStairs = itemIsStairs;
     marker.dataset.tileX = item.tile_x;
     marker.dataset.tileY = item.tile_y;
-    marker.dataset.originalRadius = radius;
-    marker.dataset.isStarMarker = isNamedNpc;
-    marker.dataset.centerX = px;
-    marker.dataset.centerY = py;
+    if (!itemIsStairs && !itemIsBridge) {
+        marker.dataset.originalRadius = radius;
+        marker.dataset.isStarMarker = isNamedNpc;
+        marker.dataset.centerX = px;
+        marker.dataset.centerY = py;
+    }
     
-    // Hover radius for visual feedback (not used for bridges)
+    // Hover radius for visual feedback (not used for bridges or stairs)
     const hoverRadius = Math.min(radius * 1.3, 4);
     
     // Event listeners on the tile hover area
     hoverArea.addEventListener('mouseenter', (e) => {
         // Don't shrink if already selected (selected = 1.8x, hover = 1.3x)
-        if (!marker.classList.contains('selected') && !itemIsBridge) {
+        if (!marker.classList.contains('selected') && !itemIsBridge && !itemIsStairs) {
             if (isNamedNpc) {
                 marker.style.transform = 'scale(1.3)';
             } else {
@@ -1816,7 +1899,7 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
         showTooltip(e, item, isNpc);
     });
     hoverArea.addEventListener('mouseleave', () => {
-        if (!marker.classList.contains('selected') && !itemIsBridge) {
+        if (!marker.classList.contains('selected') && !itemIsBridge && !itemIsStairs) {
             if (isNamedNpc) {
                 marker.style.transform = 'scale(1)';
             } else {

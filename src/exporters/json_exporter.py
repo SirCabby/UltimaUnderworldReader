@@ -976,6 +976,26 @@ class JsonExporter:
             special_link = item.special_link
             is_enchanted = item.is_enchanted
             
+            # Check if this is a move trigger that links to a level-changing teleport trap (stairs)
+            if obj_id == 0x1A0:  # move_trigger
+                from ..constants.traps import is_trap, is_level_transition_teleport
+                TELEPORT_TRAP_ID = 0x181  # teleport_trap
+                if special_link > 0 and levels:
+                    level_obj = levels.get(level)
+                    if level_obj and special_link in level_obj.objects:
+                        target = level_obj.objects[special_link]
+                        if is_trap(target.item_id) and target.item_id == TELEPORT_TRAP_ID:
+                            # Check if this teleport trap is a level transition
+                            # Use trigger coordinates for level transition detection
+                            # (teleport traps at 0,0 are templates, use trigger position instead)
+                            trap_x = target.tile_x if target.tile_x > 0 else tile_x
+                            trap_y = target.tile_y if target.tile_y > 0 else tile_y
+                            if is_level_transition_teleport(
+                                target.quality, target.owner,
+                                trap_x, trap_y
+                            ):
+                                category = 'stairs'
+            
             item_desc = get_item_description(
                 item, obj_id, is_enchanted, is_quantity, quantity, quality, owner, special_link, level
             )
@@ -1215,6 +1235,7 @@ class JsonExporter:
                 {'id': 'switches', 'name': 'Switches & Levers', 'color': '#ffa94d'},
                 {'id': 'traps', 'name': 'Traps', 'color': '#ff8787'},
                 {'id': 'triggers', 'name': 'Triggers', 'color': '#748ffc'},
+                {'id': 'stairs', 'name': 'Stairs', 'color': '#6c757d'},
                 {'id': 'illusory_walls', 'name': 'Illusory Walls', 'color': '#ff00ff'},
                 # Special Objects
                 {'id': 'texture_objects', 'name': 'Texture Map Objects', 'color': '#845ef7'},
