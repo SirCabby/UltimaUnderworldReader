@@ -1153,16 +1153,12 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
         // Show count badge for non-bridge/stairs items (visual only, no events)
         const badge = createCountBadge(centerX, centerY, nonBridgeStairsItems.length, tileX, tileY, nonBridgeStairsItems);
         group.appendChild(badge);
-    } else if (bridges.length > 1) {
-        // If only bridges, show count for multiple bridges
-        const badge = createCountBadge(centerX, centerY, bridges.length, tileX, tileY, bridges);
-        group.appendChild(badge);
     } else if (stairs.length > 1) {
         // If only stairs, show count for multiple stairs
         const badge = createCountBadge(centerX, centerY, stairs.length, tileX, tileY, stairs);
         group.appendChild(badge);
     }
-    // If only one bridge/stairs and no other items, the rect is enough (no badge needed)
+    // If only bridges (single or multiple) and no other items, the rect is enough (no badge needed)
     
     elements.markersLayer.appendChild(group);
 }
