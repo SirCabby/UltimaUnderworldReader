@@ -778,16 +778,107 @@ class JsonExporter:
             invalid_names = {'an excellent deal...', 'excellent deal'}
             return name.lower() not in invalid_names and not name.lower().startswith('an excellent deal')
         
-        def get_owner_name(owner_value: int, object_id: int) -> str:
-            """Get the name of the NPC who owns an item.
+        def get_faction_name_from_npc_type(npc_type: str) -> str:
+            """Convert NPC type name to human-readable faction name.
+            
+            Args:
+                npc_type: NPC type name from NPC_TYPES (e.g., "green_goblin", "outcast")
+            
+            Returns:
+                Human-readable faction name (e.g., "green goblins", "outcasts")
+            """
+            from ..constants.npcs import NPC_TYPES
+            
+            # Mapping from NPC type names to faction names
+            faction_map = {
+                'green_goblin': 'green goblins',
+                'goblin': 'gray goblins',
+                'outcast': 'outcasts',
+                'rat': 'rats',
+                'bandit': 'bandits',
+                'troll': 'trolls',
+                'skeleton': 'skeletons',
+                'ghoul': 'ghouls',
+                'ghost': 'ghosts',
+                'zombie': 'zombies',
+                'gazer': 'gazers',
+                'mage': 'mages',
+                'dark_mage': 'dark mages',
+                'headless': 'headless',
+                'imp': 'imps',
+                'mongbat': 'mongbats',
+                'dire_ghost': 'dire ghosts',
+                'shadow_beast': 'shadow beasts',
+                'reaper': 'reapers',
+                'wisp': 'wisps',
+                'fire_elemental': 'fire elementals',
+                'golem_stone': 'stone golems',
+                'golem_metal': 'metal golems',
+                'golem_earth': 'earth golems',
+                'lurker': 'lurkers',
+                'deep_lurker': 'deep lurkers',
+                'slime': 'slimes',
+                'vampire_bat': 'vampire bats',
+                'bat': 'bats',
+                'spider': 'spiders',
+                'giant_spider': 'giant spiders',
+                'dread_spider': 'dread spiders',
+                'acid_slug': 'acid slugs',
+                'flesh_slug': 'flesh slugs',
+                'rotworm': 'rotworms',
+                'bloodworm': 'bloodworms',
+                'lizardman': 'lizardmen',
+                'gray_lizardman': 'gray lizardmen',
+                'red_lizardman': 'red lizardmen',
+                'feral_troll': 'feral trolls',
+                'great_troll': 'great trolls',
+                'dark_ghoul': 'dark ghouls',
+                'mountainman': 'mountainmen',
+                'fighter': 'fighters',
+                'knight': 'knights',
+                'mage_female': 'female mages',
+                'mage_red': 'red mages',
+                'tyball': 'Tyball',
+                'slasher': 'slashers',
+                'dragon': 'dragons',
+                'ethereal_void': 'ethereal voids',
+                'daemon': 'daemons',
+                'undead_warrior': 'undead warriors',
+                'garamon': 'Garamon',
+                'dire_reaper': 'dire reapers',
+                'spectre': 'spectres',
+                'liche': 'liches',
+                'demon': 'demons',
+                'mountain_folk': 'mountain folk',
+                'human_male': 'humans',
+                'human_female': 'humans',
+            }
+            
+            # Return mapped faction name, or convert snake_case to title case as fallback
+            if npc_type in faction_map:
+                return faction_map[npc_type]
+            
+            # Fallback: convert snake_case to title case
+            return npc_type.replace('_', ' ').title()
+        
+        def get_owner_name(owner_value: int, object_id: int, level_num: int = None, npcs: List[Any] = None) -> str:
+            """Get the faction/group name for an item owner.
+            
+            The owner field represents a conversation slot. This function finds all NPCs
+            on the same level with that conversation slot and determines the faction
+            based on their NPC types.
             
             Args:
                 owner_value: The owner field value (0-63), represents conversation slot
                 object_id: The item's object ID (to exclude keys which use owner for lock ID)
+                level_num: The level number (0-8) where the item is located
+                npcs: List of NPCInfo objects to search for matching NPCs
             
             Returns:
-                NPC name if found, empty string if no owner or if it's a key
+                Faction/group name if found, empty string if no owner or if it's a key
             """
+            from ..constants.npcs import NPC_TYPES, get_npc_type_name
+            
             # Keys use owner field for lock ID, not NPC ownership
             if 0x100 <= object_id <= 0x10E:
                 return ""
@@ -796,11 +887,248 @@ class JsonExporter:
             if owner_value <= 0:
                 return ""
             
-            # Look up NPC name from conversation slot
-            if owner_value in npc_names:
-                return npc_names[owner_value]
+            # Level-specific owner value mappings (check these first, before NPC lookup)
+            # On level 2, owner value 10 (Lanugo's conversation slot) maps to mountainmen
+            if level_num == 1 and owner_value == 10:
+                return 'mountainmen'
+            # On level 3, owner value 11 (Thorlson's conversation slot) maps to lizardmen
+            if level_num == 2 and owner_value == 11:
+                return 'lizardmen'
+            # On level 4, owner value 13 (Morlock's conversation slot) maps to knights
+            if level_num == 3 and owner_value == 13:
+                return 'knights'
+            # On level 4, owner value 15 maps to trolls
+            if level_num == 3 and owner_value == 15:
+                return 'trolls'
+            # On level 4, owner value 31 maps to knights (Level 4 is "The Knights")
+            if level_num == 3 and owner_value == 31:
+                return 'knights'
+            # On level 7, owner value 20 (Gulik's conversation slot) maps to golems
+            if level_num == 6 and owner_value == 20:
+                return 'golems'
             
-            # Fallback for unknown owner
+            # First, check if we have a known name-to-faction mapping
+            # This takes precedence because some NPCs might not be on the level or might be the wrong type
+            known_name_to_faction = {
+                'marrowsuck': 'green goblins',  # Green goblin leader
+                'vernix': 'gray goblins',       # Gray goblin leader  
+                'garamon': 'outcasts',          # Outcast leader
+                'lanugo': 'mountainmen',       # Mountainman leader on level 2
+            }
+            
+            # Level-specific owner value mappings
+            # On level 2, if there are mountainmen on the level, prefer them over reapers
+            # This handles cases where reapers share conversation slots with mountainmen
+            if level_num == 1 and npcs is not None:
+                all_level_npcs = [npc for npc in npcs if npc.level == 1]
+                mountainmen_on_level = [npc for npc in all_level_npcs if get_npc_type_name(npc.object_id) == 'mountainman']
+                reapers_on_level = [npc for npc in all_level_npcs if get_npc_type_name(npc.object_id) == 'reaper']
+                
+                # If there are mountainmen on level 2 and this owner value matches reapers' conversation slot
+                # (or if reapers exist and we might get reapers as result), prefer mountainmen
+                if mountainmen_on_level and reapers_on_level:
+                    matching_reapers = [npc for npc in reapers_on_level if npc.conversation_slot == owner_value]
+                    # If this owner value matches reapers, return mountainmen instead
+                    if matching_reapers:
+                        return 'mountainmen'
+            
+            if owner_value in npc_names:
+                npc_name = npc_names[owner_value].lower()
+                if is_valid_npc_name(npc_names[owner_value]) and npc_name in known_name_to_faction:
+                    return known_name_to_faction[npc_name]
+            
+            # Special case for npc #36 - check for rats on the level
+            # Owner values might map to NPC indices, conversation slots, or other identifiers
+            # Try multiple matching strategies
+            # Known mapping: owner 36 on level 1 (0-indexed) = rats
+            if owner_value == 36:
+                # Direct mapping for level 1 (0-indexed)
+                if level_num == 0:
+                    return 'rats'
+                if npcs is not None and level_num is not None:
+                    # Strategy 1: Check if there's an NPC with index 36 that is a rat
+                    npc_with_index_36 = [npc for npc in npcs if npc.level == level_num and npc.index == 36]
+                    if npc_with_index_36:
+                        for npc in npc_with_index_36:
+                            if get_npc_type_name(npc.object_id) == 'rat':
+                                return 'rats'
+                    
+                    # Strategy 2: Check if there are NPCs with conversation slot 36 that are rats
+                    rat_npcs_with_slot = [
+                        npc for npc in npcs
+                        if npc.level == level_num and npc.conversation_slot == 36 and get_npc_type_name(npc.object_id) == 'rat'
+                    ]
+                    if rat_npcs_with_slot:
+                        return 'rats'
+                    
+                    # Strategy 3: Check if there are NPCs with owner field 36 that are rats
+                    rat_npcs_with_owner = [
+                        npc for npc in npcs
+                        if npc.level == level_num and npc.owner == 36 and get_npc_type_name(npc.object_id) == 'rat'
+                    ]
+                    if rat_npcs_with_owner:
+                        return 'rats'
+                    
+                    # Strategy 4: If no specific match, check if there are any rats on the level at all
+                    # (owner 36 on level 1 typically means rats)
+                    level_npcs = [npc for npc in npcs if npc.level == level_num]
+                    rat_npcs = [npc for npc in level_npcs if get_npc_type_name(npc.object_id) == 'rat']
+                    if rat_npcs:
+                        return 'rats'
+                # If we don't have level info but have NPCs, check all rats
+                elif npcs is not None and len(npcs) > 0:
+                    # Check for NPC with index 36
+                    npc_with_index_36 = [npc for npc in npcs if npc.index == 36]
+                    if npc_with_index_36:
+                        for npc in npc_with_index_36:
+                            if get_npc_type_name(npc.object_id) == 'rat':
+                                return 'rats'
+                    # Otherwise check all rats
+                    rat_npcs = [npc for npc in npcs if get_npc_type_name(npc.object_id) == 'rat']
+                    if rat_npcs:
+                        return 'rats'
+            
+            # If we have NPCs and level info, try to determine faction from NPC types
+            if npcs is not None and level_num is not None and len(npcs) > 0:
+                # The owner_value might represent:
+                # 1. Conversation slot (npc_whoami)
+                # 2. NPC index in the object list
+                # 3. NPC owner field
+                # Try all three strategies
+                
+                # Strategy 1: Match by conversation slot
+                matching_npcs = [
+                    npc for npc in npcs
+                    if npc.level == level_num and npc.conversation_slot == owner_value
+                ]
+                
+                # Strategy 2: Match by NPC index (owner value might be object index)
+                if not matching_npcs:
+                    matching_npcs = [
+                        npc for npc in npcs
+                        if npc.level == level_num and npc.index == owner_value
+                    ]
+                
+                # Strategy 3: Match by NPC owner field
+                if not matching_npcs:
+                    matching_npcs = [
+                        npc for npc in npcs
+                        if npc.level == level_num and npc.owner == owner_value
+                    ]
+                
+                # If still no matches and owner_value is a known conversation slot,
+                # try to find NPCs with that conversation slot on ANY level (maybe the NPC
+                # is on a different level but items on this level are owned by them)
+                if not matching_npcs and owner_value in npc_names:
+                    matching_npcs = [
+                        npc for npc in npcs
+                        if npc.conversation_slot == owner_value
+                    ]
+                    # If we found NPCs on other levels, use the first one's type
+                    # (assuming faction is consistent across levels)
+                    if matching_npcs:
+                        # Use the first NPC's type (or most common if multiple)
+                        type_counts = {}
+                        for npc in matching_npcs:
+                            npc_type = get_npc_type_name(npc.object_id)
+                            type_counts[npc_type] = type_counts.get(npc_type, 0) + 1
+                        if type_counts:
+                            # Level-specific overrides: prioritize certain factions on specific levels
+                            # On level 2, if the conversation slot is Lanugo (10), use mountainmen
+                            if level_num == 1 and owner_value == 10:
+                                # Lanugo on level 2 should map to mountainmen, not reapers
+                                dominant_type = 'mountainman'
+                            # On level 2, if mountainmen are present, prefer them over reapers
+                            elif level_num == 1 and 'mountainman' in type_counts:
+                                if 'reaper' in type_counts:
+                                    dominant_type = 'mountainman'
+                                else:
+                                    dominant_type = max(type_counts.items(), key=lambda x: x[1])[0]
+                            else:
+                                dominant_type = max(type_counts.items(), key=lambda x: x[1])[0]
+                            faction_name = get_faction_name_from_npc_type(dominant_type)
+                            return faction_name
+                
+                if matching_npcs:
+                    # Count NPC types
+                    type_counts = {}
+                    for npc in matching_npcs:
+                        npc_type = get_npc_type_name(npc.object_id)
+                        type_counts[npc_type] = type_counts.get(npc_type, 0) + 1
+                    
+                    # Find the most common NPC type
+                    if type_counts:
+                        dominant_type = max(type_counts.items(), key=lambda x: x[1])[0]
+                    else:
+                        dominant_type = None
+                    
+                    if dominant_type:
+                        faction_name = get_faction_name_from_npc_type(dominant_type)
+                        
+                        # Level 2 specific override: if result would be "reapers" but mountainmen exist, use mountainmen
+                        # This is a known game data issue where reapers share conversation slots with mountainmen on level 2
+                        if level_num == 1 and dominant_type == 'reaper' and npcs is not None:
+                            # Check if mountainmen are in the matching NPCs
+                            if 'mountainman' in type_counts:
+                                dominant_type = 'mountainman'
+                                faction_name = get_faction_name_from_npc_type(dominant_type)
+                            else:
+                                # Check all NPCs on level 2 - if there are mountainmen, use them
+                                all_level_npcs = [npc for npc in npcs if npc.level == 1]
+                                mountainmen_on_level = [npc for npc in all_level_npcs if get_npc_type_name(npc.object_id) == 'mountainman']
+                                if mountainmen_on_level:
+                                    dominant_type = 'mountainman'
+                                    faction_name = get_faction_name_from_npc_type(dominant_type)
+                        
+                        # Check if there's a named NPC (leader) with this conversation slot
+                        has_named_npc = (
+                            owner_value in npc_names and 
+                            npc_names[owner_value] and
+                            is_valid_npc_name(npc_names[owner_value])
+                        )
+                        
+                        # Final safety check: on level 2, if result is "reapers" but mountainmen exist, use mountainmen
+                        if level_num == 1 and faction_name == 'reapers' and npcs is not None:
+                            all_level_npcs = [npc for npc in npcs if npc.level == 1]
+                            mountainmen_on_level = [npc for npc in all_level_npcs if get_npc_type_name(npc.object_id) == 'mountainman']
+                            if mountainmen_on_level:
+                                faction_name = 'mountainmen'
+                        
+                        # If there's a named NPC and multiple NPCs, show as "faction (leader)"
+                        if has_named_npc and len(matching_npcs) > 1:
+                            return f"{faction_name} (leader)"
+                        elif has_named_npc:
+                            # Single named NPC - return faction name
+                            return faction_name
+                        else:
+                            return faction_name
+            
+            # If we have NPC data but couldn't find a match, or if we found NPCs but they might be wrong type,
+            # try to infer from NPC name using known mappings
+            if npcs is not None and len(npcs) > 0 and owner_value in npc_names:
+                npc_name = npc_names[owner_value].lower()
+                if is_valid_npc_name(npc_names[owner_value]):
+                    # Known mappings from game knowledge - these NPCs belong to specific factions
+                    name_to_faction = {
+                        'marrowsuck': 'green goblins',  # Green goblin leader
+                        'vernix': 'gray goblins',       # Gray goblin leader
+                        'garamon': 'outcasts',          # Outcast leader
+                    }
+                    
+                    # Check if we have a direct mapping
+                    if npc_name in name_to_faction:
+                        return name_to_faction[npc_name]
+            
+            # Fallback: Only use NPC name lookup if we don't have NPC data available
+            # (This preserves backward compatibility but shouldn't be used when NPCs are available)
+            if npcs is None or len(npcs) == 0:
+                if owner_value in npc_names:
+                    npc_name = npc_names[owner_value]
+                    if is_valid_npc_name(npc_name):
+                        return npc_name
+                return f"NPC #{owner_value}"
+            
+            # Final fallback for unknown owner
             return f"NPC #{owner_value}"
         
         def get_container_contents(level_num: int, container_link: int, 
@@ -876,7 +1204,7 @@ class JsonExporter:
                         item_owner = getattr(item, 'owner', 0)
                         if item_owner > 0 and not (0x100 <= item.object_id <= 0x10E):
                             content_item['owner'] = item_owner
-                            cont_owner_name = get_owner_name(item_owner, item.object_id)
+                            cont_owner_name = get_owner_name(item_owner, item.object_id, level_num, npcs)
                             if cont_owner_name:
                                 content_item['owner_name'] = cont_owner_name
                         
@@ -1084,7 +1412,7 @@ class JsonExporter:
             from ..constants.traps import is_trap, is_trigger
             if owner > 0 and not (0x100 <= obj_id <= 0x10E) and not is_special_tmap(obj_id) and not is_trap(obj_id) and not is_trigger(obj_id):
                 web_obj['owner'] = owner
-                owner_name = get_owner_name(owner, obj_id)
+                owner_name = get_owner_name(owner, obj_id, level, npcs)
                 if owner_name:
                     web_obj['owner_name'] = owner_name
             

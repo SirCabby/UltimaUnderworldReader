@@ -1652,6 +1652,15 @@ function showStackedTooltip(e, items, tileX, tileY) {
             itemEl.appendChild(qtyDiv);
         }
         
+        // Show owner information for items (item belongs to an NPC - taking it is stealing)
+        if (!isSecret && !isNpc && item.owner && item.owner > 0) {
+            const ownerDiv = document.createElement('div');
+            ownerDiv.style.cssText = 'font-size: 0.7rem; color: #fab005; margin-top: 2px;';
+            const ownerName = item.owner_name || `NPC #${item.owner}`;
+            ownerDiv.textContent = `⚠️ Owned by ${ownerName}`;
+            itemEl.appendChild(ownerDiv);
+        }
+        
         // Add stats line for non-secret items (weapons/armor)
         if (!isSecret && !isNpc) {
             const objId = item.object_id || 0;
@@ -2692,6 +2701,11 @@ function showTooltip(e, item, isNpc) {
         }
     } else {
         html += `<div class="tooltip-info">${formatCategory(item.category)}</div>`;
+        // Show owner information (item belongs to an NPC - taking it is stealing)
+        if (item.owner && item.owner > 0) {
+            const ownerName = item.owner_name || `NPC #${item.owner}`;
+            html += `<div class="tooltip-info" style="color: #fab005; font-size: 0.85rem;">⚠️ Owned by ${escapeHtml(ownerName)}</div>`;
+        }
         // Show damage values for melee weapons
         const objId = item.object_id || 0;
         if (objId <= 0x0F && (item.slash_damage !== undefined || item.bash_damage !== undefined || item.stab_damage !== undefined)) {
@@ -3741,6 +3755,11 @@ function renderVisibleObjectsPane() {
                 // Show quantity for stackable items (only if > 1)
                 if (item.quantity && item.quantity > 1) {
                     enchantLine += `<div style="color: #fcc419; font-size: 0.7rem; margin-top: 2px;">📦 Qty: ${item.quantity}</div>`;
+                }
+                // Show ownership information
+                if (item.owner && item.owner > 0) {
+                    const ownerName = item.owner_name || `NPC #${item.owner}`;
+                    enchantLine += `<div style="color: #fab005; font-size: 0.7rem; margin-top: 2px;">⚠️ Owned by ${escapeHtml(ownerName)}</div>`;
                 }
             }
             
@@ -4828,6 +4847,11 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         // Show quantity for stackable items (only if > 1)
         if (obj.quantity && obj.quantity > 1) {
             statsLine += `<div style="font-size: 0.75rem; color: #fcc419;">📦 Qty: ${obj.quantity}</div>`;
+        }
+        // Show ownership information
+        if (obj.owner && obj.owner > 0) {
+            const ownerName = obj.owner_name || `NPC #${obj.owner}`;
+            statsLine += `<div style="font-size: 0.75rem; color: #fab005;">⚠️ Owned by ${escapeHtml(ownerName)}</div>`;
         }
         
         // For storage items, always show contents count (even if empty)
