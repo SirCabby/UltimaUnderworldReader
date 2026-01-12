@@ -53,6 +53,15 @@ const CONFIG = {
 };
 
 /**
+ * Category groups for organizing categories into sections
+ */
+const CATEGORY_GROUPS = {
+    npcs: ['npcs_named', 'npcs_friendly', 'npcs_hostile'],
+    items: ['quest', 'runes', 'weapons', 'armor', 'keys', 'containers', 'spell_scrolls', 'potions', 'wands', 'food', 'treasure', 'light', 'misc', 'scrolls', 'books', 'useless_item'],
+    world: ['stairs', 'shrines', 'secret_doors', 'doors_locked', 'doors_unlocked', 'storage', 'switches', 'traps', 'triggers', 'boulders', 'illusory_walls', 'writings', 'gravestones', 'bridges', 'furniture', 'scenery', 'texture_objects', 'animations']
+};
+
+/**
  * Check if an item is a bridge object
  */
 function isBridge(item) {
@@ -400,7 +409,9 @@ const elements = {
     markersLayer: null,
     tileHighlight: null,
     levelTabs: null,
-    categoryFilters: null,
+    npcFilters: null,
+    itemFilters: null,
+    worldFilters: null,
     searchInput: null,
     tooltip: null,
     detailsSidebar: null,
@@ -444,7 +455,9 @@ async function init() {
         
         // Initialize UI
         renderLevelTabs();
-        renderCategoryFilters();
+        renderNpcFilters();
+        renderItemFilters();
+        renderWorldFilters();
         
         // Load the restored level (or first level if none saved), preserving pan/zoom from URL
         selectLevel(state.currentLevel, true);
@@ -475,7 +488,9 @@ function cacheElements() {
     elements.markersLayer = document.getElementById('markers-layer');
     elements.tileHighlight = document.getElementById('tile-highlight');
     elements.levelTabs = document.getElementById('level-tabs');
-    elements.categoryFilters = document.getElementById('category-filters');
+    elements.npcFilters = document.getElementById('npc-filters');
+    elements.itemFilters = document.getElementById('item-filters');
+    elements.worldFilters = document.getElementById('world-filters');
     elements.searchInput = document.getElementById('search-input');
     elements.tooltip = document.getElementById('tooltip');
     elements.detailsSidebar = document.getElementById('details-sidebar');
@@ -538,8 +553,12 @@ function setupEventListeners() {
     elements.searchInput.addEventListener('input', debounce(handleSearch, 200));
     
     // Category toggle buttons
-    document.getElementById('select-all-categories').addEventListener('click', selectAllCategories);
-    document.getElementById('deselect-all-categories').addEventListener('click', deselectAllCategories);
+    document.getElementById('select-all-npcs').addEventListener('click', selectAllNpcs);
+    document.getElementById('deselect-all-npcs').addEventListener('click', deselectAllNpcs);
+    document.getElementById('select-all-items').addEventListener('click', selectAllItems);
+    document.getElementById('deselect-all-items').addEventListener('click', deselectAllItems);
+    document.getElementById('select-all-world').addEventListener('click', selectAllWorld);
+    document.getElementById('deselect-all-world').addEventListener('click', deselectAllWorld);
     
     // Enchanted filter
     elements.enchantedFilter.addEventListener('change', handleEnchantedFilter);
@@ -703,42 +722,84 @@ function selectLevel(levelNum, preservePan = false) {
 // Category Filters
 // ============================================================================
 
-function renderCategoryFilters() {
-    elements.categoryFilters.innerHTML = '';
+/**
+ * Get category object by ID (includes hardcoded NPC categories)
+ */
+function getCategoryById(categoryId) {
+    // Check hardcoded NPC categories first
+    if (categoryId === 'npcs_named') {
+        return { id: 'npcs_named', name: 'Named NPCs', color: '#ffd43b' };
+    }
+    if (categoryId === 'npcs_friendly') {
+        return { id: 'npcs_friendly', name: 'Friendly NPCs', color: '#69db7c' };
+    }
+    if (categoryId === 'npcs_hostile') {
+        return { id: 'npcs_hostile', name: 'Hostile NPCs', color: '#ff4444' };
+    }
+    // Look up in data categories
+    if (state.data && state.data.categories) {
+        return state.data.categories.find(c => c.id === categoryId);
+    }
+    return null;
+}
+
+function renderNpcFilters() {
+    if (!elements.npcFilters) return;
+    elements.npcFilters.innerHTML = '';
     
     // Safety check: ensure data is loaded
     if (!state.data || !state.data.categories || !Array.isArray(state.data.categories)) {
-        console.error('Cannot render category filters: data not loaded');
+        console.error('Cannot render NPC filters: data not loaded');
         return;
     }
     
-    // Add NPC categories first (split by hostility and named status)
-    const npcHostileFilter = createCategoryFilter({
-        id: 'npcs_hostile',
-        name: 'Hostile NPCs',
-        color: '#ff4444'  // Red for hostile
+    // Render NPC categories in specified order: npcs_named, npcs_friendly, npcs_hostile
+    CATEGORY_GROUPS.npcs.forEach(categoryId => {
+        const cat = getCategoryById(categoryId);
+        if (cat) {
+            const filter = createCategoryFilter(cat);
+            elements.npcFilters.appendChild(filter);
+        }
     });
-    elements.categoryFilters.appendChild(npcHostileFilter);
+}
+
+function renderItemFilters() {
+    if (!elements.itemFilters) return;
+    elements.itemFilters.innerHTML = '';
     
-    const npcFriendlyFilter = createCategoryFilter({
-        id: 'npcs_friendly',
-        name: 'Friendly NPCs',
-        color: '#69db7c'  // Green for friendly
+    // Safety check: ensure data is loaded
+    if (!state.data || !state.data.categories || !Array.isArray(state.data.categories)) {
+        console.error('Cannot render Item filters: data not loaded');
+        return;
+    }
+    
+    // Render Item categories in specified order
+    CATEGORY_GROUPS.items.forEach(categoryId => {
+        const cat = getCategoryById(categoryId);
+        if (cat) {
+            const filter = createCategoryFilter(cat);
+            elements.itemFilters.appendChild(filter);
+        }
     });
-    elements.categoryFilters.appendChild(npcFriendlyFilter);
+}
+
+function renderWorldFilters() {
+    if (!elements.worldFilters) return;
+    elements.worldFilters.innerHTML = '';
     
-    const npcNamedFilter = createCategoryFilter({
-        id: 'npcs_named',
-        name: 'Named NPCs',
-        color: '#ffd43b'  // Gold for named characters
-    });
-    elements.categoryFilters.appendChild(npcNamedFilter);
+    // Safety check: ensure data is loaded
+    if (!state.data || !state.data.categories || !Array.isArray(state.data.categories)) {
+        console.error('Cannot render World filters: data not loaded');
+        return;
+    }
     
-    // Add other categories (skip if it's an NPC category to avoid duplicate)
-    state.data.categories.forEach(cat => {
-        if (cat.id === 'npcs' || cat.id.startsWith('npcs_')) return;  // Already added above
-        const filter = createCategoryFilter(cat);
-        elements.categoryFilters.appendChild(filter);
+    // Render World categories in specified order
+    CATEGORY_GROUPS.world.forEach(categoryId => {
+        const cat = getCategoryById(categoryId);
+        if (cat) {
+            const filter = createCategoryFilter(cat);
+            elements.worldFilters.appendChild(filter);
+        }
     });
 }
 
@@ -895,35 +956,102 @@ function updateEnchantedCount() {
     elements.enchantedCount.textContent = enchantedCount;
 }
 
-function selectAllCategories() {
-    // Add all categories to the filter set
-    state.filters.categories.add('npcs_hostile');
-    state.filters.categories.add('npcs_friendly');
-    state.filters.categories.add('npcs_named');
-    state.data.categories.forEach(cat => {
-        state.filters.categories.add(cat.id);
+function selectAllNpcs() {
+    // Add all NPC categories to the filter set
+    CATEGORY_GROUPS.npcs.forEach(categoryId => {
+        state.filters.categories.add(categoryId);
     });
-    
-    // Update all checkboxes
-    document.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+
+    // Update NPC category checkboxes
+    elements.npcFilters.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
         cb.checked = true;
     });
-    
+
     renderMarkers();
     updateStats();
     refreshVisibleObjectsIfNoSelection();
     saveFiltersToStorage();
 }
 
-function deselectAllCategories() {
-    // Clear all categories from the filter set
-    state.filters.categories.clear();
-    
-    // Update all checkboxes
-    document.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+function deselectAllNpcs() {
+    // Remove all NPC categories from the filter set
+    CATEGORY_GROUPS.npcs.forEach(categoryId => {
+        state.filters.categories.delete(categoryId);
+    });
+
+    // Update NPC category checkboxes
+    elements.npcFilters.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
         cb.checked = false;
     });
-    
+
+    renderMarkers();
+    updateStats();
+    refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+function selectAllItems() {
+    // Add all Item categories to the filter set
+    CATEGORY_GROUPS.items.forEach(categoryId => {
+        state.filters.categories.add(categoryId);
+    });
+
+    // Update Item category checkboxes
+    elements.itemFilters.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+    });
+
+    renderMarkers();
+    updateStats();
+    refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+function deselectAllItems() {
+    // Remove all Item categories from the filter set
+    CATEGORY_GROUPS.items.forEach(categoryId => {
+        state.filters.categories.delete(categoryId);
+    });
+
+    // Update Item category checkboxes
+    elements.itemFilters.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+
+    renderMarkers();
+    updateStats();
+    refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+function selectAllWorld() {
+    // Add all World categories to the filter set
+    CATEGORY_GROUPS.world.forEach(categoryId => {
+        state.filters.categories.add(categoryId);
+    });
+
+    // Update World category checkboxes
+    elements.worldFilters.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+    });
+
+    renderMarkers();
+    updateStats();
+    refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+function deselectAllWorld() {
+    // Remove all World categories from the filter set
+    CATEGORY_GROUPS.world.forEach(categoryId => {
+        state.filters.categories.delete(categoryId);
+    });
+
+    // Update World category checkboxes
+    elements.worldFilters.querySelectorAll('.category-filter input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+
     renderMarkers();
     updateStats();
     refreshVisibleObjectsIfNoSelection();
@@ -2367,6 +2495,11 @@ function renderSecretDetails(secret) {
 }
 
 function getCategoryColor(categoryId) {
+    // Check hardcoded NPC categories first
+    if (categoryId === 'npcs_named') return '#ffd43b';
+    if (categoryId === 'npcs_friendly') return '#69db7c';
+    if (categoryId === 'npcs_hostile') return '#ff4444';
+    // Look up in data categories
     const cat = state.data.categories.find(c => c.id === categoryId);
     return cat ? cat.color : '#868e96';
 }
@@ -3091,22 +3224,26 @@ function renderVisibleObjectsPane() {
     }
     
     // Build category order map to match sidebar order:
-    // 1. NPC categories first (hostile, friendly, named)
-    // 2. Then data-defined categories in their order
-    // 3. Then secret categories last
+    // 1. NPCs categories first (named, friendly, hostile)
+    // 2. Items categories
+    // 3. World categories
     const categoryOrder = new Map();
     let orderIndex = 0;
-    categoryOrder.set('npcs_hostile', orderIndex++);
-    categoryOrder.set('npcs_friendly', orderIndex++);
-    categoryOrder.set('npcs_named', orderIndex++);
-    state.data.categories.forEach(cat => {
-        if (!cat.id.startsWith('npcs')) {
-            categoryOrder.set(cat.id, orderIndex++);
-        }
+    
+    // NPCs section
+    CATEGORY_GROUPS.npcs.forEach(categoryId => {
+        categoryOrder.set(categoryId, orderIndex++);
     });
-    // Secrets at the end
-    categoryOrder.set('illusory_walls', orderIndex++);
-    categoryOrder.set('secret_doors', orderIndex++);
+    
+    // Items section
+    CATEGORY_GROUPS.items.forEach(categoryId => {
+        categoryOrder.set(categoryId, orderIndex++);
+    });
+    
+    // World section
+    CATEGORY_GROUPS.world.forEach(categoryId => {
+        categoryOrder.set(categoryId, orderIndex++);
+    });
     
     function getCategoryOrderIndex(categoryId) {
         return categoryOrder.has(categoryId) ? categoryOrder.get(categoryId) : 9999;
@@ -4812,6 +4949,11 @@ function countNestedItems(items) {
 // ============================================================================
 
 function formatCategory(categoryId) {
+    // Check hardcoded NPC categories first
+    if (categoryId === 'npcs_named') return 'Named NPCs';
+    if (categoryId === 'npcs_friendly') return 'Friendly NPCs';
+    if (categoryId === 'npcs_hostile') return 'Hostile NPCs';
+    // Look up in data categories
     const cat = state.data.categories.find(c => c.id === categoryId);
     return cat ? cat.name : categoryId;
 }
