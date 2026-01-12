@@ -117,6 +117,7 @@ const state = {
         categories: new Set(),  // Active category filters
         search: '',
         enchantedOnly: false,   // Show only enchanted items
+        ownedFilter: null,      // null = all, "only" = owned only, "exclude" = exclude owned
     },
     selectedMarker: null,
     pendingSelection: null,    // For restoring selection after page load
@@ -170,6 +171,7 @@ function saveFiltersToStorage() {
         categories: Array.from(state.filters.categories),
         search: state.filters.search,
         enchantedOnly: state.filters.enchantedOnly,
+        ownedFilter: state.filters.ownedFilter,
         collapsedCategories: Array.from(state.collapsedCategories)
     };
     try {
@@ -286,6 +288,11 @@ function restoreState() {
             state.filters.enchantedOnly = storedFilters.enchantedOnly;
         }
         
+        // Restore owned filter
+        if (storedFilters.ownedFilter === null || storedFilters.ownedFilter === 'only' || storedFilters.ownedFilter === 'exclude') {
+            state.filters.ownedFilter = storedFilters.ownedFilter;
+        }
+        
         // Restore collapsed categories (validate they exist)
         if (storedFilters.collapsedCategories && Array.isArray(storedFilters.collapsedCategories)) {
             state.collapsedCategories.clear();
@@ -392,6 +399,9 @@ function applyRestoredStateToUI() {
         elements.enchantedFilter.checked = state.filters.enchantedOnly;
     }
     
+    // Apply owned filter button state
+    updateOwnedFilterUI();
+    
     // Apply zoom level display
     if (elements.zoomLevel) {
         elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
@@ -425,6 +435,8 @@ const elements = {
     coordValue: null,
     enchantedFilter: null,
     enchantedCount: null,
+    ownedFilter: null,
+    ownedFilterLabel: null,
 };
 
 // ============================================================================
@@ -502,6 +514,8 @@ function cacheElements() {
     elements.coordValue = document.getElementById('coord-value');
     elements.enchantedFilter = document.getElementById('enchanted-filter');
     elements.enchantedCount = document.getElementById('enchanted-count');
+    elements.ownedFilter = document.getElementById('owned-filter');
+    elements.ownedFilterLabel = document.getElementById('owned-filter-label');
 }
 
 async function loadData() {
@@ -563,6 +577,9 @@ function setupEventListeners() {
     // Enchanted filter
     elements.enchantedFilter.addEventListener('change', handleEnchantedFilter);
     
+    // Owned filter
+    elements.ownedFilter.addEventListener('click', handleOwnedFilter);
+    
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboard);
 }
@@ -573,6 +590,47 @@ function handleEnchantedFilter(e) {
     updateStats();
     refreshVisibleObjectsIfNoSelection();
     saveFiltersToStorage();
+}
+
+function handleOwnedFilter(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Cycle through states: null → "only" → "exclude" → null
+    if (state.filters.ownedFilter === null || state.filters.ownedFilter === undefined) {
+        state.filters.ownedFilter = 'only';
+    } else if (state.filters.ownedFilter === 'only') {
+        state.filters.ownedFilter = 'exclude';
+    } else {
+        state.filters.ownedFilter = null;
+    }
+    
+    updateOwnedFilterUI();
+    renderMarkers();
+    updateStats();
+    refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+function updateOwnedFilterUI() {
+    if (!elements.ownedFilter || !elements.ownedFilterLabel) return;
+    
+    const filterContainer = elements.ownedFilter.closest('.owned-filter');
+    if (!filterContainer) return;
+    
+    // Remove all state classes
+    filterContainer.classList.remove('owned-filter-only', 'owned-filter-exclude');
+    
+    // Update label and add state class
+    if (state.filters.ownedFilter === 'only') {
+        elements.ownedFilterLabel.textContent = 'Owned Only';
+        filterContainer.classList.add('owned-filter-only');
+    } else if (state.filters.ownedFilter === 'exclude') {
+        elements.ownedFilterLabel.textContent = 'Exclude Owned';
+        filterContainer.classList.add('owned-filter-exclude');
+    } else {
+        elements.ownedFilterLabel.textContent = 'All Items';
+    }
 }
 
 function handleWheel(e) {
@@ -1122,7 +1180,8 @@ function renderMarkers() {
     
     // Collect secrets (illusory walls and secret doors) - show based on their category
     // Note: Secrets are never "enchanted" in the magical sense, so they're hidden when enchanted filter is on
-    if (level.secrets && !state.filters.enchantedOnly) {
+    // Note: Secrets can never be owned, so they're hidden when owned filter is set to "only"
+    if (level.secrets && !state.filters.enchantedOnly && state.filters.ownedFilter !== 'only') {
         level.secrets.forEach(secret => {
             // Check if this secret's category is enabled
             if (!state.filters.categories.has(secret.category)) {
@@ -1814,6 +1873,13 @@ function shouldShowItem(item) {
         if (!isEnchanted(item)) return false;
     }
     
+    // Check owned filter
+    if (state.filters.ownedFilter === 'only') {
+        if (!isOwned(item)) return false;
+    } else if (state.filters.ownedFilter === 'exclude') {
+        if (isOwned(item)) return false;
+    }
+    
     // Then apply search filter
     if (!state.filters.search) return true;
     const searchTerm = state.filters.search;
@@ -1889,6 +1955,96 @@ function isEnchanted(item) {
     }
     
     return false;
+}
+
+/**
+ * Check if an item is owned (has an owner > 0)
+ * Excludes types that can never have owners: traps, triggers, secret doors, stairs, useless items, and item 0x1ca
+ */
+function isOwned(item) {
+    // Items that can never have owners (even if owner field is set)
+    if (!item) return false;
+    
+    // Check if this is a secret (secrets have a type property and can never be owned)
+    if (item.type === 'secret_door' || item.type === 'illusory_wall') {
+        return false;
+    }
+    
+    const objectId = item.object_id;
+    if (objectId === undefined || objectId === null) {
+        // If no object_id, fall back to category check
+        const category = item.category;
+        if (category === 'trap' || 
+            category === 'traps' ||
+            category === 'trigger' || 
+            category === 'triggers' ||
+            category === 'secret_door' || 
+            category === 'secret_doors' || 
+            category === 'stairs' || 
+            category === 'useless_item' ||
+            category === 'animation' ||
+            category === 'animations' ||
+            category === 'writings') {
+            return false;
+        }
+        // If no object_id and category doesn't exclude it, check owner
+        return item.owner && item.owner > 0;
+    }
+    
+    // Check object ID ranges for types that can never have owners
+    // Traps: 0x180-0x19F (384-415)
+    if (objectId >= 0x180 && objectId <= 0x19F) {
+        return false;
+    }
+    
+    // Triggers: 0x1A0-0x1BF (416-447)
+    if (objectId >= 0x1A0 && objectId <= 0x1BF) {
+        return false;
+    }
+    
+    // Secret doors: 0x147 (closed), 0x14F (open)
+    if (objectId === 0x147 || objectId === 0x14F) {
+        return false;
+    }
+    
+    // Writings: 0x166 (358)
+    if (objectId === 0x166 || objectId === 358) {
+        return false;
+    }
+    
+    // Animations: 0x1C0-0x1C9 (448-457) and 0x1CB-0x1CF (459-463)
+    // Note: 0x1CA is a quest_item, not an animation
+    if ((objectId >= 0x1C0 && objectId <= 0x1C9) || (objectId >= 0x1CB && objectId <= 0x1CF)) {
+        return false;
+    }
+    
+    // Stairs are identified by category, but also check if it's a move trigger
+    // Move triggers that change level are stairs (object_id in trigger range but with special properties)
+    // For now, rely on category check for stairs
+    
+    // Specific item exclusion: 0x1ca (458)
+    if (objectId === 0x1ca || objectId === 458) {
+        return false;
+    }
+    
+    // Check category exclusions (for items where category might be more reliable)
+    const category = item.category;
+    if (category === 'trap' || 
+        category === 'traps' ||
+        category === 'trigger' || 
+        category === 'triggers' ||
+        category === 'secret_door' || 
+        category === 'secret_doors' || 
+        category === 'stairs' || 
+        category === 'useless_item' ||
+        category === 'animation' ||
+        category === 'animations' ||
+        category === 'writings') {
+        return false;
+    }
+    
+    // For all other items, check if owner field is set
+    return item.owner && item.owner > 0;
 }
 
 /**
@@ -3206,7 +3362,8 @@ function renderVisibleObjectsPane() {
     });
     
     // Collect secrets (not shown when enchanted filter is on)
-    if (level.secrets && !state.filters.enchantedOnly) {
+    // Note: Secrets can never be owned, so they're hidden when owned filter is set to "only"
+    if (level.secrets && !state.filters.enchantedOnly && state.filters.ownedFilter !== 'only') {
         level.secrets.forEach(secret => {
             if (!state.filters.categories.has(secret.category)) return;
             
@@ -4505,17 +4662,24 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
     const level = state.data.levels[state.currentLevel];
     if (!level) return;
     
-    // Find all items at this tile (respecting enchanted filter)
-    const npcsAtTile = level.npcs.filter(n => 
-        n.tile_x === tileX && n.tile_y === tileY && 
-        (!state.filters.enchantedOnly || isEnchanted(n))
-    );
-    const objectsAtTile = level.objects.filter(o => 
-        o.tile_x === tileX && o.tile_y === tileY &&
-        (!state.filters.enchantedOnly || isEnchanted(o))
-    );
+    // Find all items at this tile (respecting enchanted and owned filters)
+    const npcsAtTile = level.npcs.filter(n => {
+        if (n.tile_x !== tileX || n.tile_y !== tileY) return false;
+        if (state.filters.enchantedOnly && !isEnchanted(n)) return false;
+        if (state.filters.ownedFilter === 'only' && !isOwned(n)) return false;
+        if (state.filters.ownedFilter === 'exclude' && isOwned(n)) return false;
+        return true;
+    });
+    const objectsAtTile = level.objects.filter(o => {
+        if (o.tile_x !== tileX || o.tile_y !== tileY) return false;
+        if (state.filters.enchantedOnly && !isEnchanted(o)) return false;
+        if (state.filters.ownedFilter === 'only' && !isOwned(o)) return false;
+        if (state.filters.ownedFilter === 'exclude' && isOwned(o)) return false;
+        return true;
+    });
     // Don't show secrets when enchanted filter is on (secrets aren't magical)
-    const secretsAtTile = (level.secrets && !state.filters.enchantedOnly) 
+    // Note: Secrets can never be owned, so they're hidden when owned filter is set to "only"
+    const secretsAtTile = (level.secrets && !state.filters.enchantedOnly && state.filters.ownedFilter !== 'only') 
         ? level.secrets.filter(s => s.tile_x === tileX && s.tile_y === tileY) 
         : [];
     
