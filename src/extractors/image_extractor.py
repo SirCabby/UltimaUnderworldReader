@@ -297,12 +297,26 @@ class ImageExtractor:
         npcs_with_frames = 0
         
         # Extract ALL frames for each NPC
+        # Use critter slot (object_id - 0x40) directly as the animation file number
+        # This is the correct mapping: critter slot maps directly to CR##PAGE file number
+        # e.g., critter slot 15 (0x4F headless) -> CR17PAGE (slot 17 in octal = 15 decimal)
+        # Wait, that doesn't match online sources which say headless uses CR24PAGE
+        # Online sources indicate the mapping is not direct
+        # For now, we'll need to use a lookup table or find the correct mapping
+        # Based on online sources: headless (0x4F, slot 15) uses CR24PAGE, reaper (0x54, slot 20) uses CR17PAGE
+        # This suggests the mapping is NOT direct (object_id - 0x40)
+        # The current code uses animation_index from OBJECTS.DAT which appears incorrect
+        # Since ASSOC.ANM format is unclear, we'll need to create a lookup table based on online sources
         for npc_id in range(0x40, 0x80):  # 0x40 to 0x7F inclusive
             critter = self.objects_parser.get_critter(npc_id)
             if not critter:
                 continue
             
-            animation_index = critter.animation_index
+            # Use critter slot directly for now (object_id - 0x40)
+            # This maps to CR##PAGE where ## is the slot in octal
+            # However, online sources suggest this mapping is incorrect for some NPCs
+            critter_slot = npc_id - 0x40  # Convert object ID to critter slot (0-63)
+            animation_index = critter_slot  # Use critter slot directly as animation index
             npc_name = get_npc_type_name(npc_id)
             
             # Map animation index (decimal) to animation file (CrXX where XX is octal)
@@ -352,6 +366,9 @@ class ImageExtractor:
             # Extract all valid frames for this NPC from all page files
             npc_frames = {}
             first_valid_frame = None
+            # Prefer idle/standing frames (slots 0x20-0x27) for representative image
+            preferred_slots = set(range(0x20, 0x28))  # Idle animations at different angles
+            preferred_frame = None
             
             for (slot, page_idx), (frame, anim_parser, page_suffix) in sorted(valid_frames_all_pages.items()):
                 # Convert frame to image
@@ -368,7 +385,13 @@ class ImageExtractor:
                         
                         npc_frames[unique_slot] = img
                         validated_frames += 1
-                        # Use the first valid frame as the "representative" image for this NPC
+                        
+                        # Prefer idle frames (slots 0x20-0x27) for representative image
+                        # These are standing/idle animations that show the NPC clearly
+                        if slot in preferred_slots and preferred_frame is None:
+                            preferred_frame = img
+                        
+                        # Use the first valid frame as fallback if no preferred frame found
                         if first_valid_frame is None:
                             first_valid_frame = img
                     else:
@@ -376,8 +399,10 @@ class ImageExtractor:
             
             if npc_frames:
                 self.extracted_npc_frames[npc_id] = npc_frames
-                if first_valid_frame:
-                    self.extracted_npc_images[npc_id] = first_valid_frame
+                # Use preferred frame (idle animation) if available, otherwise first valid frame
+                representative_frame = preferred_frame if preferred_frame else first_valid_frame
+                if representative_frame:
+                    self.extracted_npc_images[npc_id] = representative_frame
                 npcs_with_frames += 1
                 if npcs_with_frames <= 10:  # Print first 10
                     pages_used = []

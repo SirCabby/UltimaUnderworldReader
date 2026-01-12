@@ -3271,21 +3271,21 @@ function renderVisibleObjectsPane() {
             const hasInventory = isNpc && item.inventory && item.inventory.length > 0;
             const extraIcon = hasContents ? ' 📦' : (hasInventory ? ' 🎒' : '');
             
-            // Add image thumbnail for non-NPC, non-secret items
+            // Add image thumbnail for non-secret items (objects only, not NPCs)
             // Exclude images for writings, doors, and texture map objects
             let imageHtml = '';
-            if (!isNpc && !isSecret && item.image_path) {
+            if (!isSecret && !isNpc && item.image_path) {
+                // Object images - exclude writings, doors, and texture map objects
                 const objId = item.object_id || 0;
-                // Exclude: writings (0x166), doors (0x140-0x14F), texture map objects (0x16E-0x16F)
                 const isWriting = objId === 0x166;
                 const isDoor = (objId >= 0x140 && objId <= 0x14F);
                 const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
-                
+
                 if (!isWriting && !isDoor && !isTextureMap) {
                     imageHtml = `
                         <div class="list-item-image-container" style="flex-shrink: 0; width: 32px; height: 32px; margin-right: 8px;">
-                            <img src="${escapeHtml(item.image_path)}" alt="${escapeHtml(displayName)}" 
-                                 class="list-item-image" 
+                            <img src="${escapeHtml(item.image_path)}" alt="${escapeHtml(displayName)}"
+                                 class="list-item-image"
                                  style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
                                  onerror="this.style.display='none';">
                         </div>
@@ -3358,11 +3358,11 @@ function renderObjectDetails(item, isNpc) {
     const displayName = isNpc ? (item.name || 'Unknown NPC') : getItemDisplayName(item);
     html += `<div class="detail-name">${uniqueIndicator}${displayName}</div>`;
     
-    // Display object image if available
+    // Display image if available (for objects only, not NPCs)
     // Exclude images for writings, doors, and texture map objects
     if (!isNpc && item.image_path) {
+        // Object images - exclude writings, doors, and texture map objects
         const objId = item.object_id || 0;
-        // Exclude: writings (0x166), doors (0x140-0x14F), texture map objects (0x16E-0x16F)
         const isWriting = objId === 0x166;
         const isDoor = (objId >= 0x140 && objId <= 0x14F);
         const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
@@ -4228,7 +4228,8 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         const hasInventory = npc.inventory && npc.inventory.length > 0;
         const isUnique = hasUniqueName(npc);
         const uniqueIndicator = isUnique ? '⭐ ' : '';
-        
+
+        // NPC images disabled for now
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem;">${uniqueIndicator}${npc.name || 'Unknown NPC'}${creatureInfo}${hasInventory ? ' 🎒' : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${npcLabel} - HP: ${npc.hp}</div>
