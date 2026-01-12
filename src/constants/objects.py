@@ -96,7 +96,7 @@ SCENERY_PICKUPABLE_ITEMS: Set[int] = {
     0x0C6, 0x0DC,  # pile of bones
     0x0C8, 0x0C9, 0x0CA, 0x0CB,  # broken items (axe, sword, mace, shield)
     0x0D5, 0x0D6,  # pile of debris
-    # Note: 0x0DB (pile of wood chips) is handled separately as misc_item
+    # Note: 0x0DB (pile of wood chips) is categorized as scenery
 }
 
 # Items that use quantity for stacking (coins, arrows, etc.)
@@ -273,8 +273,16 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     if item_id in FOOD_IDS:
         return 'food'
     
+    # Special case: items 0x126, 0x12c, and 0x13B (map) should be categorized as quest_item
+    if item_id in (0x126, 0x12c, 0x13B):
+        return 'quest_item'
+    
+    # Special case: item 0x09d should be categorized as useless_item
+    if item_id == 0x09d:
+        return 'useless_item'
+    
     # Special cases: these scenery items go to misc_item category
-    if item_id in (0x0CC, 0x0CD, 0x0DB, 0x0D8):  # piece of wood (2 variants), pile of wood chips, pole
+    if item_id in (0x0CC, 0x0CD, 0x0D8):  # piece of wood (2 variants), pole
         return 'misc_item'
     
     # Special cases: campfire (0x12A) and fountain (0x12E) should be categorized as scenery
