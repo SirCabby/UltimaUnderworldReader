@@ -167,9 +167,12 @@ class SecretFinder:
                 
                 # Special case for teleport - check if level transition
                 if target_obj.item_id == self.TELEPORT_TRAP_ID:
+                    trap_x = target_obj.tile_x if target_obj.tile_x > 0 else obj.tile_x
+                    trap_y = target_obj.tile_y if target_obj.tile_y > 0 else obj.tile_y
                     if is_level_transition_teleport(
                         target_obj.quality, target_obj.owner,
-                        target_obj.tile_x, target_obj.tile_y
+                        trap_x, trap_y,
+                        target_obj.z_pos, level_num
                     ):
                         effect_type = "level_transition"
                     else:
@@ -241,7 +244,8 @@ class SecretFinder:
             # Special handling for teleport traps to classify level transitions vs warps
             if obj.item_id == self.TELEPORT_TRAP_ID:
                 if is_level_transition_teleport(
-                    obj.quality, obj.owner, obj.tile_x, obj.tile_y
+                    obj.quality, obj.owner, obj.tile_x, obj.tile_y,
+                    obj.z_pos, level_num
                 ):
                     trap_purpose = "level_transition"
                 else:

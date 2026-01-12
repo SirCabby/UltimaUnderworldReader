@@ -993,7 +993,8 @@ class JsonExporter:
                             trap_y = target.tile_y if target.tile_y > 0 else tile_y
                             if is_level_transition_teleport(
                                 target.quality, target.owner,
-                                trap_x, trap_y
+                                trap_x, trap_y,
+                                target.z_pos, level
                             ):
                                 category = 'stairs'
                                 # Store destination level for stairs direction (1-indexed)

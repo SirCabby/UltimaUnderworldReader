@@ -332,11 +332,12 @@ def describe_teleport(quality: int, owner: int, z_pos: int,
     is_same_level = (current_level >= 0 and dest_level == current_level + 1)
     
     # Check if coordinates indicate a staircase (small movement)
+    # Stairs typically keep you in the same general area (within 5 tiles)
     is_stairs = False
     if trap_x >= 0 and trap_y >= 0:
         dx = abs(dest_x - trap_x)
         dy = abs(dest_y - trap_y)
-        is_stairs = (dx <= 2 and dy <= 2)
+        is_stairs = (dx <= 5 and dy <= 5)
     
     # Build description
     if is_same_level:
@@ -679,23 +680,36 @@ def get_trap_purpose(item_id: int) -> str:
 
 # Level transition detection
 def is_level_transition_teleport(quality: int, owner: int, 
-                                  trap_x: int, trap_y: int) -> bool:
+                                  trap_x: int, trap_y: int,
+                                  z_pos: int = -1, current_level: int = -1) -> bool:
     """
     Check if a teleport trap likely represents a level transition (stairs).
     
     Level transitions typically have:
     - Destination coordinates similar to source (same area of map)
     - Small coordinate differences (stairs are adjacent)
+    - z_pos field encoding a different level (1-9, 1-indexed)
     """
+    # If z_pos indicates a different level, it's likely a level transition
+    # z_pos encodes destination level as 1-indexed (1-9)
+    if z_pos > 0 and z_pos <= 9 and current_level >= 0:
+        dest_level_1idx = z_pos
+        current_level_1idx = current_level + 1  # Convert to 1-indexed
+        if dest_level_1idx != current_level_1idx:
+            # Different level - this is a level transition
+            return True
+    
     # If destination is same as source, it's likely a level change
     # (the X,Y stay same but level changes)
     if quality == trap_x and owner == trap_y:
         return True
     
     # Small differences might also indicate stairs
+    # Stairs typically keep you in the same general area (within 5 tiles)
+    # This threshold is more permissive to catch stairs that aren't exactly adjacent
     dx = abs(quality - trap_x)
     dy = abs(owner - trap_y)
-    if dx <= 2 and dy <= 2:
+    if dx <= 5 and dy <= 5:
         return True
     
     return False
