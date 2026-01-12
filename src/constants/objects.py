@@ -311,8 +311,8 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
     if item_id == 0x157:
         return 'shrine'
     
-    # Special case: boulders (0x154, 0x155, 0x156) should be categorized as boulder
-    if item_id in (0x154, 0x155, 0x156):  # large boulder, boulder, small boulder
+    # Special case: boulders (0x153, 0x154, 0x155, 0x156) should be categorized as boulder
+    if item_id in (0x153, 0x154, 0x155, 0x156):  # boulder, large boulder, boulder, small boulder
         return 'boulder'
     
     # Scenery items (0x0C0-0x0DF): split into scenery vs useless_item
@@ -338,6 +338,10 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
             return 'spell_scroll'
         else:
             return f'readable_{base_category}'
+    
+    # Special case: moongate (0x15A) should be categorized as door_unlocked
+    if item_id == 0x15A:
+        return 'door_unlocked'
     
     # Doors: distinguish locked from unlocked
     if base_category == 'door':
