@@ -575,16 +575,41 @@ def describe_trap_effect(trap_id: int, quality: int, owner: int, z_pos: int = 0,
     if trap_id == 0x189:
         return f"Activates ward (power {quality})"
     
-    # Tell trap (message) - uses quality + owner*64 as message index
+    # Tell trap (message) - message index calculation
+    # Uses the same logic as text_string_trap - try multiple formulas
     if trap_id == 0x18A:
-        msg_index = quality + owner * 64
-        if trap_messages and msg_index < len(trap_messages) and trap_messages[msg_index]:
-            msg = trap_messages[msg_index]
-            # Truncate long messages
-            if len(msg) > 60:
-                msg = msg[:57] + "..."
+        if not trap_messages:
+            return f"Shows message (trap_messages not available)"
+        
+        def get_cleaned_message(idx: int) -> str:
+            """Get and clean a message at the given index. Returns empty string if not found."""
+            if idx < len(trap_messages):
+                msg = trap_messages[idx]
+                if msg and msg.strip():
+                    cleaned_msg = msg.replace('\n', ' ').replace('\r', ' ').strip()
+                    while '  ' in cleaned_msg:
+                        cleaned_msg = cleaned_msg.replace('  ', ' ')
+                    return cleaned_msg
+            return ""
+        
+        # Try formula 1: when owner=0, use quality; when owner>0, use owner
+        if owner == 0:
+            msg_index1 = quality
+        else:
+            msg_index1 = owner
+        
+        msg = get_cleaned_message(msg_index1)
+        if msg:
             return f'Message: "{msg}"'
-        return f"Shows message #{msg_index}"
+        
+        # Try formula 2: quality + owner * 64 (for traps that use this encoding)
+        msg_index2 = quality + owner * 64
+        msg = get_cleaned_message(msg_index2)
+        if msg:
+            return f'Message: "{msg}"'
+        
+        # Neither formula found a message
+        return f"Shows message #{msg_index1} (quality={quality}, owner={owner})"
     
     # Delete object trap
     if trap_id == 0x18B:
@@ -616,16 +641,53 @@ def describe_trap_effect(trap_id: int, quality: int, owner: int, z_pos: int = 0,
     if trap_id == 0x18F:
         return "Multiple actions"
     
-    # Text string trap - uses quality + owner*64 as message index
+    # Text string trap - message index calculation
+    # Based on analysis of actual game data, try multiple formulas:
+    # 1. When owner=0: message index = quality
+    # 2. When owner>0: try owner first, then quality + owner * 64
+    # 3. Special case: when owner=0 and quality points to empty, try quality-1
+    # Some traps use different formulas, so we try multiple approaches
     if trap_id == 0x190:
-        msg_index = quality + owner * 64
-        if trap_messages and msg_index < len(trap_messages) and trap_messages[msg_index]:
-            msg = trap_messages[msg_index]
-            # Truncate long messages
-            if len(msg) > 60:
-                msg = msg[:57] + "..."
+        if not trap_messages:
+            return f"Shows message (trap_messages not available)"
+        
+        def get_cleaned_message(idx: int) -> str:
+            """Get and clean a message at the given index. Returns empty string if not found."""
+            if idx < len(trap_messages):
+                msg = trap_messages[idx]
+                if msg and msg.strip():
+                    cleaned_msg = msg.replace('\n', ' ').replace('\r', ' ').strip()
+                    while '  ' in cleaned_msg:
+                        cleaned_msg = cleaned_msg.replace('  ', ' ')
+                    return cleaned_msg
+            return ""
+        
+        # Try formula 1: when owner=0, use quality; when owner>0, use owner
+        if owner == 0:
+            msg_index1 = quality
+        else:
+            msg_index1 = owner
+        
+        msg = get_cleaned_message(msg_index1)
+        if msg:
             return f'Message: "{msg}"'
-        return f"Shows message #{msg_index}"
+        
+        # Try formula 2: quality + owner * 64 (for traps that use this encoding)
+        msg_index2 = quality + owner * 64
+        msg = get_cleaned_message(msg_index2)
+        if msg:
+            return f'Message: "{msg}"'
+        
+        # Special case: when owner=0 and quality points to empty, try quality * 32
+        # This handles cases like quality=4 -> index 128 (swamp stench message)
+        if owner == 0 and quality > 0:
+            msg_index3 = quality * 32
+            msg = get_cleaned_message(msg_index3)
+            if msg:
+                return f'Message: "{msg}"'
+        
+        # Neither formula found a message
+        return f"Shows message #{msg_index1} (quality={quality}, owner={owner})"
     
     # Camera trap
     if trap_id == 0x196:

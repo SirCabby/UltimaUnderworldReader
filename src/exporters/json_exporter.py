@@ -1088,6 +1088,12 @@ class JsonExporter:
                 if owner_name:
                     web_obj['owner_name'] = owner_name
             
+            # For traps and triggers, store quality and owner for debugging and message lookup
+            # These are needed for text_string_trap and tell_trap message index calculation
+            if is_trap(obj_id) or is_trigger(obj_id):
+                web_obj['quality'] = quality
+                web_obj['owner'] = owner
+            
             # Include extra_info for special object types (potions, doors, etc.)
             extra_info = item_dict.get('extra_info', {})
             if extra_info:
