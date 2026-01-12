@@ -673,6 +673,8 @@ class JsonExporter:
             'special_tmap': 'texture_objects',
             'switch': 'switches',
             'furniture': 'furniture',
+            'shrine': 'shrines',
+            'boulder': 'boulders',
             'decal': 'scenery',
             'bridge': 'bridges',
             'gravestones': 'gravestones',
@@ -1249,6 +1251,8 @@ class JsonExporter:
                 # Special Objects
                 {'id': 'texture_objects', 'name': 'Texture Map Objects', 'color': '#845ef7'},
                 {'id': 'furniture', 'name': 'Furniture', 'color': '#b197a8'},
+                {'id': 'shrines', 'name': 'Shrines', 'color': '#d4a574'},
+                {'id': 'boulders', 'name': 'Boulders', 'color': '#8b7355'},
                 {'id': 'bridges', 'name': 'Bridges', 'color': '#8B5A2B'},
                 {'id': 'scenery', 'name': 'Scenery', 'color': '#a9a9a9'},
                 {'id': 'useless_item', 'name': 'Useless Items', 'color': '#868e96'},

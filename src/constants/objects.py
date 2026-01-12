@@ -49,7 +49,9 @@ OBJECT_CATEGORIES: Dict[Tuple[int, int], str] = {
     (0x170, 0x17F): "switch",
     (0x180, 0x19F): "trap",
     (0x1A0, 0x1BF): "trigger",
-    (0x1C0, 0x1CF): "animation",
+    (0x1C0, 0x1C9): "animation",
+    (0x1CA, 0x1CA): "quest_item",  # Moved from animation category
+    (0x1CB, 0x1CF): "animation",
 }
 
 # Specific item IDs for easy reference
@@ -213,6 +215,8 @@ CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
     "open_portcullis": "Open Portcullis",
     "secret_door": "Secret Door",
     "furniture": "Furniture",       # Non-container furniture
+    "shrine": "Shrine",
+    "boulder": "Boulder",
     "decal": "Decal",
     "bridge": "Bridge",
     "writings": "Writings",
@@ -294,6 +298,14 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
         return 'gravestones'
     if item_id == 0x166:
         return 'writings'
+    
+    # Special case: shrine (0x157) should be categorized as shrine
+    if item_id == 0x157:
+        return 'shrine'
+    
+    # Special case: boulders (0x154, 0x155, 0x156) should be categorized as boulder
+    if item_id in (0x154, 0x155, 0x156):  # large boulder, boulder, small boulder
+        return 'boulder'
     
     # Scenery items (0x0C0-0x0DF): split into scenery vs useless_item
     # Items that can be picked up are "useless_item", items that can't are "scenery"
