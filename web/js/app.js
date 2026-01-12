@@ -5139,6 +5139,17 @@ function escapeHtml(text) {
  * Get the display name for an item (just the name, quantity shown separately)
  */
 function getItemDisplayName(item) {
+    // For keys (0x100-0x10E), construct a more descriptive name from the effect field
+    const objId = item.object_id || 0;
+    if (objId >= 0x100 && objId <= 0x10E) {
+        // Keys have "Opens lock #N" in the effect field - extract the lock number
+        if (item.effect) {
+            const match = item.effect.match(/lock #(\d+)/i);
+            if (match) {
+                return `Key #${match[1]}`;
+            }
+        }
+    }
     return item.name || 'Unknown';
 }
 

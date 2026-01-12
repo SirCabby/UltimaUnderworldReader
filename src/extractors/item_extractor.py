@@ -28,6 +28,8 @@ from ..constants import (
 from ..utils import parse_item_name
 
 
+
+
 class ItemExtractor:
     """
     Extracts all item data from Ultima Underworld.
@@ -73,20 +75,144 @@ class ItemExtractor:
         
         self._extracted = True
     
+    def _get_identified_name(self, item_id: int, base_name: str) -> tuple[str, str, str]:
+        """
+        Get the identified name for an item from game files.
+        
+        For most quest items and talismans, Block 4 contains the identified name.
+        Some quest items have their identified names in Block 1 (dynamically searched).
+        For enchanted items, we check Block 5 for identified names.
+        
+        Checks multiple possible locations:
+        1. Block 1 - dynamically search for quest item identified names
+        2. Block 4 at object ID (most quest items/talismans have identified names here)
+        3. Block 5 at object ID index (object look descriptions may contain identified names)
+        4. Block 4 at object ID + 512 (if Block 4 has extended entries)
+        5. Block 5 at object ID + 512 (if Block 5 has extended entries)
+        
+        Returns:
+            Tuple of (name, article, plural)
+        """
+        block1 = self.strings.get_block(StringsParser.BLOCK_UI) or []
+        block4 = self.strings.get_block(StringsParser.BLOCK_OBJECT_NAMES) or []
+        block5 = self.strings.get_block(StringsParser.BLOCK_OBJECT_LOOK) or []
+        
+        # For quest items and talismans, check if Block 4 has a generic name
+        # that might need to be replaced with an identified name from Block 1
+        is_quest_or_talisman = (
+            (0x110 <= item_id <= 0x11F or item_id == 0x1CA) or
+            (0xE1 <= item_id <= 0xE7 or item_id == 0xBF)
+        )
+        
+        if is_quest_or_talisman:
+            # First, get the Block 4 name to see if it's generic/unidentified
+            if item_id < len(block4) and block4[item_id]:
+                block4_name = block4[item_id]
+                parsed_name, parsed_article, parsed_plural = parse_item_name(block4_name)
+                block4_base = parsed_name.lower()
+                
+                # Check if Block 4 has a generic name that might have an identified version in Block 1
+                # Generic names to check: "standard", "wine", etc.
+                generic_names = ['standard', 'wine', 'taper', 'silver tree']
+                is_generic = any(generic in block4_base for generic in generic_names)
+                
+                # Search Block 1 for a more specific identified name if Block 4 is generic
+                if is_generic:
+                    # Search Block 1 for quest item names that might match
+                    for idx, block1_text in enumerate(block1):
+                        if not block1_text:
+                            continue
+                        
+                        # Strip whitespace and newlines first
+                        block1_text = block1_text.strip()
+                        if not block1_text:
+                            continue
+                        
+                        block1_lower = block1_text.lower()
+                        # Look for patterns like "the [Item Name]." where Item Name contains the base name
+                        # or is a known quest item name
+                        if block1_lower.startswith(('the ', 'a ', 'an ')) and (block1_lower.endswith('.') or block1_lower.endswith('.\n')):
+                            # Extract the item name
+                            text = block1_text
+                            for prefix in ['the ', 'a ', 'an ']:
+                                if text.lower().startswith(prefix):
+                                    text = text[len(prefix):]
+                            # Remove trailing period and any whitespace
+                            text = text.rstrip('.\n').strip()
+                            
+                            text_lower = text.lower()
+                            
+                            # Check if this Block 1 entry contains the base name or is a known quest item
+                            # For "standard" -> look for "Standard of Honor"
+                            # For "wine" or "bottle of wine" -> look for "Wine of Compassion"
+                            if block4_base == 'standard' and 'standard of honor' in text_lower:
+                                return text, "", ""
+                            elif ('wine' in block4_base or block4_base == 'bottle of wine') and 'wine of compassion' in text_lower:
+                                return text, "", ""
+                            elif 'taper of sacrifice' in text_lower and block4_base in ['taper', 'candle']:
+                                return text, "", ""
+                            elif 'silver tree' in text_lower and block4_base in ['silver tree', 'tree']:
+                                return text, "", ""
+                
+                # Use Block 4 name (either specific or as fallback if Block 1 search didn't find a match)
+                return parsed_name, parsed_article, parsed_plural
+        
+        # Try Block 5 at object ID index for enchanted items
+        if item_id < len(block5) and block5[item_id]:
+            identified_text = block5[item_id].strip()
+            # Check if it looks like a name (not a description starting with common phrases)
+            if identified_text and not identified_text.lower().startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')):
+                # Try to parse as name format
+                parsed_name, parsed_article, parsed_plural = parse_item_name(identified_text)
+                if parsed_name and parsed_name != base_name:
+                    return parsed_name, parsed_article, parsed_plural
+        
+        # Try Block 4 at object ID + 512 (if Block 4 has extended entries)
+        extended_idx = item_id + 512
+        if extended_idx < len(block4) and block4[extended_idx]:
+            raw_name = block4[extended_idx]
+            parsed_name, parsed_article, parsed_plural = parse_item_name(raw_name)
+            if parsed_name and parsed_name != base_name:
+                return parsed_name, parsed_article, parsed_plural
+        
+        # Try Block 5 at object ID + 512 (if Block 5 has extended entries)
+        if extended_idx < len(block5) and block5[extended_idx]:
+            identified_text = block5[extended_idx].strip()
+            if identified_text and not identified_text.lower().startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')):
+                parsed_name, parsed_article, parsed_plural = parse_item_name(identified_text)
+                if parsed_name and parsed_name != base_name:
+                    return parsed_name, parsed_article, parsed_plural
+        
+        # Fall back to base name from Block 4
+        return base_name, "a", ""
+    
     def _extract_item_types(self) -> None:
         """Extract all item type definitions."""
         object_names = self.strings.get_block(StringsParser.BLOCK_OBJECT_NAMES) or []
         
         for item_id in range(self.NUM_ITEM_TYPES):
-            # Get name from strings
+            # Get base name from strings
             raw_name = object_names[item_id] if item_id < len(object_names) else ""
-            name, article, plural = parse_item_name(raw_name)
+            base_name, base_article, base_plural = parse_item_name(raw_name)
             
             # Override name for dial (0x161) - game strings call it "lever" but it's actually a dial
             if item_id == 0x161:
                 name = "dial"
                 article = "a"
                 plural = "dials"
+            else:
+                # For quest items and talismans, get the identified name
+                # Quest items (0x110-0x11F, 0x1CA), talismans (0xE1-0xE7, 0xBF)
+                is_quest_or_talisman = (
+                    (0x110 <= item_id <= 0x11F or item_id == 0x1CA) or
+                    (0xE1 <= item_id <= 0xE7 or item_id == 0xBF)
+                )
+                
+                if is_quest_or_talisman:
+                    # Get identified name from game files (Block 4 for most, Block 1[264] for 0xBF)
+                    name, article, plural = self._get_identified_name(item_id, base_name)
+                else:
+                    name, article, plural = base_name, base_article, base_plural
             
             # Get common properties
             common_props = self.common.get_object(item_id)
@@ -198,6 +324,19 @@ class ItemExtractor:
                 # Override name for dial (0x161) - game strings call it "lever" but it's actually a dial
                 if obj.item_id == 0x161:
                     name = "dial"
+                else:
+                    # For quest items, talismans, and enchanted items, get the identified name
+                    # Quest items (0x110-0x11F, 0x1CA), talismans (0xE1-0xE7, 0xBF)
+                    is_quest_or_talisman = (
+                        (0x110 <= obj.item_id <= 0x11F or obj.item_id == 0x1CA) or
+                        (0xE1 <= obj.item_id <= 0xE7 or obj.item_id == 0xBF)
+                    )
+                    
+                    if is_quest_or_talisman or obj.is_enchanted:
+                        # Get identified name from game files
+                        identified_name, _, _ = self._get_identified_name(obj.item_id, name)
+                        if identified_name and identified_name != name:
+                            name = identified_name
                 
                 # Determine quantity vs special_link
                 # For triggers (0x1A0-0x1BF), quantity_or_link ALWAYS contains

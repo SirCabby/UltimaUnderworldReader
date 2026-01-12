@@ -1011,10 +1011,25 @@ class JsonExporter:
             )
             
             # Create simplified object for web
+            # Use name from placed item, but prefer item_types name for quest/enchanted items
+            # (item_types should have the identified names)
+            item_name = item_dict.get('name', '')
+            
+            # For quest items, talismans, and enchanted items, prefer item_types name
+            # which should have the identified name from _get_identified_name()
+            is_quest_or_talisman = (
+                (0x110 <= obj_id <= 0x11F or obj_id == 0x1CA) or
+                (0xE1 <= obj_id <= 0xE7 or obj_id == 0xBF)
+            )
+            if (is_quest_or_talisman or is_enchanted) and item_types and obj_id in item_types:
+                item_name = item_types[obj_id].name
+            elif not item_name and item_types and obj_id in item_types:
+                item_name = item_types[obj_id].name
+            
             web_obj = {
                 'id': item_dict.get('index', 0),
                 'object_id': obj_id,
-                'name': item_dict.get('name', ''),
+                'name': item_name,
                 'tile_x': tile_x,
                 'tile_y': tile_y,
                 'z': pos.get('z', 0),
