@@ -31,6 +31,7 @@ FOOD_NUTRITION: Dict[int, int] = {
     0xBE: 8,    # Flask of Port - minimal nutrition, causes intoxication
     0xCE: 6,    # Plant - light snack (edible plant found in the dungeon)
     0xCF: 6,    # Plant - light snack (edible plant found in the dungeon)
+    0xD9: 32,   # Dead Rotworm - edible creature remains
 }
 
 # Food item names for reference (from STRINGS.PAK block 4)
@@ -50,6 +51,7 @@ FOOD_NAMES: Dict[int, str] = {
     0xBE: "flask of port",    # Alcoholic beverage
     0xCE: "plant",
     0xCF: "plant",
+    0xD9: "dead rotworm",
 }
 
 # Notes about each food item
@@ -69,15 +71,16 @@ FOOD_NOTES: Dict[int, str] = {
     0xBE: "Strong alcohol - causes intoxication!",
     0xCE: "Edible plant found in the dungeon",
     0xCF: "Edible plant found in the dungeon",
+    0xD9: "Edible creature remains",
 }
 
 # Food ID range constants
 FOOD_ID_MIN = 0xB0
 FOOD_ID_MAX = 0xB9  # For solid foods only
 
-# All food item IDs (includes beverages: ale, water, port, and edible plants)
+# All food item IDs (includes beverages: ale, water, port, and edible plants/creatures)
 # Note: Wine (0xBF) is a quest item, not a consumable food
-FOOD_IDS = {0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBD, 0xBE, 0xCE, 0xCF}
+FOOD_IDS = {0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBD, 0xBE, 0xCE, 0xCF, 0xD9}
 
 
 def is_food(item_id: int) -> bool:

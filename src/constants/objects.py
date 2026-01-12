@@ -93,6 +93,7 @@ SCENERY_PICKUPABLE_ITEMS: Set[int] = {
     0x0C4, 0x0C5,  # bones
     0x0C6, 0x0DC,  # pile of bones
     0x0C8, 0x0C9, 0x0CA, 0x0CB,  # broken items (axe, sword, mace, shield)
+    0x0D5, 0x0D6,  # pile of debris
     # Note: 0x0DB (pile of wood chips) is handled separately as misc_item
 }
 
