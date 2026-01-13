@@ -161,7 +161,7 @@ class ItemExtractor:
         if item_id < len(block5) and block5[item_id]:
             identified_text = block5[item_id].strip()
             # Skip quality descriptions that are commonly used in Block 5
-            quality_descriptions = {'massive', 'sturdy', 'new', 'smooth', 'old', 'worn', 'broken', 'fine', 'excellent', 'poor', 'good', 'bad'}
+            quality_descriptions = {'massive', 'sturdy', 'new', 'smooth', 'old', 'worn', 'broken', 'fine', 'excellent', 'poor', 'good', 'bad', 'undamaged', 'damaged', 'slightly damaged', 'tattered'}
             identified_lower = identified_text.lower()
             # Check if it looks like a name (not a description starting with common phrases, and not a quality description)
             if identified_text and not identified_lower.startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')) and identified_lower not in quality_descriptions:
@@ -182,7 +182,7 @@ class ItemExtractor:
         if extended_idx < len(block5) and block5[extended_idx]:
             identified_text = block5[extended_idx].strip()
             # Skip quality descriptions that are commonly used in Block 5
-            quality_descriptions = {'massive', 'sturdy', 'new', 'smooth', 'old', 'worn', 'broken', 'fine', 'excellent', 'poor', 'good', 'bad'}
+            quality_descriptions = {'massive', 'sturdy', 'new', 'smooth', 'old', 'worn', 'broken', 'fine', 'excellent', 'poor', 'good', 'bad', 'undamaged', 'damaged', 'slightly damaged', 'tattered'}
             identified_lower = identified_text.lower()
             if identified_text and not identified_lower.startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')) and identified_lower not in quality_descriptions:
                 parsed_name, parsed_article, parsed_plural = parse_item_name(identified_text)
