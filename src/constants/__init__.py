@@ -175,6 +175,7 @@ __all__ = [
     'ITEM_IDS',
     'POTION_EFFECTS',
     'SPECIAL_WANDS',
+    'SPELL_OBJECT_QUALITY_CORRECTIONS',
     'QUEST_BOOK_TEXT_INDICES',
     'get_category',
     'get_detailed_category',

@@ -443,7 +443,7 @@ def get_tmap_info(quality: int, owner: int) -> Dict[str, Any]:
 
 
 # Special Wands with unique spells that can't be cast normally
-# These wands have spells that aren't in the spell table, so they show as "unknown spell"
+# These wands have spells that aren't in the spell table
 # Key: (level, tile_x, tile_y) -> description dict
 SPECIAL_WANDS = {
     # Bullfrog Wand on Level 4 - used to solve the Puzzle of the Bullfrog
@@ -451,6 +451,11 @@ SPECIAL_WANDS = {
         'name': 'Bullfrog Wand',
     },
 }
+
+# Note: The correct wand spell mapping logic is now implemented in the exporters.
+# When a spell object (0x120) has is_quantity=True and quantity_or_link >= 256,
+# the spell index is calculated as: quantity_or_link - 256
+# Otherwise, the spell index is: quality + 256 (if quality < 64)
 
 
 def get_special_wand_info(level: int, tile_x: int, tile_y: int) -> Optional[Dict[str, str]]:
@@ -466,6 +471,8 @@ def get_special_wand_info(level: int, tile_x: int, tile_y: int) -> Optional[Dict
         Dictionary with wand info or None if not a special wand
     """
     return SPECIAL_WANDS.get((level, tile_x, tile_y))
+
+
 
 
 # Location-based category overrides

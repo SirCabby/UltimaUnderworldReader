@@ -263,12 +263,22 @@ class XlsxExporter:
                                 
                                 # Wands - show spell from linked object
                                 elif 0x98 <= obj.item_id <= 0x9B:
-                                    if not obj.is_quantity:
+                                    # Check for special wands with unique spells or incorrect mappings first
+                                    from ..constants import get_special_wand_info
+                                    special_wand = get_special_wand_info(npc.level, obj.tile_x, obj.tile_y)
+                                    if special_wand:
+                                        item_desc = f"wand of {special_wand['name']} ({obj.quality} charges)"
+                                    elif not obj.is_quantity:
                                         link = obj.quantity_or_link
                                         if link in level.objects:
                                             spell_obj = level.objects[link]
                                             if spell_obj.item_id == 0x120:
-                                                spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                                                # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
+                                                # Otherwise use quality + 256 (if quality < 64)
+                                                if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
+                                                    spell_idx = spell_obj.quantity_or_link - 256
+                                                else:
+                                                    spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
                                                 spell = spell_names[spell_idx] if spell_idx < len(spell_names) else ""
                                                 if spell:
                                                     item_desc = f"wand of {spell} ({obj.quality} charges)"
@@ -553,19 +563,25 @@ class XlsxExporter:
         
         # Wands (0x98-0x9B)
         if 0x98 <= object_id <= 0x9B:
+            # Check for special wands with unique spells or incorrect mappings first
+            from ..constants import get_special_wand_info
+            special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
+            if special_wand:
+                return f"{special_wand['name']} ({item.quality} charges)"
+            
             if level_parser and not item.is_quantity:
                 level = level_parser.get_level(item.level)
                 if level and item.special_link in level.objects:
                     spell_obj = level.objects[item.special_link]
                     if spell_obj.item_id == 0x120:
-                        spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                        # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
+                        # Otherwise use quality + 256 (if quality < 64)
+                        if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
+                            spell_idx = spell_obj.quantity_or_link - 256
+                        else:
+                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
                         if spell_idx < len(spell_names) and spell_names[spell_idx]:
                             return f"Wand of {spell_names[spell_idx]}"
-            # Check for special wands with unique spells
-            from ..constants import get_special_wand_info
-            special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
-            if special_wand:
-                return f"{special_wand['name']} ({item.quality} charges)"
             return f"Wand (unknown spell, {item.quality} charges)"
         
         # Map (0x13B)
@@ -719,20 +735,26 @@ class XlsxExporter:
         
         # Wands
         if 0x98 <= object_id <= 0x9B:
+            # Check for special wands with unique spells or incorrect mappings first
+            special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
+            if special_wand:
+                return f"{special_wand['name']} ({item.quality} charges)"
+            
             if level_parser and not item.is_quantity:
                 level = level_parser.get_level(item.level)
                 if level and item.special_link in level.objects:
                     spell_obj = level.objects[item.special_link]
                     if spell_obj.item_id == 0x120:
-                        spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                        # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
+                        # Otherwise use quality + 256 (if quality < 64)
+                        if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
+                            spell_idx = spell_obj.quantity_or_link - 256
+                        else:
+                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
                         spell = spell_names.get(spell_idx, "")
                         if spell:
                             spell_with_desc = format_spell_with_description(spell)
                             return f"{spell_with_desc} ({item.quality} charges)"
-            # Check for special wands with unique spells not in the spell table
-            special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
-            if special_wand:
-                return f"{special_wand['name']} ({item.quality} charges)"
             return f"Unknown spell ({item.quality} charges)" if item.quality > 0 else "Empty"
         
         # Keys

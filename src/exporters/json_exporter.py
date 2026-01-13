@@ -314,21 +314,27 @@ class JsonExporter:
             
             # Wands (0x98-0x9B)
             if 0x98 <= object_id <= 0x9B:
-                if levels and not is_quantity:
-                    level = levels.get(level_num)
-                    if level and special_link in level.objects:
-                        spell_obj = level.objects[special_link]
-                        if spell_obj.item_id == 0x120:
-                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
-                            if spell_idx in spell_names:
-                                return f"Wand of {spell_names[spell_idx]}"
-                # Check for special wands with unique spells
+                # Check for special wands with unique spells or incorrect mappings first
                 from ..constants import get_special_wand_info
                 tile_x = getattr(item, 'tile_x', 0)
                 tile_y = getattr(item, 'tile_y', 0)
                 special_wand = get_special_wand_info(level_num, tile_x, tile_y)
                 if special_wand:
                     return f"{special_wand['name']} ({quality} charges)"
+                
+                if levels and not is_quantity:
+                    level = levels.get(level_num)
+                    if level and special_link in level.objects:
+                        spell_obj = level.objects[special_link]
+                        if spell_obj.item_id == 0x120:
+                            # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
+                            # Otherwise use quality + 256 (if quality < 64)
+                            if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
+                                spell_idx = spell_obj.quantity_or_link - 256
+                            else:
+                                spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                            if spell_idx in spell_names:
+                                return f"Wand of {spell_names[spell_idx]}"
                 return f"Wand ({quality} charges)"
             
             # Map (0x13B)
@@ -498,22 +504,28 @@ class JsonExporter:
             
             # Wands - show charges and spell
             if 0x98 <= object_id <= 0x9B:
-                if levels and not is_quantity:
-                    level = levels.get(level_num)
-                    if level and special_link in level.objects:
-                        spell_obj = level.objects[special_link]
-                        if spell_obj.item_id == 0x120:
-                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
-                            spell = spell_names.get(spell_idx, "")
-                            if spell:
-                                return f"{format_spell(spell)} ({quality} charges)"
-                # Check for special wands with unique spells not in the spell table
+                # Check for special wands with unique spells or incorrect mappings first
                 from ..constants import get_special_wand_info
                 tile_x = getattr(item, 'tile_x', 0)
                 tile_y = getattr(item, 'tile_y', 0)
                 special_wand = get_special_wand_info(level_num, tile_x, tile_y)
                 if special_wand:
                     return f"{special_wand['name']} ({quality} charges)"
+                
+                if levels and not is_quantity:
+                    level = levels.get(level_num)
+                    if level and special_link in level.objects:
+                        spell_obj = level.objects[special_link]
+                        if spell_obj.item_id == 0x120:
+                            # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
+                            # Otherwise use quality + 256 (if quality < 64)
+                            if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
+                                spell_idx = spell_obj.quantity_or_link - 256
+                            else:
+                                spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
+                            spell = spell_names.get(spell_idx, "")
+                            if spell:
+                                return f"{format_spell(spell)} ({quality} charges)"
                 return f"Unknown spell ({quality} charges)" if quality > 0 else "Empty"
             
             # Keys
