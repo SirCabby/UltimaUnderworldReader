@@ -595,6 +595,34 @@ class JsonExporter:
                     return f"Unknown enchantment ({ench_property})"
                 return ""
             
+            # For armor items, check for enchantment even if is_enchanted flag is not set
+            # Some armor items may have enchantment data in the link field without the flag set
+            if 0x20 <= object_id < 0x40 and not is_enchanted:
+                link = quantity if is_quantity else special_link
+                if link >= 512:
+                    ench_property = link - 512
+                    if 192 <= ench_property <= 199:
+                        spell_idx = 464 + (ench_property - 192)
+                        spell = spell_names.get(spell_idx, "")
+                        if spell:
+                            return format_spell(spell)
+                        return f"Protection +{ench_property - 191}"
+                    elif 200 <= ench_property <= 207:
+                        spell_idx = 472 + (ench_property - 200)
+                        spell = spell_names.get(spell_idx, "")
+                        if spell:
+                            return format_spell(spell)
+                        return f"Toughness +{ench_property - 199}"
+                    elif ench_property < 64:
+                        spell_idx = 256 + ench_property
+                        spell = spell_names.get(spell_idx, "")
+                        return format_spell(spell)
+                    else:
+                        spell = spell_names.get(ench_property, "")
+                        if spell:
+                            return format_spell(spell)
+                        return f"Enchantment #{ench_property}"
+            
             # Check if enchanted (for other item types)
             if not is_enchanted:
                 return ""
