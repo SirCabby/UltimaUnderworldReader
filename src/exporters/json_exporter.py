@@ -557,7 +557,33 @@ class JsonExporter:
                 else:
                     return "Heals Wounds"
             
-            # Check if enchanted
+            # For sceptres, check for enchantment even if is_enchanted flag is not set
+            # Sceptres encode enchantments with a -76 offset: ench_property - 76 = spell_index
+            # Example: 760 - 512 = 248, then 248 - 76 = 172 ("Restore Mana")
+            if object_id == 0x0AA:
+                # Try special_link first (standard enchantment encoding)
+                link = special_link
+                if link >= 512:
+                    ench_property = link - 512
+                    # Sceptres use offset -76 to map to spell index
+                    spell_idx = ench_property - 76
+                    spell = spell_names.get(spell_idx, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Unknown enchantment ({ench_property})"
+                # Try quantity (may be used for sceptres even when is_quantity is False)
+                link = quantity
+                if link >= 512:
+                    ench_property = link - 512
+                    # Sceptres use offset -76 to map to spell index
+                    spell_idx = ench_property - 76
+                    spell = spell_names.get(spell_idx, "")
+                    if spell:
+                        return format_spell(spell)
+                    return f"Unknown enchantment ({ench_property})"
+                return ""
+            
+            # Check if enchanted (for other item types)
             if not is_enchanted:
                 return ""
             
