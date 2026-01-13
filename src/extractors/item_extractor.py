@@ -160,8 +160,11 @@ class ItemExtractor:
         # Try Block 5 at object ID index for enchanted items
         if item_id < len(block5) and block5[item_id]:
             identified_text = block5[item_id].strip()
-            # Check if it looks like a name (not a description starting with common phrases)
-            if identified_text and not identified_text.lower().startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')):
+            # Skip quality descriptions that are commonly used in Block 5
+            quality_descriptions = {'massive', 'sturdy', 'new', 'smooth', 'old', 'worn', 'broken', 'fine', 'excellent', 'poor', 'good', 'bad'}
+            identified_lower = identified_text.lower()
+            # Check if it looks like a name (not a description starting with common phrases, and not a quality description)
+            if identified_text and not identified_lower.startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')) and identified_lower not in quality_descriptions:
                 # Try to parse as name format
                 parsed_name, parsed_article, parsed_plural = parse_item_name(identified_text)
                 if parsed_name and parsed_name != base_name:
@@ -178,7 +181,10 @@ class ItemExtractor:
         # Try Block 5 at object ID + 512 (if Block 5 has extended entries)
         if extended_idx < len(block5) and block5[extended_idx]:
             identified_text = block5[extended_idx].strip()
-            if identified_text and not identified_text.lower().startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')):
+            # Skip quality descriptions that are commonly used in Block 5
+            quality_descriptions = {'massive', 'sturdy', 'new', 'smooth', 'old', 'worn', 'broken', 'fine', 'excellent', 'poor', 'good', 'bad'}
+            identified_lower = identified_text.lower()
+            if identified_text and not identified_lower.startswith(('it is', 'it looks', 'this is', 'you see', 'a ', 'an ', 'some ')) and identified_lower not in quality_descriptions:
                 parsed_name, parsed_article, parsed_plural = parse_item_name(identified_text)
                 if parsed_name and parsed_name != base_name:
                     return parsed_name, parsed_article, parsed_plural
