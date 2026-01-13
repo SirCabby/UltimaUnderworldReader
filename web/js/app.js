@@ -3929,7 +3929,47 @@ function renderObjectDetails(item, isNpc) {
         }
     } else {
         const catColor = getCategoryColor(item.category);
-        const objId = typeof item.object_id === 'string' ? parseInt(item.object_id, 16) : (item.object_id || 0);
+        // Try to get object_id from multiple possible sources - ALWAYS display Object ID
+        let objId = item.object_id;
+        
+        // Check if object_id exists and is valid
+        if (objId === undefined || objId === null || objId === '') {
+            // Try to get from object_id_hex if available
+            if (item.object_id_hex) {
+                objId = parseInt(item.object_id_hex, 16);
+            } else if (item.id !== undefined) {
+                // Last resort: try to use id if it's a valid object ID (0-511)
+                // But only if it looks like an object ID, not an index
+                const testId = Number(item.id);
+                if (!isNaN(testId) && testId >= 0 && testId <= 511) {
+                    objId = testId;
+                } else {
+                    objId = 0;
+                }
+            } else {
+                // Fallback to 0 if not found
+                objId = 0;
+            }
+        }
+        
+        // Handle string hex values (e.g., "0x0AA" or "0AA")
+        if (typeof objId === 'string') {
+            if (objId.startsWith('0x') || objId.startsWith('0X')) {
+                objId = parseInt(objId, 16);
+            } else if (/^[0-9A-Fa-f]+$/.test(objId)) {
+                objId = parseInt(objId, 16);
+            } else {
+                objId = parseInt(objId, 10);
+            }
+        }
+        
+        // Ensure it's a valid number (0-511 for object IDs)
+        objId = Number(objId);
+        if (isNaN(objId) || objId < 0 || objId > 511) {
+            objId = 0;
+        }
+        
+        // ALWAYS display Object ID - this should never be skipped
         html += `
             <div class="detail-row">
                 <span class="detail-label">Category</span>
@@ -4547,16 +4587,40 @@ function selectContainerItem(item, parentContainer = null) {
     html += `<div class="detail-name">${getItemDisplayName(item)}</div>`;
     
     const catColor = getCategoryColor(item.category);
+    
+    // Get object_id - try multiple sources
+    let objId = item.object_id;
+    if (objId === undefined || objId === null || objId === '') {
+        if (item.object_id_hex) {
+            objId = parseInt(item.object_id_hex, 16);
+        } else {
+            objId = 0;
+        }
+    }
+    if (typeof objId === 'string') {
+        if (objId.startsWith('0x') || objId.startsWith('0X')) {
+            objId = parseInt(objId, 16);
+        } else if (/^[0-9A-Fa-f]+$/.test(objId)) {
+            objId = parseInt(objId, 16);
+        } else {
+            objId = parseInt(objId, 10);
+        }
+    }
+    objId = Number(objId) || 0;
+    
     html += `
         <div class="detail-row">
             <span class="detail-label">Category</span>
             <span class="detail-category" style="background: ${catColor}22; color: ${catColor};">${formatCategory(item.category)}</span>
         </div>
+        <div class="detail-row">
+            <span class="detail-label">Object ID</span>
+            <span class="detail-value" style="font-family: var(--font-mono);">${objId} (0x${objId.toString(16).toUpperCase().padStart(3, '0')})</span>
+        </div>
     `;
     
     // Show quantity for stackable items (always show in selected object view, even if 1)
     // Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems, resilient spears
-    const objId = typeof item.object_id === 'string' ? parseInt(item.object_id, 16) : (item.object_id || 0);
     const quantityItems = [0x0A2, 0x0A3, 0x0A4, 0x0A6, 0x0A7]; // Ruby (162), Red gem (163), Small blue gem (164), Sapphire (166), Emerald (167)
     const canHaveQuantity = quantityItems.includes(objId);
     
@@ -4910,6 +4974,7 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             ${locationImageHtml}
             <div class="detail-name" style="font-size: 0.9rem;">${getItemDisplayName(obj)}${hasContents ? ' 📦' : ''}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${formatCategory(obj.category)}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">ID: ${objId} (0x${objId.toString(16).toUpperCase().padStart(3, '0')})</div>
             ${statsLine}
             ${contentsInfo}
             ${descriptionHtml}
