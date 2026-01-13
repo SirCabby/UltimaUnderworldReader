@@ -294,16 +294,20 @@ class LevelParser:
         # Parse mobile objects (indices 0-255)
         for i in range(self.MOBILE_OBJECT_COUNT):
             offset = self.OFFSET_MOBILE + i * self.MOBILE_OBJECT_SIZE
-            obj = self._parse_object(i, data, offset, is_mobile=True)
-            if obj.item_id != 0:  # Skip empty slots
+            # Check if slot is completely empty (all zeros) before parsing
+            words = struct.unpack_from('<4H', data, offset)
+            if not all(w == 0 for w in words):  # Only parse non-empty slots
+                obj = self._parse_object(i, data, offset, is_mobile=True)
                 objects[i] = obj
         
         # Parse static objects (indices 256-1023)
         for i in range(self.STATIC_OBJECT_COUNT):
             idx = i + 256
             offset = self.OFFSET_STATIC + i * self.STATIC_OBJECT_SIZE
-            obj = self._parse_object(idx, data, offset, is_mobile=False)
-            if obj.item_id != 0:  # Skip empty slots
+            # Check if slot is completely empty (all zeros) before parsing
+            words = struct.unpack_from('<4H', data, offset)
+            if not all(w == 0 for w in words):  # Only parse non-empty slots
+                obj = self._parse_object(idx, data, offset, is_mobile=False)
                 objects[idx] = obj
         
         # Set tile coordinates for objects based on their position in tile chains
