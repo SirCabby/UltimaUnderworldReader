@@ -763,10 +763,26 @@ class XlsxExporter:
                 return f"Opens lock #{item.owner}"
             return ""
         
-        # Books/Scrolls
+        # Books/Scrolls - text index reference or spell name for spell scrolls
         if 0x130 <= object_id <= 0x13F and object_id != 0x13B:
             if item.is_quantity and link_value >= 512:
-                return f"Text #{link_value - 512}"
+                text_idx = link_value - 512
+                # For enchanted scrolls (spell scrolls), show the spell name
+                if item.is_enchanted:
+                    # Try multiple offsets: +256 (common), +144 (for some spells like Hallucination), then direct
+                    spell_256 = spell_names.get(text_idx + 256, "")
+                    if spell_256:
+                        return format_spell_with_description(spell_256)
+                    spell_144 = spell_names.get(text_idx + 144, "")
+                    if spell_144:
+                        return format_spell_with_description(spell_144)
+                    # Try raw index
+                    spell_raw = spell_names.get(text_idx, "")
+                    if spell_raw:
+                        return format_spell_with_description(spell_raw)
+                    return f"Spell #{text_idx}"
+                # Regular readable scrolls/books
+                return f"Text #{text_idx}"
             return ""
         
         # Potions
@@ -786,14 +802,20 @@ class XlsxExporter:
                 return "Heals Wounds"
         
         # For sceptres, check for enchantment even if is_enchanted flag is not set
-        # Sceptres encode enchantments with a -76 offset: ench_property - 76 = spell_index
+        # Sceptres encode enchantments with an offset: ench_property - offset = spell_index
+        # Try -73 first (works for some sceptres like Ally), then fall back to -76
         # Example: 760 - 512 = 248, then 248 - 76 = 172 ("Restore Mana")
         if object_id == 0x0AA:
             # Try special_link first (standard enchantment encoding)
             link = item.special_link
             if link >= 512:
                 ench_property = link - 512
-                # Sceptres use offset -76 to map to spell index
+                # Try -73 offset first
+                spell_idx = ench_property - 73
+                spell = spell_names.get(spell_idx, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                # Fall back to -76 offset
                 spell_idx = ench_property - 76
                 spell = spell_names.get(spell_idx, "")
                 if spell:
@@ -803,7 +825,12 @@ class XlsxExporter:
             link = item.quantity
             if link >= 512:
                 ench_property = link - 512
-                # Sceptres use offset -76 to map to spell index
+                # Try -73 offset first
+                spell_idx = ench_property - 73
+                spell = spell_names.get(spell_idx, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                # Fall back to -76 offset
                 spell_idx = ench_property - 76
                 spell = spell_names.get(spell_idx, "")
                 if spell:
@@ -834,9 +861,16 @@ class XlsxExporter:
                         return format_spell_with_description(spell)
                     return f"Toughness +{ench_property - 199}"
                 elif ench_property < 64:
+                    # Try direct index first (some spells are at direct index)
+                    spell = spell_names.get(ench_property, "")
+                    if spell:
+                        return format_spell_with_description(spell)
+                    # Fall back to 256+offset (other spells use this mapping)
                     spell_idx = 256 + ench_property
                     spell = spell_names.get(spell_idx, "")
-                    return format_spell_with_description(spell)
+                    if spell:
+                        return format_spell_with_description(spell)
+                    return f"Enchantment #{ench_property}"
                 else:
                     spell = spell_names.get(ench_property, "")
                     if spell:
@@ -905,9 +939,16 @@ class XlsxExporter:
                     return format_spell_with_description(spell)
                 return f"Toughness +{ench_property - 199}"
             elif ench_property < 64:
+                # Try direct index first (some spells are at direct index)
+                spell = spell_names.get(ench_property, "")
+                if spell:
+                    return format_spell_with_description(spell)
+                # Fall back to 256+offset (other spells use this mapping)
                 spell_idx = 256 + ench_property
                 spell = spell_names.get(spell_idx, "")
-                return format_spell_with_description(spell)
+                if spell:
+                    return format_spell_with_description(spell)
+                return f"Enchantment #{ench_property}"
             else:
                 # Values 64-191: Look up directly in spell names
                 # This includes Cursed (144-159), various spell effects, etc.

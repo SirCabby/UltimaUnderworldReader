@@ -223,6 +223,8 @@ Contains property tables for specific object classes:
 | `map_data.json` | Level statistics |
 | `ultima_underworld_data.xlsx` | Multi-sheet Excel workbook |
 
+**Note on Difficulty Settings**: Ultima Underworld has two difficulty settings (Standard and Easy). Item locations may differ between difficulties. The exported data represents one difficulty setting (the exact setting cannot be determined from the data files alone). See [DIFFICULTY.md](DIFFICULTY.md) for details.
+
 ## API Usage
 
 ```python
