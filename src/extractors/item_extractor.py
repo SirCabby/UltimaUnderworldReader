@@ -387,6 +387,15 @@ class ItemExtractor:
                     if can_have_quantity and quantity == 0:
                         quantity = 1
                 
+                # For armor items, check if enchantment data is present even if is_enchanted flag is not set
+                # Some armor items may have enchantment data in the link field without the flag set
+                is_enchanted = obj.is_enchanted
+                if 0x20 <= obj.item_id < 0x40 and not is_enchanted:
+                    # Check if link field contains enchantment data (>= 512)
+                    # Use quantity_or_link directly since we've already determined quantity/special_link
+                    if obj.quantity_or_link >= 512:
+                        is_enchanted = True
+                
                 # Get base and detailed categories
                 base_category = get_category(obj.item_id)
                 # Look up can_be_picked_up from item type if available
@@ -395,7 +404,7 @@ class ItemExtractor:
                     can_be_picked_up = self.item_types[obj.item_id].can_be_picked_up
                 detailed_cat = get_detailed_category(
                     obj.item_id,
-                    is_enchanted=obj.is_enchanted,
+                    is_enchanted=is_enchanted,
                     owner=obj.owner,
                     special_link=special_link,
                     can_be_picked_up=can_be_picked_up
@@ -428,7 +437,7 @@ class ItemExtractor:
                     owner=obj.owner,
                     quantity=quantity,
                     flags=obj.flags,
-                    is_enchanted=obj.is_enchanted,
+                    is_enchanted=is_enchanted,
                     is_invisible=obj.is_invisible,
                     is_quantity=obj.is_quantity,
                     object_class=base_category,

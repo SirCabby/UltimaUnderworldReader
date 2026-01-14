@@ -113,6 +113,7 @@ const state = {
     pan: { x: 0, y: 0 },
     isDragging: false,
     dragStart: { x: 0, y: 0 },
+    zoomLocked: false,  // Lock zoom level to prevent changes
     filters: {
         categories: new Set(),  // Active category filters
         search: '',
@@ -550,6 +551,7 @@ function setupEventListeners() {
     document.getElementById('zoom-in').addEventListener('click', () => adjustZoom(CONFIG.zoom.step));
     document.getElementById('zoom-out').addEventListener('click', () => adjustZoom(-CONFIG.zoom.step));
     document.getElementById('zoom-reset').addEventListener('click', resetView);
+    document.getElementById('zoom-lock').addEventListener('click', toggleZoomLock);
     
     // Mouse wheel zoom
     elements.mapContainer.addEventListener('wheel', handleWheel, { passive: false });
@@ -634,6 +636,7 @@ function updateOwnedFilterUI() {
 }
 
 function handleWheel(e) {
+    if (state.zoomLocked) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? -CONFIG.zoom.step : CONFIG.zoom.step;
     adjustZoom(delta);
@@ -5133,6 +5136,7 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
 // ============================================================================
 
 function adjustZoom(delta) {
+    if (state.zoomLocked) return;
     state.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, state.zoom + delta));
     updateMapTransform();
     elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
@@ -5140,11 +5144,26 @@ function adjustZoom(delta) {
 }
 
 function resetView() {
+    if (state.zoomLocked) return;
     state.zoom = CONFIG.zoom.default;
     state.pan = { x: 0, y: 0 };
     updateMapTransform();
     elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
     updateUrlHash();
+}
+
+function toggleZoomLock() {
+    state.zoomLocked = !state.zoomLocked;
+    const lockBtn = document.getElementById('zoom-lock');
+    if (state.zoomLocked) {
+        lockBtn.classList.add('locked');
+        lockBtn.title = 'Unlock Zoom Level';
+        lockBtn.textContent = '🔓';
+    } else {
+        lockBtn.classList.remove('locked');
+        lockBtn.title = 'Lock Zoom Level';
+        lockBtn.textContent = '🔒';
+    }
 }
 
 function updateMapTransform() {

@@ -846,6 +846,19 @@ body {
     color: var(--text-accent);
 }
 
+.zoom-btn.locked {
+    background: var(--text-accent);
+    border-color: var(--text-accent);
+    color: var(--bg-primary);
+}
+
+.zoom-btn.locked:hover {
+    background: var(--text-accent);
+    border-color: var(--text-accent);
+    color: var(--bg-primary);
+    opacity: 0.9;
+}
+
 .zoom-level {
     font-family: var(--font-mono);
     font-size: 0.85rem;
