@@ -22,6 +22,24 @@
                     <input type="text" id="search-input" placeholder="Search objects...">
                     <span class="search-icon">🔍</span>
                 </div>
+                <div class="save-game-controls">
+                    <div class="save-game-status" id="save-game-status">
+                        <span class="status-label">Base Game</span>
+                    </div>
+                    <div class="save-game-actions">
+                        <input type="file" id="save-game-input" webkitdirectory directory multiple style="display: none;" accept=".ark,.dat">
+                        <button type="button" id="load-save-btn" class="save-game-btn" title="Load Save Game Directory">
+                            📁 Load Save
+                        </button>
+                        <button type="button" id="revert-save-btn" class="save-game-btn" disabled title="Revert to Base Game">
+                            ↶ Revert
+                        </button>
+                        <label class="save-game-toggle">
+                            <input type="checkbox" id="show-changes-only">
+                            <span>Changes Only</span>
+                        </label>
+                    </div>
+                </div>
             </div>
         </header>
 

@@ -125,6 +125,72 @@ body {
     gap: 16px;
 }
 
+/* Save Game Controls */
+.save-game-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.save-game-status {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.save-game-status.loaded {
+    color: #69db7c;
+    background: rgba(105, 219, 124, 0.1);
+}
+
+.save-game-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.save-game-btn {
+    padding: 6px 12px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.save-game-btn:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    border-color: var(--border-accent);
+}
+
+.save-game-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.save-game-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.save-game-toggle input[type="checkbox"] {
+    cursor: pointer;
+}
+
 .search-box {
     position: relative;
 }
@@ -808,6 +874,57 @@ body {
 .markers-layer .stairs-rect.selected,
 .markers-layer .stairs-marker.selected .stairs-rect {
     filter: brightness(1.2) drop-shadow(0 0 3px rgba(108, 117, 125, 0.6));
+}
+
+/* Save Game Change Indicators */
+.markers-layer .marker-group.marker-removed .marker {
+    opacity: 0.5;
+    stroke: #ff4444 !important;
+    stroke-width: 2 !important;
+    stroke-dasharray: 3 2 !important;
+}
+
+.markers-layer .marker-group.marker-added .marker {
+    stroke: #69db7c !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 4px rgba(105, 219, 124, 0.8));
+}
+
+.markers-layer .marker-group.marker-moved .marker {
+    stroke: #ffa94d !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 4px rgba(255, 169, 77, 0.6));
+}
+
+.markers-layer .marker-group.marker-modified .marker {
+    stroke: #748ffc !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 4px rgba(116, 143, 252, 0.6));
+}
+
+/* Change indicators for stacked markers */
+.markers-layer .marker-stack.marker-removed .count-badge circle {
+    stroke: #ff4444 !important;
+    stroke-dasharray: 3 2 !important;
+    opacity: 0.7;
+}
+
+.markers-layer .marker-stack.marker-added .count-badge circle {
+    stroke: #69db7c !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 4px rgba(105, 219, 124, 0.8));
+}
+
+.markers-layer .marker-stack.marker-moved .count-badge circle {
+    stroke: #ffa94d !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 4px rgba(255, 169, 77, 0.6));
+}
+
+.markers-layer .marker-stack.marker-modified .count-badge circle {
+    stroke: #748ffc !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 4px rgba(116, 143, 252, 0.6));
 }
 
 /* Zoom Controls */

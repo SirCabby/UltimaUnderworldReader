@@ -43,6 +43,8 @@ from .image_parser import (
     BitmapHeader,
     SpriteImage,
 )
+from .save_game_parser import SaveGameParser
+from .save_game_comparator import SaveGameComparator, ObjectChange
 
 __all__ = [
     # Strings
@@ -93,4 +95,8 @@ __all__ = [
     # Animations
     'AnimationFileParser',
     'AnimationFrame',
+    # Save games
+    'SaveGameParser',
+    'SaveGameComparator',
+    'ObjectChange',
 ]

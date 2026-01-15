@@ -125,6 +125,13 @@ const state = {
     tooltipHideTimeout: null,  // For delayed tooltip hiding
     isTooltipHovered: false,   // Track if tooltip is being hovered
     collapsedCategories: new Set(),  // Tracks which categories are collapsed in visible objects list
+    saveGame: {
+        loaded: false,
+        saveData: null,      // Parsed save game data
+        changes: null,        // Change metadata
+        baseData: null,       // Original base game data (backup)
+        showChangesOnly: false // Toggle state
+    },
 };
 
 // ============================================================================
@@ -438,6 +445,11 @@ const elements = {
     enchantedCount: null,
     ownedFilter: null,
     ownedFilterLabel: null,
+    saveGameInput: null,
+    loadSaveBtn: null,
+    revertSaveBtn: null,
+    showChangesOnly: null,
+    saveGameStatus: null,
 };
 
 // ============================================================================
@@ -517,6 +529,11 @@ function cacheElements() {
     elements.enchantedCount = document.getElementById('enchanted-count');
     elements.ownedFilter = document.getElementById('owned-filter');
     elements.ownedFilterLabel = document.getElementById('owned-filter-label');
+    elements.saveGameInput = document.getElementById('save-game-input');
+    elements.loadSaveBtn = document.getElementById('load-save-btn');
+    elements.revertSaveBtn = document.getElementById('revert-save-btn');
+    elements.showChangesOnly = document.getElementById('show-changes-only');
+    elements.saveGameStatus = document.getElementById('save-game-status');
 }
 
 async function loadData() {
@@ -531,6 +548,9 @@ async function loadData() {
         throw new Error('Invalid data format: missing or invalid categories array');
     }
     
+    // Store base data backup
+    state.saveGame.baseData = JSON.parse(JSON.stringify(state.data));
+    
     // Initialize filters with all categories enabled (will be overridden by restoreState if saved filters exist)
     state.filters.categories.clear();
     state.data.categories.forEach(cat => {
@@ -540,6 +560,180 @@ async function loadData() {
     state.filters.categories.add('npcs_hostile');
     state.filters.categories.add('npcs_friendly');
     state.filters.categories.add('npcs_named');
+}
+
+// ============================================================================
+// Save Game Loading
+// ============================================================================
+
+/**
+ * Load save game from uploaded directory
+ */
+async function loadSaveGame(files) {
+    if (!files || files.length === 0) {
+        alert('Please select a save game directory');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        elements.loadSaveBtn.disabled = true;
+        elements.loadSaveBtn.textContent = 'Loading...';
+        
+        // Create FormData with all files
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+        
+        // Send to server
+        const response = await fetch('/api/upload-save', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to load save game');
+        }
+        
+        // Store save game data
+        state.saveGame.loaded = true;
+        state.saveGame.saveData = result.save_data;
+        state.saveGame.changes = result.changes;
+        
+        // Merge save data into state.data (replace levels with save game levels)
+        // Keep categories and metadata from base
+        state.data.levels = result.save_data.levels.map(level => ({
+            ...level,
+            // Preserve secrets from base game if they exist
+            secrets: state.data.levels[level.level]?.secrets || []
+        }));
+        
+        // Update UI
+        updateSaveGameUI();
+        renderMarkers();
+        updateStats();
+        updateCategoryCounts();
+        refreshVisibleObjectsIfNoSelection();
+        
+        // Show success message
+        const summary = result.summary;
+        console.log('Save game loaded:', summary);
+        
+    } catch (error) {
+        console.error('Error loading save game:', error);
+        alert(`Error loading save game: ${error.message}`);
+    } finally {
+        elements.loadSaveBtn.disabled = false;
+        elements.loadSaveBtn.textContent = '📁 Load Save';
+    }
+}
+
+/**
+ * Revert to base game data
+ */
+function revertToBaseGame() {
+    if (!state.saveGame.baseData) {
+        console.warn('No base data to revert to');
+        return;
+    }
+    
+    // Restore base data
+    state.data = JSON.parse(JSON.stringify(state.saveGame.baseData));
+    
+    // Clear save game state
+    state.saveGame.loaded = false;
+    state.saveGame.saveData = null;
+    state.saveGame.changes = null;
+    state.saveGame.showChangesOnly = false;
+    
+    // Update UI
+    updateSaveGameUI();
+    renderMarkers();
+    updateStats();
+    updateCategoryCounts();
+    refreshVisibleObjectsIfNoSelection();
+    
+    // Uncheck changes only toggle
+    if (elements.showChangesOnly) {
+        elements.showChangesOnly.checked = false;
+    }
+}
+
+/**
+ * Toggle between showing all objects and changes only
+ */
+function toggleChangesView() {
+    state.saveGame.showChangesOnly = elements.showChangesOnly.checked;
+    renderMarkers();
+    updateStats();
+}
+
+/**
+ * Update save game UI elements
+ */
+function updateSaveGameUI() {
+    if (state.saveGame.loaded) {
+        elements.revertSaveBtn.disabled = false;
+        elements.saveGameStatus.textContent = 'Save Game Loaded';
+        elements.saveGameStatus.classList.add('loaded');
+    } else {
+        elements.revertSaveBtn.disabled = true;
+        elements.saveGameStatus.textContent = 'Base Game';
+        elements.saveGameStatus.classList.remove('loaded');
+    }
+}
+
+/**
+ * Get change type for an object
+ */
+function getObjectChangeType(item) {
+    if (!state.saveGame.loaded || !item) {
+        return null;
+    }
+    
+    // Check if item has change_type property (from save data)
+    if (item.change_type) {
+        return item.change_type;
+    }
+    
+    // Check changes metadata
+    if (state.saveGame.changes && state.saveGame.changes[state.currentLevel]) {
+        const levelChanges = state.saveGame.changes[state.currentLevel];
+        
+        // Check removed objects
+        for (const change of levelChanges.removed || []) {
+            if (change.base_data && change.base_data.id === item.id) {
+                return 'removed';
+            }
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Check if object should be shown based on changes filter
+ */
+function shouldShowBasedOnChanges(item) {
+    if (!state.saveGame.loaded || !state.saveGame.showChangesOnly) {
+        return true; // Show all when not filtering
+    }
+    
+    const changeType = getObjectChangeType(item);
+    if (!changeType) {
+        return false; // No change info, hide it
+    }
+    
+    // Show only if it's a change (not unchanged)
+    return changeType !== 'unchanged';
 }
 
 // ============================================================================
@@ -581,6 +775,26 @@ function setupEventListeners() {
     
     // Owned filter
     elements.ownedFilter.addEventListener('click', handleOwnedFilter);
+    
+    // Save game controls
+    if (elements.loadSaveBtn) {
+        elements.loadSaveBtn.addEventListener('click', () => {
+            elements.saveGameInput?.click();
+        });
+    }
+    if (elements.saveGameInput) {
+        elements.saveGameInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                loadSaveGame(e.target.files);
+            }
+        });
+    }
+    if (elements.revertSaveBtn) {
+        elements.revertSaveBtn.addEventListener('click', revertToBaseGame);
+    }
+    if (elements.showChangesOnly) {
+        elements.showChangesOnly.addEventListener('change', toggleChangesView);
+    }
     
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboard);
@@ -1153,7 +1367,7 @@ function renderMarkers() {
         const npcCategoryMatch = state.filters.categories.has(npcCategory);
         const hasMatchingInventory = hasContentMatchingCategory(npc.inventory);
         
-        if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc)) {
+        if ((npcCategoryMatch || hasMatchingInventory) && shouldShowItem(npc) && shouldShowBasedOnChanges(npc)) {
             const key = `${npc.tile_x},${npc.tile_y}`;
             if (!tileGroups.has(key)) {
                 tileGroups.set(key, []);
@@ -1171,7 +1385,7 @@ function renderMarkers() {
         const objCategoryMatch = state.filters.categories.has(obj.category);
         const hasMatchingContents = hasContentMatchingCategory(obj.contents);
         
-        if ((objCategoryMatch || hasMatchingContents) && shouldShowItem(obj)) {
+        if ((objCategoryMatch || hasMatchingContents) && shouldShowItem(obj) && shouldShowBasedOnChanges(obj)) {
             const key = `${obj.tile_x},${obj.tile_y}`;
             if (!tileGroups.has(key)) {
                 tileGroups.set(key, []);
@@ -1266,6 +1480,26 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     group.classList.add('marker-stack');
     if (bridges.length > 0) group.classList.add('has-bridge');
     if (stairs.length > 0) group.classList.add('has-stairs');
+    
+    // Check for change types in stacked items
+    const changeTypes = new Set();
+    items.forEach(itemData => {
+        const changeType = getObjectChangeType(itemData.item);
+        if (changeType && changeType !== 'unchanged') {
+            changeTypes.add(changeType);
+        }
+    });
+    // Add change indicator classes (prioritize added > moved > modified > removed)
+    if (changeTypes.has('added')) {
+        group.classList.add('marker-added');
+    } else if (changeTypes.has('moved')) {
+        group.classList.add('marker-moved');
+    } else if (changeTypes.has('modified')) {
+        group.classList.add('marker-modified');
+    } else if (changeTypes.has('removed')) {
+        group.classList.add('marker-removed');
+    }
+    
     group.dataset.tileX = tileX;
     group.dataset.tileY = tileY;
     group.dataset.count = items.length;
@@ -2201,17 +2435,29 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     const itemIsBridge = isBridge(item);
     const itemIsStairs = isStairs(item);
     
+    // Get change type for save game visualization
+    const changeType = getObjectChangeType(item);
+    
     // Create a group to hold both hover area and marker
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('marker-group');
     if (itemIsBridge) group.classList.add('bridge-marker');
     if (itemIsStairs) group.classList.add('stairs-marker');
+    
+    // Add change indicator classes
+    if (changeType) {
+        group.classList.add(`marker-${changeType}`);
+    }
+    
     group.dataset.id = item.id;
     group.dataset.isNpc = isNpc;
     group.dataset.isBridge = itemIsBridge;
     group.dataset.isStairs = itemIsStairs;
     group.dataset.tileX = item.tile_x;
     group.dataset.tileY = item.tile_y;
+    if (changeType) {
+        group.dataset.changeType = changeType;
+    }
     
     // Create invisible tile-sized hover area (added first so marker renders on top)
     const hoverArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
