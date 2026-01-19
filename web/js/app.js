@@ -119,6 +119,7 @@ const state = {
         search: '',
         enchantedOnly: false,   // Show only enchanted items
         ownedFilter: null,      // null = all, "only" = owned only, "exclude" = exclude owned
+        changesOnly: false,     // Show only changed objects (when save game loaded)
     },
     selectedMarker: null,
     pendingSelection: null,    // For restoring selection after page load
@@ -126,11 +127,9 @@ const state = {
     isTooltipHovered: false,   // Track if tooltip is being hovered
     collapsedCategories: new Set(),  // Tracks which categories are collapsed in visible objects list
     saveGame: {
-        loaded: false,
-        saveData: null,      // Parsed save game data
-        changes: null,        // Change metadata
-        baseData: null,       // Original base game data (backup)
-        showChangesOnly: false // Toggle state
+        currentSaveName: null,  // null = base game, string = save folder name
+        saves: {},              // { folderName: { saveData, changes } }
+        baseData: null,         // Original base game data (backup)
     },
 };
 
@@ -180,6 +179,7 @@ function saveFiltersToStorage() {
         search: state.filters.search,
         enchantedOnly: state.filters.enchantedOnly,
         ownedFilter: state.filters.ownedFilter,
+        changesOnly: state.filters.changesOnly,
         collapsedCategories: Array.from(state.collapsedCategories)
     };
     try {
@@ -301,6 +301,11 @@ function restoreState() {
             state.filters.ownedFilter = storedFilters.ownedFilter;
         }
         
+        // Restore changes only filter
+        if (typeof storedFilters.changesOnly === 'boolean') {
+            state.filters.changesOnly = storedFilters.changesOnly;
+        }
+        
         // Restore collapsed categories (validate they exist)
         if (storedFilters.collapsedCategories && Array.isArray(storedFilters.collapsedCategories)) {
             state.collapsedCategories.clear();
@@ -410,6 +415,11 @@ function applyRestoredStateToUI() {
     // Apply owned filter button state
     updateOwnedFilterUI();
     
+    // Apply changes only filter checkbox
+    if (elements.changesOnlyCheckbox) {
+        elements.changesOnlyCheckbox.checked = state.filters.changesOnly;
+    }
+
     // Apply zoom level display
     if (elements.zoomLevel) {
         elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
@@ -445,11 +455,11 @@ const elements = {
     enchantedCount: null,
     ownedFilter: null,
     ownedFilterLabel: null,
+    changesOnlyFilter: null,
+    changesOnlyCheckbox: null,
     saveGameInput: null,
     loadSaveBtn: null,
-    revertSaveBtn: null,
-    showChangesOnly: null,
-    saveGameStatus: null,
+    saveGameSelector: null,
 };
 
 // ============================================================================
@@ -483,6 +493,7 @@ async function init() {
         renderNpcFilters();
         renderItemFilters();
         renderWorldFilters();
+        updateSaveGameUI();
         
         // Load the restored level (or first level if none saved), preserving pan/zoom from URL
         selectLevel(state.currentLevel, true);
@@ -529,11 +540,11 @@ function cacheElements() {
     elements.enchantedCount = document.getElementById('enchanted-count');
     elements.ownedFilter = document.getElementById('owned-filter');
     elements.ownedFilterLabel = document.getElementById('owned-filter-label');
+    elements.changesOnlyFilter = document.getElementById('changes-only-filter');
+    elements.changesOnlyCheckbox = document.getElementById('changes-only-checkbox');
     elements.saveGameInput = document.getElementById('save-game-input');
     elements.loadSaveBtn = document.getElementById('load-save-btn');
-    elements.revertSaveBtn = document.getElementById('revert-save-btn');
-    elements.showChangesOnly = document.getElementById('show-changes-only');
-    elements.saveGameStatus = document.getElementById('save-game-status');
+    elements.saveGameSelector = document.getElementById('save-game-selector');
 }
 
 async function loadData() {
@@ -603,25 +614,17 @@ async function loadSaveGame(files) {
             throw new Error(result.error || 'Failed to load save game');
         }
         
-        // Store save game data
-        state.saveGame.loaded = true;
-        state.saveGame.saveData = result.save_data;
-        state.saveGame.changes = result.changes;
+        // Extract save folder name from result
+        const saveFolderName = result.save_folder_name || 'Save Game';
         
-        // Merge save data into state.data (replace levels with save game levels)
-        // Keep categories and metadata from base
-        state.data.levels = result.save_data.levels.map(level => ({
-            ...level,
-            // Preserve secrets from base game if they exist
-            secrets: state.data.levels[level.level]?.secrets || []
-        }));
+        // Store save game data in the saves object
+        state.saveGame.saves[saveFolderName] = {
+            saveData: result.save_data,
+            changes: result.changes
+        };
         
-        // Update UI
-        updateSaveGameUI();
-        renderMarkers();
-        updateStats();
-        updateCategoryCounts();
-        refreshVisibleObjectsIfNoSelection();
+        // Switch to the newly loaded save
+        switchSaveGame(saveFolderName);
         
         // Show success message
         const summary = result.summary;
@@ -637,57 +640,91 @@ async function loadSaveGame(files) {
 }
 
 /**
- * Revert to base game data
+ * Switch between saves or base game
+ * @param {string|null} saveName - Save folder name, or null/empty string for base game
  */
-function revertToBaseGame() {
-    if (!state.saveGame.baseData) {
-        console.warn('No base data to revert to');
-        return;
+function switchSaveGame(saveName) {
+    if (!saveName || saveName === '') {
+        // Switch to base game
+        if (!state.saveGame.baseData) {
+            console.warn('No base data to switch to');
+            return;
+        }
+        
+        // Restore base data
+        state.data = JSON.parse(JSON.stringify(state.saveGame.baseData));
+        state.saveGame.currentSaveName = null;
+    } else {
+        // Switch to a specific save
+        const save = state.saveGame.saves[saveName];
+        if (!save) {
+            console.warn(`Save "${saveName}" not found`);
+            return;
+        }
+        
+        if (!state.saveGame.baseData) {
+            console.warn('No base data available');
+            return;
+        }
+        
+        // Merge save data into state.data (replace levels with save game levels)
+        // Keep categories and metadata from base
+        state.data.levels = save.saveData.levels.map(level => ({
+            ...level,
+            // Preserve secrets from base game if they exist
+            secrets: state.saveGame.baseData.levels[level.level]?.secrets || []
+        }));
+        state.saveGame.currentSaveName = saveName;
     }
     
-    // Restore base data
-    state.data = JSON.parse(JSON.stringify(state.saveGame.baseData));
-    
-    // Clear save game state
-    state.saveGame.loaded = false;
-    state.saveGame.saveData = null;
-    state.saveGame.changes = null;
-    state.saveGame.showChangesOnly = false;
-    
-    // Update UI
+    // Update UI (this will also reset changesOnly filter if switching to base)
     updateSaveGameUI();
     renderMarkers();
     updateStats();
     updateCategoryCounts();
     refreshVisibleObjectsIfNoSelection();
-    
-    // Uncheck changes only toggle
-    if (elements.showChangesOnly) {
-        elements.showChangesOnly.checked = false;
-    }
-}
-
-/**
- * Toggle between showing all objects and changes only
- */
-function toggleChangesView() {
-    state.saveGame.showChangesOnly = elements.showChangesOnly.checked;
-    renderMarkers();
-    updateStats();
 }
 
 /**
  * Update save game UI elements
  */
 function updateSaveGameUI() {
-    if (state.saveGame.loaded) {
-        elements.revertSaveBtn.disabled = false;
-        elements.saveGameStatus.textContent = 'Save Game Loaded';
-        elements.saveGameStatus.classList.add('loaded');
+    if (!elements.saveGameSelector) {
+        return;
+    }
+    
+    // Clear existing options except "Base Game"
+    elements.saveGameSelector.innerHTML = '<option value="">Base Game</option>';
+    
+    // Add all loaded saves to the dropdown
+    const saveNames = Object.keys(state.saveGame.saves).sort();
+    for (const saveName of saveNames) {
+        const option = document.createElement('option');
+        option.value = saveName;
+        option.textContent = saveName;
+        elements.saveGameSelector.appendChild(option);
+    }
+    
+    // Set the selected option based on currentSaveName
+    if (state.saveGame.currentSaveName) {
+        elements.saveGameSelector.value = state.saveGame.currentSaveName;
+        elements.saveGameSelector.classList.add('loaded');
+        // Show changes only filter when save game is loaded
+        if (elements.changesOnlyFilter) {
+            elements.changesOnlyFilter.style.display = '';
+        }
     } else {
-        elements.revertSaveBtn.disabled = true;
-        elements.saveGameStatus.textContent = 'Base Game';
-        elements.saveGameStatus.classList.remove('loaded');
+        elements.saveGameSelector.value = '';
+        elements.saveGameSelector.classList.remove('loaded');
+        // Hide changes only filter when no save game is loaded
+        if (elements.changesOnlyFilter) {
+            elements.changesOnlyFilter.style.display = 'none';
+        }
+        // Reset changes only filter state when switching to base game
+        state.filters.changesOnly = false;
+        if (elements.changesOnlyCheckbox) {
+            elements.changesOnlyCheckbox.checked = false;
+        }
     }
 }
 
@@ -695,7 +732,13 @@ function updateSaveGameUI() {
  * Get change type for an object
  */
 function getObjectChangeType(item) {
-    if (!state.saveGame.loaded || !item) {
+    if (!state.saveGame.currentSaveName || !item) {
+        return null;
+    }
+    
+    // Get current save
+    const currentSave = state.saveGame.saves[state.saveGame.currentSaveName];
+    if (!currentSave) {
         return null;
     }
     
@@ -705,8 +748,8 @@ function getObjectChangeType(item) {
     }
     
     // Check changes metadata
-    if (state.saveGame.changes && state.saveGame.changes[state.currentLevel]) {
-        const levelChanges = state.saveGame.changes[state.currentLevel];
+    if (currentSave.changes && currentSave.changes[state.currentLevel]) {
+        const levelChanges = currentSave.changes[state.currentLevel];
         
         // Check removed objects
         for (const change of levelChanges.removed || []) {
@@ -723,7 +766,7 @@ function getObjectChangeType(item) {
  * Check if object should be shown based on changes filter
  */
 function shouldShowBasedOnChanges(item) {
-    if (!state.saveGame.loaded || !state.saveGame.showChangesOnly) {
+    if (!state.saveGame.currentSaveName || !state.filters.changesOnly) {
         return true; // Show all when not filtering
     }
     
@@ -776,6 +819,11 @@ function setupEventListeners() {
     // Owned filter
     elements.ownedFilter.addEventListener('click', handleOwnedFilter);
     
+    // Changes only filter
+    if (elements.changesOnlyCheckbox) {
+        elements.changesOnlyCheckbox.addEventListener('change', handleChangesOnlyFilter);
+    }
+    
     // Save game controls
     if (elements.loadSaveBtn) {
         elements.loadSaveBtn.addEventListener('click', () => {
@@ -789,11 +837,11 @@ function setupEventListeners() {
             }
         });
     }
-    if (elements.revertSaveBtn) {
-        elements.revertSaveBtn.addEventListener('click', revertToBaseGame);
-    }
-    if (elements.showChangesOnly) {
-        elements.showChangesOnly.addEventListener('change', toggleChangesView);
+    if (elements.saveGameSelector) {
+        elements.saveGameSelector.addEventListener('change', (e) => {
+            const selectedValue = e.target.value;
+            switchSaveGame(selectedValue || null);
+        });
     }
     
     // Keyboard shortcuts
@@ -802,6 +850,14 @@ function setupEventListeners() {
 
 function handleEnchantedFilter(e) {
     state.filters.enchantedOnly = e.target.checked;
+    renderMarkers();
+    updateStats();
+    refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+function handleChangesOnlyFilter(e) {
+    state.filters.changesOnly = e.target.checked;
     renderMarkers();
     updateStats();
     refreshVisibleObjectsIfNoSelection();

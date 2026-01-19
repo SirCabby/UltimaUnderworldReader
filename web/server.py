@@ -75,12 +75,21 @@ def upload_save():
             
             # Save all uploaded files
             lev_ark_path = None
+            save_folder_name = None
             for file in files:
                 if file.filename:
                     # Preserve directory structure from webkitdirectory
                     file_path = temp_path / file.filename
                     file_path.parent.mkdir(parents=True, exist_ok=True)
                     file.save(str(file_path))
+                    
+                    # Extract save folder name from the first file's path
+                    # webkitdirectory preserves relative paths like "SAVE1/lev.ark"
+                    if save_folder_name is None and file.filename:
+                        # Get the top-level folder name
+                        path_parts = Path(file.filename).parts
+                        if len(path_parts) > 0:
+                            save_folder_name = path_parts[0]
                     
                     # Check if this is lev.ark
                     if file.filename.lower().endswith('lev.ark'):
@@ -91,10 +100,20 @@ def upload_save():
                 for lev_file in temp_path.rglob('lev.ark'):
                     if lev_file.is_file():
                         lev_ark_path = lev_file
+                        # Extract folder name from the path if not already found
+                        if save_folder_name is None:
+                            # Get relative path from temp_path
+                            rel_path = lev_file.relative_to(temp_path)
+                            if len(rel_path.parts) > 1:
+                                save_folder_name = rel_path.parts[0]
                         break
             
             if not lev_ark_path:
                 return jsonify({'error': 'lev.ark file not found in uploaded directory'}), 400
+            
+            # Default to a generic name if we couldn't extract the folder name
+            if not save_folder_name:
+                save_folder_name = 'Save Game'
             
             # Parse save game - pass the directory containing lev.ark
             save_parser = SaveGameParser(lev_ark_path.parent)
@@ -118,6 +137,7 @@ def upload_save():
             return jsonify({
                 'success': True,
                 'save_data': save_data_with_changes,
+                'save_folder_name': save_folder_name,
                 'changes': {
                     level: {
                         change_type: [

@@ -136,18 +136,29 @@ body {
     border-radius: 6px;
 }
 
-.save-game-status {
+.save-game-selector {
     font-size: 0.85rem;
     color: var(--text-secondary);
     padding: 4px 8px;
     background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     white-space: nowrap;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
 }
 
-.save-game-status.loaded {
+.save-game-selector:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-accent);
+}
+
+.save-game-selector.loaded {
     color: #69db7c;
     background: rgba(105, 219, 124, 0.1);
+    border-color: rgba(105, 219, 124, 0.3);
 }
 
 .save-game-actions {
