@@ -20,17 +20,14 @@ Input/
 You need a legal copy of Ultima Underworld I. The game is available from:
 
 - **GOG.com**: [Ultima Underworld 1+2](https://www.gog.com/game/ultima_underworld_1_2)
-- **Steam**: Search for "Ultima Underworld"
 - **Original CD-ROM**: If you have the original media
 
-### Extracting from GOG/Steam
+### Extracting from GOG
 
 After purchasing and downloading:
 
 1. **GOG**: Install the game, then find the DATA folder in the installation directory
-2. **Steam**: Right-click the game → Properties → Local Files → Browse Local Files
-
-Copy the entire `DATA` folder to `Input/UW1/DATA/`.
+2. Copy the entire `DATA` folder to `Input/UW1/DATA/`.
 
 ## Verification
 
@@ -47,14 +44,10 @@ Once you have the game files in place:
 
 ```bash
 # Extract all data to JSON and Excel
-make xlsx
-
-# Or just JSON
 make extract
 
 # Generate web map viewer
 make web
-make start
 ```
 
 ## Legal Notice
