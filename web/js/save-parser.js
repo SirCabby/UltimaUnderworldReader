@@ -602,10 +602,60 @@ function extractSaveFolderName(files) {
     return 'Save Game';
 }
 
+/**
+ * Find DESC file from a list of uploaded files
+ * The DESC file contains the user-entered save game description/name.
+ * @param {FileList} files - List of uploaded files
+ * @returns {File|null} - The DESC file or null
+ */
+function findDescFile(files) {
+    for (const file of files) {
+        // Check the filename (may include path from webkitdirectory)
+        const filename = file.name.toLowerCase();
+        if (filename === 'desc') {
+            return file;
+        }
+        
+        // Also check webkitRelativePath for nested files
+        if (file.webkitRelativePath) {
+            const pathParts = file.webkitRelativePath.toLowerCase().split('/');
+            if (pathParts[pathParts.length - 1] === 'desc') {
+                return file;
+            }
+        }
+    }
+    return null;
+}
+
+/**
+ * Parse DESC file to extract the save game name/description
+ * 
+ * The DESC file is a simple text file containing the user-entered
+ * description for the save slot.
+ * 
+ * @param {File} file - The DESC file
+ * @returns {Promise<string|null>} - The save game name or null on error
+ */
+async function parseSaveGameName(file) {
+    try {
+        const text = await file.text();
+        
+        // Trim whitespace and newlines
+        const name = text.trim();
+        
+        return name || null;
+    } catch (error) {
+        console.error('Error parsing DESC file:', error);
+        return null;
+    }
+}
+
 // Export for use in app.js
 window.SaveParser = {
     parseLevArk,
     findLevArkFile,
+    findDescFile,
+    parseSaveGameName,
     extractSaveFolderName,
     parseArkContainer,
     buildCategoryMap,

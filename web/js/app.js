@@ -615,6 +615,15 @@ async function loadSaveGame(files) {
         // Extract save folder name
         const saveFolderName = window.SaveParser.extractSaveFolderName(files);
         
+        // Try to extract save game name from DESC file
+        let saveGameName = null;
+        const descFile = window.SaveParser.findDescFile(files);
+        console.log('Looking for DESC file, found:', descFile ? descFile.name : 'not found');
+        if (descFile) {
+            saveGameName = await window.SaveParser.parseSaveGameName(descFile);
+            console.log('Parsed save game name:', saveGameName);
+        }
+        
         // Parse the save game using client-side parser
         // Pass the base game data for category and name lookup
         const baseData = state.saveGame.baseData || state.data;
@@ -630,7 +639,8 @@ async function loadSaveGame(files) {
         // Store save game data in the saves object
         state.saveGame.saves[saveFolderName] = {
             saveData: result.save_data,
-            changes: result.changes
+            changes: result.changes,
+            saveGameName: saveGameName  // Save game name from DESC file (may be null)
         };
         
         // Switch to the newly loaded save
@@ -709,9 +719,11 @@ function updateSaveGameUI() {
     // Add all loaded saves to the dropdown
     const saveNames = Object.keys(state.saveGame.saves).sort();
     for (const saveName of saveNames) {
+        const save = state.saveGame.saves[saveName];
         const option = document.createElement('option');
         option.value = saveName;
-        option.textContent = saveName;
+        // Display save game name from DESC file if available, otherwise folder name
+        option.textContent = save.saveGameName || saveName;
         elements.saveGameSelector.appendChild(option);
     }
     
