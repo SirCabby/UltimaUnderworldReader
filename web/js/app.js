@@ -113,7 +113,7 @@ const state = {
     pan: { x: 0, y: 0 },
     isDragging: false,
     dragStart: { x: 0, y: 0 },
-    zoomLocked: false,  // Lock zoom level to prevent changes
+    viewLocked: false,  // Lock zoom and pan to prevent changes
     filters: {
         categories: new Set(),  // Active category filters
         search: '',
@@ -180,7 +180,8 @@ function saveFiltersToStorage() {
         enchantedOnly: state.filters.enchantedOnly,
         ownedFilter: state.filters.ownedFilter,
         changesOnly: state.filters.changesOnly,
-        collapsedCategories: Array.from(state.collapsedCategories)
+        collapsedCategories: Array.from(state.collapsedCategories),
+        viewLocked: state.viewLocked
     };
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
@@ -327,6 +328,11 @@ function restoreState() {
                 }
             });
         }
+        
+        // Restore view lock state
+        if (typeof storedFilters.viewLocked === 'boolean') {
+            state.viewLocked = storedFilters.viewLocked;
+        }
     }
     
     // Restore navigation from URL hash
@@ -424,6 +430,9 @@ function applyRestoredStateToUI() {
     if (elements.zoomLevel) {
         elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
     }
+    
+    // Apply view lock button state
+    updateViewLockButton();
 }
 
 // ============================================================================
@@ -789,7 +798,7 @@ function setupEventListeners() {
     document.getElementById('zoom-in').addEventListener('click', () => adjustZoom(CONFIG.zoom.step));
     document.getElementById('zoom-out').addEventListener('click', () => adjustZoom(-CONFIG.zoom.step));
     document.getElementById('zoom-reset').addEventListener('click', resetView);
-    document.getElementById('zoom-lock').addEventListener('click', toggleZoomLock);
+    document.getElementById('zoom-lock').addEventListener('click', toggleViewLock);
     
     // Mouse wheel zoom
     elements.mapContainer.addEventListener('wheel', handleWheel, { passive: false });
@@ -907,7 +916,7 @@ function updateOwnedFilterUI() {
 }
 
 function handleWheel(e) {
-    if (state.zoomLocked) return;
+    if (state.viewLocked) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? -CONFIG.zoom.step : CONFIG.zoom.step;
     adjustZoom(delta);
@@ -915,6 +924,7 @@ function handleWheel(e) {
 
 function handlePanStart(e) {
     if (e.button !== 0) return;
+    if (state.viewLocked) return;
     state.isDragging = true;
     state.dragStart = { x: e.clientX - state.pan.x, y: e.clientY - state.pan.y };
     elements.mapWrapper.style.cursor = 'grabbing';
@@ -5439,7 +5449,7 @@ function selectLocationItem(item, isNpc, tileX, tileY) {
 // ============================================================================
 
 function adjustZoom(delta) {
-    if (state.zoomLocked) return;
+    if (state.viewLocked) return;
     state.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, state.zoom + delta));
     updateMapTransform();
     elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
@@ -5447,7 +5457,7 @@ function adjustZoom(delta) {
 }
 
 function resetView() {
-    if (state.zoomLocked) return;
+    if (state.viewLocked) return;
     state.zoom = CONFIG.zoom.default;
     state.pan = { x: 0, y: 0 };
     updateMapTransform();
@@ -5455,16 +5465,21 @@ function resetView() {
     updateUrlHash();
 }
 
-function toggleZoomLock() {
-    state.zoomLocked = !state.zoomLocked;
+function toggleViewLock() {
+    state.viewLocked = !state.viewLocked;
+    updateViewLockButton();
+    saveFiltersToStorage();
+}
+
+function updateViewLockButton() {
     const lockBtn = document.getElementById('zoom-lock');
-    if (state.zoomLocked) {
+    if (state.viewLocked) {
         lockBtn.classList.add('locked');
-        lockBtn.title = 'Unlock Zoom Level';
+        lockBtn.title = 'Unlock View (Zoom & Pan)';
         lockBtn.textContent = '🔓';
     } else {
         lockBtn.classList.remove('locked');
-        lockBtn.title = 'Lock Zoom Level';
+        lockBtn.title = 'Lock View (Zoom & Pan)';
         lockBtn.textContent = '🔒';
     }
 }
