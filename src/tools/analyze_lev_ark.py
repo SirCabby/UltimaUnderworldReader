@@ -4,10 +4,17 @@ LEV.ARK Structure Analyzer
 
 Analyzes the structure of LEV.ARK to investigate difficulty settings
 and document the complete block layout.
+
+Usage:
+    python -m src.tools.analyze_lev_ark [path_to_LEV.ARK]
 """
 
 import sys
 from pathlib import Path
+
+# Add project root to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from src.parsers.ark_parser import LevArkParser
 
 
@@ -174,7 +181,7 @@ if __name__ == '__main__':
         if default_path.exists():
             filepath = default_path
         else:
-            print("Usage: python analyze_lev_ark.py <path_to_LEV.ARK>")
+            print("Usage: python -m src.tools.analyze_lev_ark <path_to_LEV.ARK>")
             print(f"   or place LEV.ARK at: {default_path}")
             sys.exit(1)
     else:

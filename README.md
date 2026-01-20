@@ -15,8 +15,7 @@ This project parses the original DOS game files and extracts comprehensive game 
 
 - **Python 3.8+**
 - **openpyxl** (optional, for Excel export)
-- **Flask** and **flask-cors** (for web viewer)
-- **Pillow** (optional, for image generation in web viewer)
+- **Pillow** (optional, for image extraction)
 
 ## Setup
 
@@ -26,13 +25,9 @@ This project parses the original DOS game files and extracts comprehensive game 
    ```
 
 2. **Prepare input files:**
-   - Place your Ultima Underworld game data files in `Input/UW1/DATA/`
+   - Place your Ultima Underworld game data files in the `Input` folder
+   - Follow the detailed instructions available at [`Input/README.md`](Input/README.md)
    - See [Required Input Files](#required-input-files) below for the complete list
-   - Detailed instructions are available in [`Input/README.md`](Input/README.md)
-
-3. **Create output directories** (if they don't exist):
-   - The `Output/` directory will be created automatically
-   - For the web viewer, `web/data/`, `web/maps/`, and `web/images/` will be created as needed
 
 ## Quick Start
 
@@ -40,22 +35,10 @@ This project parses the original DOS game files and extracts comprehensive game 
 
 ### Basic Extraction
 
-**Using Python directly:**
-```bash
-# Extract to JSON only
-python main.py Input/UW1/DATA Output
-
-# Extract to JSON + Excel
-python main.py Input/UW1/DATA Output --xlsx
-```
-
 **Using Makefile (recommended):**
 ```bash
-# Extract to JSON only
+# Extract to JSON and XLSX
 make extract
-
-# Extract to JSON + Excel
-make xlsx
 ```
 
 ### Web Map Viewer
@@ -72,17 +55,14 @@ This includes all features including save game comparison (parsed client-side in
 
 #### Option 2: Run Locally
 
-For local development or if you want to regenerate data from your own game files:
+For local development, or if you prefer a local solution:
 
 ```bash
 # Generate all web viewer data (extracts data, generates maps, extracts images)
 make web
 
-# Start the web server (default: http://localhost:8080)
-make start
-
-# Or use a simple static server (no Flask required, simulates GitHub Pages)
-make serve-static
+# Start a simple static server (simulates GitHub Pages)
+make serve
 
 # Open in browser automatically
 make open
@@ -138,8 +118,6 @@ Contains all extracted game data in JSON format (and optionally XLSX):
 
 **Regenerate with:**
 ```bash
-python main.py Input/UW1/DATA Output
-# or
 make extract
 ```
 
@@ -151,31 +129,22 @@ make extract
 **`web/maps/`** - Map images:
 - `level1.png` through `level9.png` - Visual map representations
 
-**`web/images/objects/`** - Object sprite images:
+**`web/images/extracted/objects/`** - Object sprite images:
 - `object_*.png` - Extracted object sprites (if `OBJECTS.GR`/`TMOBJ.GR` available)
 
-**`web/images/npcs/`** - NPC sprite images:
-- `npc_*.png` - Extracted NPC sprites (if `OBJECTS.GR`/`TMOBJ.GR` available)
-
-**Note:** `web/images/stairs/` is **not** excluded - it contains manually extracted art assets that are committed to the repository.
+**`web/images/static/`** - Static assets (committed to repository):
+- `stairs/stairs_up.png`, `stairs/stairs_down.png` - Stair images
 
 **Regenerate with:**
 ```bash
 # Generate everything for web viewer
 make web
-
-# Or individually:
-make extract        # Generates web/data/web_map_data.json
-make maps          # Generates web/maps/*.png
-make images        # Generates web/images/objects/*.png and web/images/npcs/*.png
 ```
 
 **Clean all generated files:**
 ```bash
 make clean
 ```
-
-**Note on Difficulty Settings**: Ultima Underworld has two difficulty settings (Standard and Easy). Item locations may differ between difficulties. The exported data represents one difficulty setting (the exact setting cannot be determined from the data files alone). See [DIFFICULTY.md](DIFFICULTY.md) for details.
 
 ## Project Structure
 
@@ -202,18 +171,24 @@ make clean
 │   │   ├── npcs.py             # NPC types, goals, attitudes
 │   │   ├── objects.py          # Object categories
 │   │   └── mantras.py          # Shrine mantras
-│   ├── output/             # Export formats
+│   ├── exporters/          # Export formats
 │   │   ├── json_exporter.py
 │   │   └── xlsx_exporter.py
+│   ├── tools/              # Debug and analysis utilities
+│   │   ├── analyze_lev_ark.py  # LEV.ARK structure analyzer
+│   │   ├── check_item.py       # Check specific item raw data
+│   │   └── inspect_level_data.py  # Level data byte-level inspector
 │   └── utils.py            # Shared utilities
 ├── Input/UW1/DATA/         # Game data files (not included)
 ├── Output/                 # Extracted data (JSON, XLSX)
 └── web/                    # Web map viewer
     ├── data/               # Web viewer data (generated)
     ├── maps/               # Map images (generated)
-    ├── images/             # Object/NPC sprites (generated)
+    ├── images/             # Object sprites (extracted/) and static assets (static/)
+    ├── generate_maps.py    # Map image generator
+    ├── generate_images.py  # Object image extractor
     ├── index.html          # Web viewer interface
-    └── server.py           # Flask web server
+    └── server.py           # Simple HTTP server
 ```
 
 ## Binary File Formats
@@ -362,29 +337,6 @@ Contains property tables for specific object classes:
 | 0x180-0x19F | Traps |
 | 0x1A0-0x1BF | Triggers |
 | 0x1C0-0x1FF | System objects |
-
-## API Usage
-
-```python
-from src import StringsParser, ItemExtractor, NPCExtractor
-
-# Parse strings
-strings = StringsParser("Input/UW1/DATA/STRINGS.PAK")
-strings.parse()
-object_names = strings.get_block(4)  # Block 4 = object names
-
-# Extract items
-items = ItemExtractor("Input/UW1/DATA")
-items.extract()
-for item_id, item in items.item_types.items():
-    print(f"{item_id}: {item.name} ({item.category})")
-
-# Extract NPCs
-npcs = NPCExtractor("Input/UW1/DATA")
-npcs.extract()
-for npc in npcs.get_npcs_with_conversation():
-    print(f"{npc.name} @ Level {npc.level}")
-```
 
 ## Credits
 

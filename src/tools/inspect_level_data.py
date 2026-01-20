@@ -4,11 +4,18 @@ Level Data Byte-Level Inspector
 
 Inspects unknown data regions and object placement patterns in level data blocks
 to investigate difficulty-related encoding.
+
+Usage:
+    python -m src.tools.inspect_level_data [--file PATH] [--level 0-8]
 """
 
 import sys
 import struct
 from pathlib import Path
+
+# Add project root to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from src.parsers.ark_parser import LevArkParser
 from src.parsers.level_parser import LevelParser
 

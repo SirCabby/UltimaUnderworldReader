@@ -1,4 +1,13 @@
+#!/usr/bin/env python3
+"""
+Quick JSON category checker for web_map_data.json.
+
+Usage:
+    python -m src.tools.check_categories
+"""
+
 import json
+
 d = json.load(open('web/data/web_map_data.json'))
 
 print('Categories in data:')
@@ -12,4 +21,3 @@ if secrets_cat:
     print(f'  Found: {secrets_cat}')
 else:
     print('  NOT FOUND!')
-

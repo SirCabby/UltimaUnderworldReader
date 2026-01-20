@@ -1,10 +1,9 @@
 # Ultima Underworld Data Extraction Toolkit
 # Python 3.8+
 
-# Excel export
+# Excel export (optional)
 openpyxl>=3.1.0
 
-# Web server with file upload support
-Flask>=2.3.0
-flask-cors>=4.0.0
+# Image extraction (optional)
+Pillow>=10.0.0
 

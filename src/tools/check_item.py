@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 """
 Script to check a specific item's raw data.
+
+Usage:
+    python -m src.tools.check_item <data_path> <level> <tile_x> <tile_y> <item_id_hex>
+
+Example:
+    python -m src.tools.check_item Input/UW1/DATA 4 29 25 0x021
 """
+
 import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+# Add project root to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from parsers.level_parser import LevelParser
+from src.parsers.level_parser import LevelParser
+
 
 def check_item(data_path, level, tile_x, tile_y, item_id):
     """Check raw data for a specific item."""
@@ -58,10 +66,11 @@ def check_item(data_path, level, tile_x, tile_y, item_id):
                 else:
                     print(f"    Type: Unknown enchantment #{ench_property}")
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 6:
-        print("Usage: python check_item.py <data_path> <level> <tile_x> <tile_y> <item_id_hex>")
-        print("Example: python check_item.py Input/UW1/DATA 4 29 25 0x021")
+        print("Usage: python -m src.tools.check_item <data_path> <level> <tile_x> <tile_y> <item_id_hex>")
+        print("Example: python -m src.tools.check_item Input/UW1/DATA 4 29 25 0x021")
         sys.exit(1)
     
     data_path = sys.argv[1]

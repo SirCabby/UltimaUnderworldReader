@@ -5,12 +5,12 @@ DATA_PATH = Input/UW1/DATA
 OUTPUT_PATH = Output
 WEB_PORT = 8080
 
-.PHONY: all extract clean help web maps images serve
+.PHONY: all extract clean help web maps images serve open
 
 # Default target - regenerate all
 all: web
 
-# Extract to JSON only
+# Extract game data to JSON and XLSX
 extract:
 	python main.py $(DATA_PATH) $(OUTPUT_PATH) --xlsx
 
@@ -38,6 +38,11 @@ serve:
 	@echo "Press Ctrl+C to stop the server"
 	cd web && python server.py $(WEB_PORT)
 
+# Open web viewer in default browser
+open:
+	@echo "Opening web viewer in browser..."
+	python -c "import webbrowser; webbrowser.open('http://localhost:$(WEB_PORT)')"
+
 # Show help
 help:
 	@echo "Available targets:"
@@ -47,6 +52,7 @@ help:
 	@echo "  make images   - Extract object/NPC images for web viewer"
 	@echo "  make web      - Prepare web viewer (extract + maps + images)"
 	@echo "  make serve    - Start HTTP server on port $(WEB_PORT) for local testing"
+	@echo "  make open     - Open web viewer in default browser"
 	@echo "  make clean    - Remove all generated files"
 	@echo "  make help     - Show this help message"
 
