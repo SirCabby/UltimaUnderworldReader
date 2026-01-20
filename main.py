@@ -141,7 +141,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     print("[8/8] Exporting web map viewer data...")
     # Try to load image paths if they exist (from make web)
     image_paths = {}
-    web_images_dir = Path("web/images/objects")
+    web_images_dir = Path("web/images/extracted/objects")
     if web_images_dir.exists():
         # Scan for existing images and build path mapping
         for img_file in web_images_dir.glob("object_*.png"):
@@ -149,26 +149,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
             try:
                 obj_id_str = img_file.stem.replace("object_", "")
                 obj_id = int(obj_id_str, 10)
-                image_paths[obj_id] = f"images/objects/{img_file.name}"
-            except ValueError:
-                continue
-    
-    # Try to load NPC image paths if they exist (from make web)
-    npc_image_paths = {}
-    web_npc_images_dir = Path("web/images/npcs")
-    if web_npc_images_dir.exists():
-        # Scan for existing NPC images and build path mapping
-        # Only use main NPC images (npc_XX.png), not frame images (npc_XX_frame_YY.png)
-        for img_file in web_npc_images_dir.glob("npc_*.png"):
-            # Skip frame images (those with "_frame_" in the name)
-            if "_frame_" in img_file.stem:
-                continue
-            
-            # Extract NPC object ID from filename (npc_XX.png where XX is 2-digit hex, or npc_XXX.png where XXX is 3-digit hex)
-            try:
-                npc_id_str = img_file.stem.replace("npc_", "")
-                npc_id = int(npc_id_str, 16)  # Parse as hex (handles both 2-digit and 3-digit)
-                npc_image_paths[npc_id] = f"images/npcs/{img_file.name}"
+                image_paths[obj_id] = f"images/extracted/objects/{img_file.name}"
             except ValueError:
                 continue
     
@@ -182,7 +163,7 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
         secrets.secrets,  # Pass secrets (illusory walls, secret doors)
         convs.conversations,  # Pass conversations to verify dialogue scripts exist
         image_paths,  # Pass image paths for object images
-        npc_image_paths  # Pass image paths for NPC images
+        {}  # NPC images not currently generated
     )
     print(f"       Exported web map data to {web_map_path.name}")
     

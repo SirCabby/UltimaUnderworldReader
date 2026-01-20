@@ -113,10 +113,9 @@ desktop.ini
 /Output/
 
 # Generated web viewer files - derived from game data
-# Regenerate with: python main.py (for data), python web/generate_maps.py (for maps), and python web/generate_images.py (for images)
-/web/data/
-/web/maps/
-/web/images/
-# But keep stairs icons (they're manually extracted art assets)
-!/web/images/stairs/
-!/web/images/stairs/*.png
+# These are now committed to enable GitHub Pages hosting
+# Regenerate with: make web (or individual commands below)
+# - python main.py (for data)
+# - python web/generate_maps.py (for maps)
+# - python web/generate_images.py (for images)
+# Note: The images/ directory contains extracted game sprites which are committed for GitHub Pages

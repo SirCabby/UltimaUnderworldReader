@@ -6,7 +6,7 @@ Maps object IDs (0-511) to sprite indices in OBJECTS.GR or TMOBJ.GR.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 import sys
 
 # Add parent to path for imports
@@ -192,12 +192,15 @@ class ImageExtractor:
             except Exception as e:
                 print(f"  Warning: Could not load auxiliary palette file: {e}")
     
-    def save_images(self, output_dir: str | Path) -> Dict[int, str]:
+    def save_images(self, output_dir: str | Path, object_ids_filter: Optional[Set[int]] = None) -> Dict[int, str]:
         """
         Save extracted images to PNG files.
         
         Args:
             output_dir: Directory to save images to
+            object_ids_filter: Optional set of object IDs to save. If provided,
+                only images for these object IDs will be saved. If None, all
+                extracted images will be saved.
             
         Returns:
             Dictionary mapping object_id -> image_path (relative to output_dir)
@@ -206,8 +209,14 @@ class ImageExtractor:
         output_path.mkdir(parents=True, exist_ok=True)
         
         image_paths = {}
+        skipped_count = 0
         
         for object_id, img in self.extracted_images.items():
+            # Skip if filter is provided and this object ID is not in the filter
+            if object_ids_filter is not None and object_id not in object_ids_filter:
+                skipped_count += 1
+                continue
+            
             filename = f"object_{object_id:03d}.png"
             filepath = output_path / filename
             
@@ -217,6 +226,9 @@ class ImageExtractor:
                 image_paths[object_id] = f"images/objects/{filename}"
             except Exception as e:
                 print(f"    Warning: Failed to save {filename}: {e}")
+        
+        if skipped_count > 0:
+            print(f"  Skipped {skipped_count} unused object images (not placed in game)")
         
         return image_paths
     
@@ -426,8 +438,11 @@ class ImageExtractor:
         """
         Save extracted NPC images to PNG files.
         
-        Saves all frames for each NPC, with the main representative image
-        as npc_0x40.png (2-digit hex) and additional frames as npc_0x40_frame_0x30.png.
+        Saves only the main representative image for each NPC as npc_XX.png (2-digit hex).
+        
+        Note: Frame image saving has been commented out as the web UI only uses
+        the main representative images. Uncomment the frame saving code below
+        if you need animation frames for other purposes.
         
         Args:
             output_dir: Directory to save images to
@@ -441,12 +456,12 @@ class ImageExtractor:
         image_paths = {}
         total_saved = 0
         
-        # Save all frames for each NPC
+        # Save main representative image for each NPC
         for npc_id, frames_dict in self.extracted_npc_frames.items():
             if not frames_dict:
                 continue
             
-            # Save the main representative image (first valid frame)
+            # Save the main representative image (preferred idle frame or first valid frame)
             if npc_id in self.extracted_npc_images:
                 main_img = self.extracted_npc_images[npc_id]
                 filename = f"npc_{npc_id:02X}.png"  # Use 2-digit hex to match existing format
@@ -459,29 +474,32 @@ class ImageExtractor:
                     npc_name = get_npc_type_name(npc_id)
                     print(f"    Warning: Failed to save NPC 0x{npc_id:02X} ({npc_name}) main image: {e}")
             
-            # Save all additional frames with slot numbers
-            for slot, img in frames_dict.items():
-                # Skip if this is the same as the main image (don't duplicate)
-                if npc_id in self.extracted_npc_images and img is self.extracted_npc_images[npc_id]:
-                    continue
-                
-                # Format slot number: if >= 0x100, it's from .N01, use 3-digit hex, otherwise 2-digit
-                if slot >= 0x100:
-                    # Slot from .N01: format as 0xXXX (3-digit) to distinguish from .N00 slots
-                    filename = f"npc_{npc_id:02X}_frame_{slot:03X}.png"
-                else:
-                    # Slot from .N00: use 2-digit hex
-                    filename = f"npc_{npc_id:02X}_frame_{slot:02X}.png"
-                filepath = output_path / filename
-                try:
-                    img.save(filepath, "PNG")
-                    total_saved += 1
-                except Exception as e:
-                    npc_name = get_npc_type_name(npc_id)
-                    print(f"    Warning: Failed to save NPC 0x{npc_id:02X} ({npc_name}) frame 0x{slot:03X}: {e}")
+            # NOTE: Frame images commented out - web UI only uses main representative images
+            # Uncomment if you need animation frames for other purposes
+            # 
+            # # Save all additional frames with slot numbers
+            # for slot, img in frames_dict.items():
+            #     # Skip if this is the same as the main image (don't duplicate)
+            #     if npc_id in self.extracted_npc_images and img is self.extracted_npc_images[npc_id]:
+            #         continue
+            #     
+            #     # Format slot number: if >= 0x100, it's from .N01, use 3-digit hex, otherwise 2-digit
+            #     if slot >= 0x100:
+            #         # Slot from .N01: format as 0xXXX (3-digit) to distinguish from .N00 slots
+            #         filename = f"npc_{npc_id:02X}_frame_{slot:03X}.png"
+            #     else:
+            #         # Slot from .N00: use 2-digit hex
+            #         filename = f"npc_{npc_id:02X}_frame_{slot:02X}.png"
+            #     filepath = output_path / filename
+            #     try:
+            #         img.save(filepath, "PNG")
+            #         total_saved += 1
+            #     except Exception as e:
+            #         npc_name = get_npc_type_name(npc_id)
+            #         print(f"    Warning: Failed to save NPC 0x{npc_id:02X} ({npc_name}) frame 0x{slot:03X}: {e}")
         
         if total_saved > 0:
-            print(f"  Saved {total_saved} NPC frame images ({len(image_paths)} main images + {total_saved - len(image_paths)} additional frames)")
+            print(f"  Saved {total_saved} NPC images")
         
         return image_paths
     

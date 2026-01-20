@@ -41,8 +41,8 @@ const CONFIG = {
     
     // Stairs settings
     stairs: {
-        downImage: 'images/stairs/stairs_down.png',
-        upImage: 'images/stairs/stairs_up.png',
+        downImage: 'images/static/stairs/stairs_down.png',
+        upImage: 'images/static/stairs/stairs_up.png',
     },
     
     // Paths
@@ -579,6 +579,7 @@ async function loadData() {
 
 /**
  * Load save game from uploaded directory
+ * Uses client-side parsing for static hosting compatibility (GitHub Pages)
  */
 async function loadSaveGame(files) {
     if (!files || files.length === 0) {
@@ -591,31 +592,31 @@ async function loadSaveGame(files) {
         elements.loadSaveBtn.disabled = true;
         elements.loadSaveBtn.textContent = 'Loading...';
         
-        // Create FormData with all files
-        const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
+        // Check if client-side parser is available
+        if (!window.SaveParser || !window.SaveComparator) {
+            throw new Error('Save game parser not loaded. Please refresh the page.');
         }
         
-        // Send to server
-        const response = await fetch('/api/upload-save', {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`);
+        // Find lev.ark file in the uploaded files
+        const levArkFile = window.SaveParser.findLevArkFile(files);
+        if (!levArkFile) {
+            throw new Error('lev.ark file not found in uploaded directory');
         }
         
-        const result = await response.json();
+        // Extract save folder name
+        const saveFolderName = window.SaveParser.extractSaveFolderName(files);
+        
+        // Parse the save game using client-side parser
+        // Pass the base game data for category and name lookup
+        const baseData = state.saveGame.baseData || state.data;
+        const saveData = await window.SaveParser.parseLevArk(levArkFile, baseData);
+        
+        // Compare save game with base game
+        const result = window.SaveComparator.compareSaveGame(baseData, saveData);
         
         if (!result.success) {
             throw new Error(result.error || 'Failed to load save game');
         }
-        
-        // Extract save folder name from result
-        const saveFolderName = result.save_folder_name || 'Save Game';
         
         // Store save game data in the saves object
         state.saveGame.saves[saveFolderName] = {

@@ -13,22 +13,169 @@ This project parses the original DOS game files and extracts comprehensive game 
 
 ## Requirements
 
-- Python 3.8+
-- openpyxl (optional, for Excel export)
+- **Python 3.8+**
+- **openpyxl** (optional, for Excel export)
+- **Flask** and **flask-cors** (for web viewer)
+- **Pillow** (optional, for image generation in web viewer)
 
-```bash
-pip install -r requirements.txt
-```
+## Setup
+
+1. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Prepare input files:**
+   - Place your Ultima Underworld game data files in `Input/UW1/DATA/`
+   - See [Required Input Files](#required-input-files) below for the complete list
+   - Detailed instructions are available in [`Input/README.md`](Input/README.md)
+
+3. **Create output directories** (if they don't exist):
+   - The `Output/` directory will be created automatically
+   - For the web viewer, `web/data/`, `web/maps/`, and `web/images/` will be created as needed
 
 ## Quick Start
 
+**Prerequisites:** Ensure you have the required game data files in `Input/UW1/DATA/` (see [Required Input Files](#required-input-files)).
+
+### Basic Extraction
+
+**Using Python directly:**
 ```bash
-# Extract to JSON
+# Extract to JSON only
 python main.py Input/UW1/DATA Output
 
 # Extract to JSON + Excel
 python main.py Input/UW1/DATA Output --xlsx
 ```
+
+**Using Makefile (recommended):**
+```bash
+# Extract to JSON only
+make extract
+
+# Extract to JSON + Excel
+make xlsx
+```
+
+### Web Map Viewer
+
+The web viewer provides an interactive map interface with the following options:
+
+#### Option 1: View on GitHub Pages (No Setup Required)
+
+The web viewer is hosted on GitHub Pages and can be accessed directly:
+
+**https://\<username\>.github.io/UltimaUnderworldReader/**
+
+This includes all features including save game comparison (parsed client-side in your browser).
+
+#### Option 2: Run Locally
+
+For local development or if you want to regenerate data from your own game files:
+
+```bash
+# Generate all web viewer data (extracts data, generates maps, extracts images)
+make web
+
+# Start the web server (default: http://localhost:8080)
+make start
+
+# Or use a simple static server (no Flask required, simulates GitHub Pages)
+make serve-static
+
+# Open in browser automatically
+make open
+```
+
+**Note:** Local generation requires:
+- Game data files (see [Required Input Files](#required-input-files))
+- Optional: `OBJECTS.GR` or `TMOBJ.GR` for object images
+- Optional: `TERRAIN.DAT` for accurate map generation
+
+See [Generated Files](#generated-files) for details on what gets created.
+
+## Required Input Files
+
+The following files are **required** and must be placed in `Input/UW1/DATA/`:
+
+| File | Size (approx) | Description |
+|------|---------------|-------------|
+| `STRINGS.PAK` | ~47 KB | Game text strings (Huffman compressed) |
+| `LEV.ARK` | ~300 KB | Level data (tilemaps, objects) |
+| `CNV.ARK` | ~166 KB | Conversation scripts |
+| `OBJECTS.DAT` | ~1 KB | Object class properties |
+| `COMOBJ.DAT` | ~6 KB | Common object properties |
+
+**Optional files** (for web viewer features):
+
+| File | Purpose |
+|------|---------|
+| `OBJECTS.GR` or `TMOBJ.GR` | Object sprite images (for web viewer) |
+| `TERRAIN.DAT` | Terrain classification (for accurate map generation) |
+
+**Where to get the files:**
+- See [`Input/README.md`](Input/README.md) for detailed instructions on obtaining game files from GOG, Steam, or original media
+- The game data files are copyrighted material and must be obtained legally
+
+## Generated Files
+
+After cloning the repository, several directories are excluded by `.gitignore` and need to be regenerated:
+
+### Output Directory (`Output/`)
+
+Contains all extracted game data in JSON format (and optionally XLSX):
+
+- `strings.json` - All game text organized by block
+- `items.json` - 512 item type definitions
+- `placed_objects.json` - All objects placed in levels
+- `npcs.json` - All NPCs with stats and positions
+- `spells.json` - Spells, runes, mantras
+- `conversations.json` - Decompiled conversation data
+- `map_data.json` - Level statistics
+- `web_map_data.json` - Web viewer data format
+- `ultima_underworld_data.xlsx` - Multi-sheet Excel workbook (if `--xlsx` used)
+
+**Regenerate with:**
+```bash
+python main.py Input/UW1/DATA Output
+# or
+make extract
+```
+
+### Web Viewer Files
+
+**`web/data/`** - Web viewer data:
+- `web_map_data.json` - Formatted data for the interactive map viewer
+
+**`web/maps/`** - Map images:
+- `level1.png` through `level9.png` - Visual map representations
+
+**`web/images/objects/`** - Object sprite images:
+- `object_*.png` - Extracted object sprites (if `OBJECTS.GR`/`TMOBJ.GR` available)
+
+**`web/images/npcs/`** - NPC sprite images:
+- `npc_*.png` - Extracted NPC sprites (if `OBJECTS.GR`/`TMOBJ.GR` available)
+
+**Note:** `web/images/stairs/` is **not** excluded - it contains manually extracted art assets that are committed to the repository.
+
+**Regenerate with:**
+```bash
+# Generate everything for web viewer
+make web
+
+# Or individually:
+make extract        # Generates web/data/web_map_data.json
+make maps          # Generates web/maps/*.png
+make images        # Generates web/images/objects/*.png and web/images/npcs/*.png
+```
+
+**Clean all generated files:**
+```bash
+make clean
+```
+
+**Note on Difficulty Settings**: Ultima Underworld has two difficulty settings (Standard and Easy). Item locations may differ between difficulties. The exported data represents one difficulty setting (the exact setting cannot be determined from the data files alone). See [DIFFICULTY.md](DIFFICULTY.md) for details.
 
 ## Project Structure
 
@@ -60,7 +207,13 @@ python main.py Input/UW1/DATA Output --xlsx
 │   │   └── xlsx_exporter.py
 │   └── utils.py            # Shared utilities
 ├── Input/UW1/DATA/         # Game data files (not included)
-└── Output/                 # Extracted data
+├── Output/                 # Extracted data (JSON, XLSX)
+└── web/                    # Web map viewer
+    ├── data/               # Web viewer data (generated)
+    ├── maps/               # Map images (generated)
+    ├── images/             # Object/NPC sprites (generated)
+    ├── index.html          # Web viewer interface
+    └── server.py           # Flask web server
 ```
 
 ## Binary File Formats
@@ -209,21 +362,6 @@ Contains property tables for specific object classes:
 | 0x180-0x19F | Traps |
 | 0x1A0-0x1BF | Triggers |
 | 0x1C0-0x1FF | System objects |
-
-## Output Files
-
-| File | Description |
-|------|-------------|
-| `strings.json` | All game text organized by block |
-| `items.json` | 512 item type definitions |
-| `placed_objects.json` | All objects placed in levels |
-| `npcs.json` | All NPCs with stats and positions |
-| `spells.json` | Spells, runes, mantras |
-| `conversations.json` | Decompiled conversation data |
-| `map_data.json` | Level statistics |
-| `ultima_underworld_data.xlsx` | Multi-sheet Excel workbook |
-
-**Note on Difficulty Settings**: Ultima Underworld has two difficulty settings (Standard and Easy). Item locations may differ between difficulties. The exported data represents one difficulty setting (the exact setting cannot be determined from the data files alone). See [DIFFICULTY.md](DIFFICULTY.md) for details.
 
 ## API Usage
 
