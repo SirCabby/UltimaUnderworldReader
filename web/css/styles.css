@@ -570,6 +570,179 @@ body {
     color: #ff6b6b;
 }
 
+/* Change Types Filter */
+.change-types-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: linear-gradient(135deg, rgba(116, 143, 252, 0.08) 0%, var(--bg-tertiary) 100%);
+}
+
+.change-types-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.change-types-header:hover {
+    background: var(--bg-elevated);
+}
+
+.dropdown-arrow {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+}
+
+.change-types-filter.expanded .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.change-types-dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    margin-top: 8px;
+    overflow: hidden;
+    transition: max-height 0.2s ease, opacity 0.2s ease, padding 0.2s ease, margin 0.2s ease;
+}
+
+.change-types-dropdown.collapsed {
+    display: none;
+}
+
+.change-type-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.change-type-option:hover {
+    background: var(--bg-tertiary);
+}
+
+.change-type-option input[type="checkbox"] {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-accent);
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.change-type-option input[type="checkbox"]:checked {
+    background: #748ffc;
+    border-color: #748ffc;
+}
+
+.change-type-option input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: bold;
+}
+
+.change-type-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    min-width: 1.2em;
+    text-align: center;
+}
+
+.change-type-label {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.change-type-quick-btns {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border-color);
+}
+
+.change-type-quick-btns .quick-btn {
+    flex: 1;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.change-type-quick-btns .quick-btn:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-accent);
+}
+
+/* Change badge in item lists */
+.change-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.change-badge.change-added {
+    background: rgba(105, 219, 124, 0.2);
+    color: #69db7c;
+}
+
+.change-badge.change-removed {
+    background: rgba(255, 68, 68, 0.2);
+    color: #ff4444;
+}
+
+.change-badge.change-moved {
+    background: rgba(255, 169, 77, 0.2);
+    color: #ffa94d;
+}
+
+.change-badge.change-modified {
+    background: rgba(116, 143, 252, 0.2);
+    color: #748ffc;
+}
+
+.change-badge.change-unchanged {
+    background: rgba(134, 142, 150, 0.15);
+    color: #868e96;
+}
+
+/* Change description tooltip */
+.change-description {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 4px 0;
+    margin-top: 4px;
+    border-top: 1px solid var(--border-color);
+}
+
 .filter-icon {
     font-size: 1.1rem;
     flex-shrink: 0;
@@ -888,11 +1061,25 @@ body {
 }
 
 /* Save Game Change Indicators */
-.markers-layer .marker-group.marker-removed .marker {
-    opacity: 0.5;
-    stroke: #ff4444 !important;
-    stroke-width: 2 !important;
-    stroke-dasharray: 3 2 !important;
+/* Removed items now use X marker, no special circle styling needed */
+.markers-layer .marker-group.marker-removed .removed-x-marker {
+    opacity: 0.8;
+}
+
+.markers-layer .removed-x {
+    stroke: #ff4444;
+    stroke-width: 2;
+}
+
+/* Selected removed X marker */
+.markers-layer .marker-group.marker-removed.selected .removed-x-marker,
+.markers-layer .marker-group.marker-removed .removed-x-marker.selected {
+    transform-origin: center;
+}
+
+.markers-layer .marker-group.marker-removed.selected .removed-x {
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 3px rgba(255, 68, 68, 0.8));
 }
 
 .markers-layer .marker-group.marker-added .marker {
@@ -916,8 +1103,7 @@ body {
 /* Change indicators for stacked markers */
 .markers-layer .marker-stack.marker-removed .count-badge circle {
     stroke: #ff4444 !important;
-    stroke-dasharray: 3 2 !important;
-    opacity: 0.7;
+    stroke-width: 2 !important;
 }
 
 .markers-layer .marker-stack.marker-added .count-badge circle {

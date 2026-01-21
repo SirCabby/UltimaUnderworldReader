@@ -31,6 +31,10 @@ const SaveParser = {
     // ARK block layout for LEV.ARK
     LEVEL_DATA_START: 0,
     
+    // Object ID constants for stairs detection
+    MOVE_TRIGGER_ID: 0x1A0,  // 416 - move_trigger
+    TELEPORT_TRAP_ID: 0x181, // 385 - teleport_trap
+    
     // Tile types
     TileType: {
         SOLID: 0,
@@ -379,6 +383,65 @@ async function parseLevArk(file, baseData) {
 }
 
 /**
+ * Map Python/internal categories to web UI categories
+ * This handles cases where object_types has internal category names
+ */
+const CATEGORY_MAPPING = {
+    // Weapons
+    'melee_weapon': 'weapons',
+    'ranged_weapon': 'weapons',
+    // Armor
+    'armor': 'armor',
+    // Keys & Containers
+    'key': 'keys',
+    'container': 'containers',
+    'static_container': 'storage',
+    // Consumables
+    'food': 'food',
+    'potion': 'potions',
+    // Books & Scrolls
+    'book': 'books',
+    'scroll': 'scrolls',
+    'spell_scroll': 'spell_scrolls',
+    // Magic Items
+    'rune': 'runes',
+    'wand': 'wands',
+    // Treasure & Light
+    'treasure': 'treasure',
+    'light': 'light',
+    // Doors
+    'door': 'doors_unlocked',
+    'door_locked': 'doors_locked',
+    'door_unlocked': 'doors_unlocked',
+    'open_door': 'doors_unlocked',
+    'secret_door': 'secret_doors',
+    'portcullis': 'doors_unlocked',
+    'portcullis_locked': 'doors_locked',
+    'open_portcullis': 'doors_unlocked',
+    // Mechanics
+    'switch': 'switches',
+    'trap': 'traps',
+    'trigger': 'triggers',
+    // Environment
+    'shrine': 'shrines',
+    'bridge': 'bridges',
+    'boulder': 'boulders',
+    'furniture': 'furniture',
+    'scenery': 'scenery',
+    'useless_item': 'useless_item',
+    'animation': 'animations',
+    'special_tmap': 'texture_objects',
+    'writing': 'writings',
+    'gravestone': 'gravestones',
+    // Quest items
+    'quest': 'quest',
+    'talisman': 'quest',
+    // Misc
+    'misc': 'misc',
+    'unknown': 'misc'
+};
+
+/**
  * Build a category lookup map from base game data
  * @param {Object} baseData - The base game data (web_map_data.json)
  * @returns {Map} - Map from object_id to category
@@ -386,11 +449,29 @@ async function parseLevArk(file, baseData) {
 function buildCategoryMap(baseData) {
     const categoryMap = new Map();
     
-    if (!baseData || !baseData.levels) {
+    if (!baseData) {
         return categoryMap;
     }
     
-    // Scan all base game objects to build category map
+    // First, use object_types table if available (complete list of all 512 object types)
+    if (baseData.object_types) {
+        for (const [idStr, typeInfo] of Object.entries(baseData.object_types)) {
+            const objId = parseInt(idStr, 10);
+            if (!isNaN(objId) && typeInfo.category) {
+                // Map internal category to web category
+                const webCategory = CATEGORY_MAPPING[typeInfo.category] || typeInfo.category;
+                categoryMap.set(objId, webCategory);
+            }
+        }
+    }
+    
+    // Fall back to scanning placed objects if object_types is not present
+    if (!baseData.levels) {
+        return categoryMap;
+    }
+    
+    // Scan all base game objects to build category map (fills any gaps)
+    // These already have web categories applied
     for (const level of baseData.levels) {
         if (level.objects) {
             for (const obj of level.objects) {
@@ -415,11 +496,26 @@ function buildCategoryMap(baseData) {
 function buildNameMap(baseData) {
     const nameMap = new Map();
     
-    if (!baseData || !baseData.levels) {
+    if (!baseData) {
         return nameMap;
     }
     
-    // Scan all base game objects to build name map
+    // First, use object_types table if available (complete list of all 512 object types)
+    if (baseData.object_types) {
+        for (const [idStr, typeInfo] of Object.entries(baseData.object_types)) {
+            const objId = parseInt(idStr, 10);
+            if (!isNaN(objId) && typeInfo.name) {
+                nameMap.set(objId, typeInfo.name);
+            }
+        }
+    }
+    
+    // Fall back to scanning placed objects if object_types is not present
+    if (!baseData.levels) {
+        return nameMap;
+    }
+    
+    // Scan all base game objects to build name map (fills any gaps)
     for (const level of baseData.levels) {
         if (level.objects) {
             for (const obj of level.objects) {
@@ -442,6 +538,110 @@ function buildNameMap(baseData) {
     }
     
     return nameMap;
+}
+
+/**
+ * Check if a teleport trap likely represents a level transition (stairs).
+ * 
+ * Level transitions typically have:
+ * - z_pos field encoding a different level (1-9, 1-indexed)
+ * - Destination coordinates similar to source (same area of map)
+ * 
+ * @param {number} quality - Destination X coordinate (from teleport trap quality field)
+ * @param {number} owner - Destination Y coordinate (from teleport trap owner field)
+ * @param {number} trapX - Source X coordinate
+ * @param {number} trapY - Source Y coordinate
+ * @param {number} zPos - z_pos field from teleport trap (encodes destination level 1-9)
+ * @param {number} currentLevel - Current level (0-indexed)
+ * @returns {boolean} - True if this is a level transition
+ */
+function isLevelTransitionTeleport(quality, owner, trapX, trapY, zPos, currentLevel) {
+    // If z_pos indicates a different level, it's likely a level transition
+    // z_pos encodes destination level as 1-indexed (1-9)
+    if (zPos > 0 && zPos <= 9 && currentLevel >= 0) {
+        const destLevel1Idx = zPos;
+        const currentLevel1Idx = currentLevel + 1; // Convert to 1-indexed
+        if (destLevel1Idx !== currentLevel1Idx) {
+            // Different level - this is a level transition
+            return true;
+        }
+    }
+    
+    // If destination is same as source, it's likely a level change
+    // (the X,Y stay same but level changes)
+    if (quality === trapX && owner === trapY) {
+        return true;
+    }
+    
+    // Small differences might also indicate stairs
+    // Stairs typically keep you in the same general area (within 5 tiles)
+    const dx = Math.abs(quality - trapX);
+    const dy = Math.abs(owner - trapY);
+    if (dx <= 5 && dy <= 5) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Check if a move_trigger links to a teleport trap that changes levels (stairs)
+ * 
+ * @param {Object} obj - The move_trigger object
+ * @param {Object} allObjects - All objects in the level, indexed by index
+ * @param {number} currentLevel - Current level (0-indexed)
+ * @returns {Object|null} - { isStairs: true, destLevel: number } or null if not stairs
+ */
+function checkForStairs(obj, allObjects, currentLevel) {
+    // Only check move_trigger objects
+    if (obj.item_id !== SaveParser.MOVE_TRIGGER_ID) {
+        return null;
+    }
+    
+    // Get the linked object index from quantity_or_link field
+    const linkedIndex = obj.quantity_or_link;
+    if (linkedIndex <= 0) {
+        return null;
+    }
+    
+    // Look up the linked object
+    const linkedObj = allObjects[linkedIndex];
+    if (!linkedObj) {
+        return null;
+    }
+    
+    // Check if linked object is a teleport trap
+    if (linkedObj.item_id !== SaveParser.TELEPORT_TRAP_ID) {
+        return null;
+    }
+    
+    // Check if this teleport trap is a level transition
+    // Use trigger coordinates for level transition detection
+    // (teleport traps at 0,0 are templates, use trigger position instead)
+    const trapX = linkedObj.tile_x > 0 ? linkedObj.tile_x : obj.tile_x;
+    const trapY = linkedObj.tile_y > 0 ? linkedObj.tile_y : obj.tile_y;
+    
+    if (isLevelTransitionTeleport(
+        linkedObj.quality,
+        linkedObj.owner,
+        trapX,
+        trapY,
+        linkedObj.z_pos,
+        currentLevel
+    )) {
+        // This is a stairs - calculate destination level (1-indexed)
+        // z_pos encodes destination level (1-indexed: 1-9)
+        const destLevel = (linkedObj.z_pos > 0 && linkedObj.z_pos <= 9) 
+            ? linkedObj.z_pos 
+            : currentLevel + 2; // Fallback
+        
+        return {
+            isStairs: true,
+            destLevel: destLevel
+        };
+    }
+    
+    return null;
 }
 
 /**
@@ -529,7 +729,43 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
             });
         } else {
             // Process as regular object
-            const category = categoryMap.get(obj.item_id) || 'misc';
+            let category = categoryMap.get(obj.item_id) || 'misc';
+            let stairsDestLevel = null;
+            
+            // Check if this is a move_trigger that links to a level-changing teleport (stairs)
+            const stairsInfo = checkForStairs(obj, level.objects, levelNum);
+            if (stairsInfo && stairsInfo.isStairs) {
+                category = 'stairs';
+                stairsDestLevel = stairsInfo.destLevel;
+            }
+            
+            // Quantity handling - must match the Python exporter's logic
+            // is_quantity flag means quantity_or_link holds a count
+            // Values >= 512 are enchantment data, not real quantities
+            const hasQuantity = obj.is_quantity && obj.quantity_or_link > 0 && obj.quantity_or_link < 512;
+            
+            // Items that always have quantity (gems):
+            const QUANTITY_CAPABLE_ITEMS = [
+                0x0A2,  // Ruby
+                0x0A3,  // Red gem
+                0x0A4,  // Small blue gem (tiny blue gem)
+                0x0A6,  // Sapphire
+                0x0A7,  // Emerald
+            ];
+            const isQuantityCapable = QUANTITY_CAPABLE_ITEMS.includes(obj.item_id);
+            
+            // Determine if item is truly enchanted
+            // For some items, the is_enchanted flag is set incorrectly when quantity_or_link >= 512
+            // Only trust is_enchanted for items that CAN be enchanted (weapons, armor, wands, rings, etc.)
+            const ENCHANTABLE_RANGES = [
+                [0x000, 0x01F],  // Weapons (melee and ranged)
+                [0x020, 0x03F],  // Armor
+                [0x098, 0x09B],  // Wands
+                [0x0A0, 0x0AF],  // Treasure (can have enchantments)
+                [0x130, 0x13F],  // Books and scrolls (spell scrolls)
+            ];
+            const canBeEnchanted = ENCHANTABLE_RANGES.some(([min, max]) => obj.item_id >= min && obj.item_id <= max);
+            const isEnchanted = canBeEnchanted && obj.is_enchanted;
             
             const objData = {
                 id: idx,
@@ -539,14 +775,25 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
                 tile_y: obj.tile_y,
                 z: obj.z_pos,
                 category: category,
-                is_enchanted: obj.is_enchanted,
+                is_enchanted: isEnchanted,
                 quality: obj.quality,
                 owner: obj.owner
             };
             
-            // Add quantity if present
-            if (obj.is_quantity && obj.quantity_or_link > 0) {
+            // Add stairs destination level if this is a stairs trigger
+            if (category === 'stairs' && stairsDestLevel !== null) {
+                objData.stairs_dest_level = stairsDestLevel;
+            }
+            
+            // Add quantity - matching Python exporter's logic
+            if (hasQuantity) {
                 objData.quantity = obj.quantity_or_link;
+            } else if (obj.item_id === 0xA0 || obj.item_id === 0xA1) {
+                // Coins always have quantity, default to 1
+                objData.quantity = 1;
+            } else if (isQuantityCapable) {
+                // For quantity-capable items, default to 1 if quantity is 0
+                objData.quantity = obj.quantity_or_link > 0 ? obj.quantity_or_link : 1;
             }
             
             objects.push(objData);

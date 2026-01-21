@@ -1495,18 +1495,17 @@ class JsonExporter:
             if category == 'stairs' and stairs_dest_level is not None:
                 web_obj['stairs_dest_level'] = stairs_dest_level  # 1-indexed
             
-            # Add quantity for stackable items (coins, ammo, candles, torches, etc.)
+            # Add quantity for stackable items
             # is_quantity flag means the quantity_or_link field holds a count
             # quantity >= 512 means it's enchantment data, not a real quantity
             
-            # Items that can have quantity: emeralds, rubies, sapphires, tiny blue gems, red gems
+            # Items that always have quantity (gems, coins):
             quantity_capable_items = [
                 0x0A2,  # Ruby
                 0x0A3,  # Red gem
                 0x0A4,  # Small blue gem (tiny blue gem)
                 0x0A6,  # Sapphire
                 0x0A7,  # Emerald
-                # Add resilient spear object ID here when found
             ]
             can_have_quantity = obj_id in quantity_capable_items
             
@@ -1672,6 +1671,18 @@ class JsonExporter:
             
             npcs_by_level[level].append(web_npc)
         
+        # Build object types lookup table (all 512 object types with names)
+        # Use category_map to convert Python categories to web categories
+        object_types = {}
+        if item_types:
+            for obj_id, item_info in item_types.items():
+                # Map Python category to web category using the same category_map
+                web_category = category_map.get(item_info.category, 'misc')
+                object_types[obj_id] = {
+                    'name': item_info.name,
+                    'category': web_category
+                }
+        
         # Build final data structure
         web_data = {
             'metadata': {
@@ -1681,6 +1692,7 @@ class JsonExporter:
                 'grid_size': 64,
                 'num_levels': 9,
             },
+            'object_types': object_types,
             'categories': [
                 # Weapons & Armor
                 {'id': 'weapons', 'name': 'Weapons', 'color': '#e03131'},
