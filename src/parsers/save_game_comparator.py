@@ -153,6 +153,28 @@ class SaveGameComparator:
             if base_val != save_val:
                 return True
         
+        # Check extra_info for important changes (door lock status, etc.)
+        base_extra = base_obj.get('extra_info', {})
+        save_extra = save_obj.get('extra_info', {})
+        
+        # Check door/container lock status
+        base_locked = base_extra.get('is_locked')
+        save_locked = save_extra.get('is_locked')
+        if base_locked != save_locked:
+            return True
+        
+        # Check door open status
+        base_open = base_extra.get('is_open')
+        save_open = save_extra.get('is_open')
+        if base_open != save_open:
+            return True
+        
+        # Check lock_id if present (lock might have changed)
+        base_lock_id = base_extra.get('lock_id')
+        save_lock_id = save_extra.get('lock_id')
+        if base_lock_id != save_lock_id:
+            return True
+        
         return False
     
     def _object_position_changed(self, base_obj: Dict, save_obj: Dict) -> bool:
@@ -216,6 +238,11 @@ class SaveGameComparator:
         
         return self.changes
     
+    def _is_door(self, obj: Dict) -> bool:
+        """Check if an object is a door (object_id in 0x140-0x14F range)."""
+        obj_id = obj.get('object_id', 0)
+        return 0x140 <= obj_id <= 0x14F
+    
     def _compare_object_lists(
         self, 
         level_num: int, 
@@ -253,6 +280,7 @@ class SaveGameComparator:
             save_map[key] = obj
         
         # Find removed objects (in base but not in save)
+        removed_doors = []  # Track removed doors for special matching
         for key, base_obj in base_map.items():
             if key not in save_map:
                 # Object was removed
@@ -264,8 +292,12 @@ class SaveGameComparator:
                     base_index=base_obj.get('id', 0)
                 )
                 self.changes[level_num]['removed'].append(change)
+                # Track doors for special matching
+                if not is_npc and self._is_door(base_obj):
+                    removed_doors.append((key, base_obj, change))
         
         # Find added objects (in save but not in base)
+        added_doors = []  # Track added doors for special matching
         for key, save_obj in save_map.items():
             if key not in base_map:
                 # Object was added
@@ -277,6 +309,58 @@ class SaveGameComparator:
                     save_index=save_obj.get('id', 0)
                 )
                 self.changes[level_num]['added'].append(change)
+                # Track doors for special matching
+                if not is_npc and self._is_door(save_obj):
+                    added_doors.append((key, save_obj, change))
+        
+        # Special handling: Match doors by position even if object_id changed
+        # This handles cases where a door's object_id changes when locked/unlocked
+        if not is_npc and removed_doors and added_doors:
+            matched_pairs = []
+            matched_removed = set()  # Track which removed doors have been matched
+            matched_added = set()    # Track which added doors have been matched
+            
+            for rem_key, rem_obj, rem_change in removed_doors:
+                if rem_change in matched_removed:
+                    continue  # Already matched
+                
+                rem_x = rem_obj.get('tile_x', 0)
+                rem_y = rem_obj.get('tile_y', 0)
+                rem_z = rem_obj.get('z', 0)
+                
+                for add_key, add_obj, add_change in added_doors:
+                    if add_change in matched_added:
+                        continue  # Already matched
+                    
+                    add_x = add_obj.get('tile_x', 0)
+                    add_y = add_obj.get('tile_y', 0)
+                    add_z = add_obj.get('z', 0)
+                    
+                    # Check if positions match (same tile, same z)
+                    if rem_x == add_x and rem_y == add_y and rem_z == add_z:
+                        # Both are doors at the same position - treat as modified
+                        matched_pairs.append((rem_obj, add_obj, rem_change, add_change))
+                        matched_removed.add(rem_change)
+                        matched_added.add(add_change)
+                        break
+            
+            # Convert matched door pairs from removed/added to modified
+            for rem_obj, add_obj, rem_change, add_change in matched_pairs:
+                # Remove from removed/added lists
+                self.changes[level_num]['removed'].remove(rem_change)
+                self.changes[level_num]['added'].remove(add_change)
+                
+                # Add as modified
+                change = ObjectChange(
+                    change_type='modified',
+                    object_id=add_obj.get('object_id', 0),
+                    level=level_num,
+                    base_data=rem_obj,
+                    save_data=add_obj,
+                    base_index=rem_obj.get('id', 0),
+                    save_index=add_obj.get('id', 0)
+                )
+                self.changes[level_num]['modified'].append(change)
         
         # Find moved/modified objects (in both but different)
         for key in base_map.keys() & save_map.keys():

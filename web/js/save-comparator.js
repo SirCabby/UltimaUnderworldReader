@@ -276,6 +276,46 @@ class SaveGameComparator {
             }
         }
         
+        // Check extra_info for important changes (door lock status, etc.)
+        const baseExtra = baseObj.extra_info || {};
+        const saveExtra = saveObj.extra_info || {};
+        
+        // Check door/container lock status
+        const baseLocked = baseExtra.is_locked;
+        const saveLocked = saveExtra.is_locked;
+        if (baseLocked !== saveLocked) {
+            changes.push({
+                property: 'is_locked',
+                displayName: 'Lock Status',
+                from: baseLocked ? 'Locked' : 'Unlocked',
+                to: saveLocked ? 'Locked' : 'Unlocked'
+            });
+        }
+        
+        // Check door open status
+        const baseOpen = baseExtra.is_open;
+        const saveOpen = saveExtra.is_open;
+        if (baseOpen !== saveOpen) {
+            changes.push({
+                property: 'is_open',
+                displayName: 'Open Status',
+                from: baseOpen ? 'Open' : 'Closed',
+                to: saveOpen ? 'Open' : 'Closed'
+            });
+        }
+        
+        // Check lock_id if present (lock might have changed)
+        const baseLockId = baseExtra.lock_id;
+        const saveLockId = saveExtra.lock_id;
+        if (baseLockId !== saveLockId && (baseLockId !== undefined || saveLockId !== undefined)) {
+            changes.push({
+                property: 'lock_id',
+                displayName: 'Lock ID',
+                from: baseLockId !== undefined ? baseLockId : 'none',
+                to: saveLockId !== undefined ? saveLockId : 'none'
+            });
+        }
+        
         return changes;
     }
     
@@ -325,6 +365,16 @@ class SaveGameComparator {
         const z = obj.z !== undefined ? obj.z : (obj.z_pos !== undefined ? obj.z_pos : 0);
         const objId = obj.object_id !== undefined ? obj.object_id : 0;
         return `${x},${y},${z},${objId}`;
+    }
+    
+    /**
+     * Check if an object ID represents a door (any door type)
+     * @param {number} objectId - Object ID to check
+     * @returns {boolean} - True if this is a door
+     */
+    _isDoor(objectId) {
+        // Doors: 0x140-0x14F (all door types including portcullis and secret doors)
+        return objectId >= 0x140 && objectId <= 0x14F;
     }
     
     /**
@@ -528,26 +578,55 @@ class SaveGameComparator {
                         changed_properties: []
                     });
                 }
-            } else {
-                // Object not found by id in save - try position-based matching as fallback
-                const posKey = this._getPositionKey(baseObj);
-                const saveObjectsAtPosition = saveByPosition.get(posKey) || [];
-                
-                // Find an unmatched save object at the exact same position with same object_id
-                let matchedSaveObj = null;
-                for (const saveObj of saveObjectsAtPosition) {
-                    if (!matchedSaveIds.has(saveObj.id)) {
-                        // Check that object_id matches (already in posKey, but verify)
-                        const baseObjId = baseObj.object_id !== undefined ? baseObj.object_id : 0;
-                        const saveObjId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
-                        
-                        if (this._areSameObjectType(baseObjId, saveObjId)) {
-                            matchedSaveObj = saveObj;
-                            matchedSaveIds.add(saveObj.id); // Mark as matched to prevent reuse
-                            break; // Match found, stop searching
+                } else {
+                    // Object not found by id in save - try position-based matching as fallback
+                    const posKey = this._getPositionKey(baseObj);
+                    const saveObjectsAtPosition = saveByPosition.get(posKey) || [];
+                    
+                    // Find an unmatched save object at the exact same position with same object_id
+                    let matchedSaveObj = null;
+                    const baseObjId = baseObj.object_id !== undefined ? baseObj.object_id : 0;
+                    const baseX = baseObj.tile_x !== undefined ? baseObj.tile_x : 0;
+                    const baseY = baseObj.tile_y !== undefined ? baseObj.tile_y : 0;
+                    const baseZ = baseObj.z !== undefined ? baseObj.z : (baseObj.z_pos !== undefined ? baseObj.z_pos : 0);
+                    
+                    // First try exact position key match (same object_id)
+                    for (const saveObj of saveObjectsAtPosition) {
+                        if (!matchedSaveIds.has(saveObj.id)) {
+                            const saveObjId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+                            
+                            if (this._areSameObjectType(baseObjId, saveObjId)) {
+                                matchedSaveObj = saveObj;
+                                matchedSaveIds.add(saveObj.id); // Mark as matched to prevent reuse
+                                break; // Match found, stop searching
+                            }
                         }
                     }
-                }
+                    
+                    // Special handling: If no match found and this is a door, try matching by position
+                    // even if object_id differs (as long as both are door IDs)
+                    // This handles cases where a door's object_id changes when locked/unlocked
+                    if (!matchedSaveObj && !isNpc && this._isDoor(baseObjId)) {
+                        // Search all save objects at the same position (x, y, z) for any door
+                        for (const [savePosKey, saveObjs] of saveByPosition) {
+                            for (const saveObj of saveObjs) {
+                                if (matchedSaveIds.has(saveObj.id)) continue;
+                                
+                                const saveObjId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+                                const saveX = saveObj.tile_x !== undefined ? saveObj.tile_x : 0;
+                                const saveY = saveObj.tile_y !== undefined ? saveObj.tile_y : 0;
+                                const saveZ = saveObj.z !== undefined ? saveObj.z : (saveObj.z_pos !== undefined ? saveObj.z_pos : 0);
+                                
+                                // Match if same position and both are doors
+                                if (baseX === saveX && baseY === saveY && baseZ === saveZ && this._isDoor(saveObjId)) {
+                                    matchedSaveObj = saveObj;
+                                    matchedSaveIds.add(saveObj.id);
+                                    break;
+                                }
+                            }
+                            if (matchedSaveObj) break;
+                        }
+                    }
                 
                 if (matchedSaveObj) {
                     // Found matching object at exact same position - same object, different index
@@ -628,9 +707,95 @@ class SaveGameComparator {
             }
         }
         
+        // Special handling: Match doors by position even if object_id changed
+        // This handles cases where a door's object_id changes when locked/unlocked
+        // and the door wasn't matched by index
+        const matchedDoorSaveIds = new Set(); // Track which save door IDs were matched
+        if (!isNpc) {
+            const removedDoors = this.changes[levelNum].removed.filter(change => {
+                const objId = change.base_data?.object_id || 0;
+                return this._isDoor(objId);
+            });
+            const addedDoors = [];
+            
+            // Collect added doors (we'll process them after)
+            for (const [id, saveObj] of saveById) {
+                if (!baseById.has(id) && !matchedSaveIds.has(id)) {
+                    const objId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+                    if (this._isDoor(objId)) {
+                        addedDoors.push({ id, saveObj });
+                    }
+                }
+            }
+            
+            // Match removed and added doors by position
+            const matchedPairs = [];
+            const matchedRemoved = new Set();
+            const matchedAdded = new Set();
+            
+            for (const remChange of removedDoors) {
+                if (matchedRemoved.has(remChange)) continue;
+                
+                const remObj = remChange.base_data;
+                if (!remObj) continue;
+                
+                const remX = remObj.tile_x !== undefined ? remObj.tile_x : 0;
+                const remY = remObj.tile_y !== undefined ? remObj.tile_y : 0;
+                const remZ = remObj.z !== undefined ? remObj.z : (remObj.z_pos !== undefined ? remObj.z_pos : 0);
+                
+                for (const addEntry of addedDoors) {
+                    if (matchedAdded.has(addEntry.id)) continue;
+                    
+                    const addObj = addEntry.saveObj;
+                    const addX = addObj.tile_x !== undefined ? addObj.tile_x : 0;
+                    const addY = addObj.tile_y !== undefined ? addObj.tile_y : 0;
+                    const addZ = addObj.z !== undefined ? addObj.z : (addObj.z_pos !== undefined ? addObj.z_pos : 0);
+                    
+                    // Match if same position
+                    if (remX === addX && remY === addY && remZ === addZ) {
+                        matchedPairs.push({ remChange, addEntry });
+                        matchedRemoved.add(remChange);
+                        matchedAdded.add(addEntry.id);
+                        matchedDoorSaveIds.add(addEntry.id);
+                        break;
+                    }
+                }
+            }
+            
+            // Convert matched door pairs from removed/added to modified
+            for (const { remChange, addEntry } of matchedPairs) {
+                // Remove from removed/added lists
+                const remIndex = this.changes[levelNum].removed.indexOf(remChange);
+                if (remIndex >= 0) {
+                    this.changes[levelNum].removed.splice(remIndex, 1);
+                }
+                
+                // Get property changes between the two doors
+                const propertyChanges = this._getChangedProperties(remChange.base_data, addEntry.saveObj);
+                
+                // Add as modified
+                this.changes[levelNum].modified.push({
+                    change_type: ChangeType.MODIFIED,
+                    object_id: addEntry.saveObj.object_id || 0,
+                    level: levelNum,
+                    base_data: remChange.base_data,
+                    save_data: addEntry.saveObj,
+                    base_index: remChange.base_index,
+                    save_index: addEntry.id,
+                    is_npc: isNpc,
+                    changed_properties: propertyChanges
+                });
+            }
+        }
+        
         // Find added objects (in save but not in base, and not already matched by position)
         for (const [id, saveObj] of saveById) {
             if (!baseById.has(id) && !matchedSaveIds.has(id)) {
+                // Skip if this door was already matched in the special door matching above
+                if (matchedDoorSaveIds.has(id)) {
+                    continue;
+                }
+                
                 // Check if this is a secret door that matches a secret in base game
                 // If so, don't show it as "added" since secrets are handled separately
                 const objId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
