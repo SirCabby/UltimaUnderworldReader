@@ -645,6 +645,39 @@ function checkForStairs(obj, allObjects, currentLevel) {
 }
 
 /**
+ * Build a map of NPC names by their object id (index) for a specific level
+ * This allows save game NPCs to inherit their proper names from base data
+ * @param {Object} baseData - The base game data (web_map_data.json)
+ * @param {number} levelNum - Level number
+ * @returns {Map} - Map from NPC id (index) to {name, creature_type}
+ */
+function buildNpcNameMapForLevel(baseData, levelNum) {
+    const npcNameMap = new Map();
+    
+    if (!baseData || !baseData.levels) {
+        return npcNameMap;
+    }
+    
+    // Find the base level
+    const baseLevel = baseData.levels.find(l => l.level === levelNum);
+    if (!baseLevel || !baseLevel.npcs) {
+        return npcNameMap;
+    }
+    
+    // Build map from NPC id to their name and creature_type
+    for (const npc of baseLevel.npcs) {
+        if (npc.id !== undefined) {
+            npcNameMap.set(npc.id, {
+                name: npc.name,
+                creature_type: npc.creature_type
+            });
+        }
+    }
+    
+    return npcNameMap;
+}
+
+/**
  * Convert a parsed level to web format
  * @param {number} levelNum - Level number
  * @param {Object} level - Parsed level data
@@ -654,6 +687,7 @@ function checkForStairs(obj, allObjects, currentLevel) {
  */
 function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
     const nameMap = buildNameMap(baseData);
+    const npcNameMap = buildNpcNameMapForLevel(baseData, levelNum);
     const objects = [];
     const npcs = [];
     
@@ -705,19 +739,25 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
             continue;
         }
         
-        // Get name from base data
-        const name = nameMap.get(obj.item_id) || `Object ${obj.item_id}`;
+        // Get name from base data (type name)
+        const typeName = nameMap.get(obj.item_id) || `Object ${obj.item_id}`;
         
         // Determine if this is an NPC
         const isNpc = obj.is_npc && obj.is_mobile;
         
         if (isNpc) {
+            // For NPCs, try to get their specific name from base data first (by object id/index)
+            // This preserves named NPCs like "Dr. Owl" instead of just showing "Human"
+            const baseNpcInfo = npcNameMap.get(idx);
+            const npcName = baseNpcInfo ? baseNpcInfo.name : typeName;
+            const creatureType = baseNpcInfo ? baseNpcInfo.creature_type : typeName;
+            
             // Process as NPC
             npcs.push({
                 id: idx,
                 object_id: obj.item_id,
-                name: name,
-                creature_type: name,
+                name: npcName,
+                creature_type: creatureType,
                 tile_x: obj.tile_x,
                 tile_y: obj.tile_y,
                 z: obj.z_pos,
@@ -770,7 +810,7 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
             const objData = {
                 id: idx,
                 object_id: obj.item_id,
-                name: name,
+                name: typeName,
                 tile_x: obj.tile_x,
                 tile_y: obj.tile_y,
                 z: obj.z_pos,

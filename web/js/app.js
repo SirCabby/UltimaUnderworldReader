@@ -1637,7 +1637,14 @@ function renderMarkers() {
     // Collect secrets (illusory walls and secret doors) - show based on their category
     // Note: Secrets are never "enchanted" in the magical sense, so they're hidden when enchanted filter is on
     // Note: Secrets can never be owned, so they're hidden when owned filter is set to "only"
-    if (level.secrets && !state.filters.enchantedOnly && state.filters.ownedFilter !== 'only') {
+    // Note: Secrets are static base game data - hide them when change filter excludes 'unchanged'
+    const showSecrets = level.secrets && 
+                        !state.filters.enchantedOnly && 
+                        state.filters.ownedFilter !== 'only' &&
+                        // If save game is loaded and change filter is active, only show secrets if 'unchanged' is selected
+                        (!state.saveGame || state.filters.changeTypes.has('unchanged'));
+    
+    if (showSecrets) {
         level.secrets.forEach(secret => {
             // Check if this secret's category is enabled
             if (!state.filters.categories.has(secret.category)) {
@@ -3972,7 +3979,13 @@ function renderVisibleObjectsPane() {
     
     // Collect secrets (not shown when enchanted filter is on)
     // Note: Secrets can never be owned, so they're hidden when owned filter is set to "only"
-    if (level.secrets && !state.filters.enchantedOnly && state.filters.ownedFilter !== 'only') {
+    // Note: Secrets are static base game data - hide them when change filter excludes 'unchanged'
+    const showSecretsInList = level.secrets && 
+                              !state.filters.enchantedOnly && 
+                              state.filters.ownedFilter !== 'only' &&
+                              (!state.saveGame || state.filters.changeTypes.has('unchanged'));
+    
+    if (showSecretsInList) {
         level.secrets.forEach(secret => {
             if (!state.filters.categories.has(secret.category)) return;
             

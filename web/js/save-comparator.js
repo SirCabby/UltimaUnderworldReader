@@ -109,11 +109,15 @@ class SaveGameComparator {
             return 0x147;
         }
         
-        // Switches/buttons (0x170-0x17F) often come in pairs
-        // Many switches have even/odd pairs representing on/off states
-        // Normalize to even number (the "off" state)
-        if (objId >= 0x170 && objId <= 0x17F) {
-            return objId & ~1; // Clear lowest bit to normalize to even
+        // Switches/buttons (0x170-0x17F) come in pairs
+        // The activated state is +8 from the deactivated state
+        // 0x170-0x177 are deactivated, 0x178-0x17F are activated versions
+        // Normalize to the deactivated (lower) ID
+        if (objId >= 0x178 && objId <= 0x17F) {
+            return objId - 8; // Map activated to deactivated
+        }
+        if (objId >= 0x170 && objId <= 0x177) {
+            return objId; // Already deactivated
         }
         
         return objId;
@@ -134,9 +138,12 @@ class SaveGameComparator {
         if (objId === 0x147) return 'Closed';  // Secret door
         if (objId === 0x14F) return 'Open';    // Secret door
         
-        // Switches - odd IDs are often "activated" state
-        if (objId >= 0x170 && objId <= 0x17F) {
-            return (objId & 1) ? 'Activated' : 'Deactivated';
+        // Switches - 0x178-0x17F are activated states of 0x170-0x177
+        if (objId >= 0x178 && objId <= 0x17F) {
+            return 'Activated';
+        }
+        if (objId >= 0x170 && objId <= 0x177) {
+            return 'Deactivated';
         }
         
         return `State 0x${objId.toString(16).toUpperCase()}`;
@@ -191,6 +198,16 @@ class SaveGameComparator {
         
         // Secret doors (0x150-0x15F) - quality used internally
         if (objectId >= 0x150 && objectId <= 0x15F) {
+            if (property === 'quality') return true;
+        }
+        
+        // Skulls (0x0C3) - quality used internally
+        if (objectId === 0x0C3) {
+            if (property === 'quality') return true;
+        }
+        
+        // Dials (0x161) - quality used internally
+        if (objectId === 0x161) {
             if (property === 'quality') return true;
         }
         
@@ -322,7 +339,17 @@ class SaveGameComparator {
                 
                 // Check if the object type changed (different item in same slot)
                 // Use normalized comparison for paired types (open/closed doors, switch states)
-                if (!this._areSameObjectType(baseObj.object_id, saveObj.object_id)) {
+                const baseObjId = baseObj.object_id !== undefined ? baseObj.object_id : 0;
+                const saveObjId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+                
+                // Debug: log switch/button comparisons
+                if ((baseObjId >= 0x170 && baseObjId <= 0x17F) || (saveObjId >= 0x170 && saveObjId <= 0x17F)) {
+                    console.log(`Switch comparison: base=0x${baseObjId.toString(16)}, save=0x${saveObjId.toString(16)}, ` +
+                                `normalized: ${this._normalizeObjectId(baseObjId).toString(16)} vs ${this._normalizeObjectId(saveObjId).toString(16)}, ` +
+                                `same=${this._areSameObjectType(baseObjId, saveObjId)}`);
+                }
+                
+                if (!this._areSameObjectType(baseObjId, saveObjId)) {
                     // Object was replaced with a different type - treat as removed + added
                     this.changes[levelNum].removed.push({
                         change_type: ChangeType.REMOVED,
