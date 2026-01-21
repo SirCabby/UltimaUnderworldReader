@@ -288,11 +288,11 @@ class SaveGameComparator {
     _getPositionChange(baseObj, saveObj) {
         const baseX = baseObj.tile_x ?? 0;
         const baseY = baseObj.tile_y ?? 0;
-        const baseZ = baseObj.z ?? 0;
+        const baseZ = baseObj.z ?? (baseObj.z_pos ?? 0);
         
         const saveX = saveObj.tile_x ?? 0;
         const saveY = saveObj.tile_y ?? 0;
-        const saveZ = saveObj.z ?? 0;
+        const saveZ = saveObj.z ?? (saveObj.z_pos ?? 0);
         
         // Check if position changed at all
         if (baseX !== saveX || baseY !== saveY || baseZ !== saveZ) {
@@ -313,15 +313,95 @@ class SaveGameComparator {
      * @param {Array} saveList - Save game objects
      * @param {boolean} isNpc - Whether these are NPC objects
      */
-    _compareObjectLists(levelNum, baseList, saveList, isNpc = false) {
+    /**
+     * Create a position key for an object (used for exact position matching)
+     * Includes: tile_x, tile_y, z, and object_id to ensure exact matching
+     * @param {Object} obj - Object with position and type info
+     * @returns {string} - Position key like "x,y,z,object_id"
+     */
+    _getPositionKey(obj) {
+        const x = obj.tile_x !== undefined ? obj.tile_x : 0;
+        const y = obj.tile_y !== undefined ? obj.tile_y : 0;
+        const z = obj.z !== undefined ? obj.z : (obj.z_pos !== undefined ? obj.z_pos : 0);
+        const objId = obj.object_id !== undefined ? obj.object_id : 0;
+        return `${x},${y},${z},${objId}`;
+    }
+    
+    /**
+     * Check if an object ID represents a secret door
+     * @param {number} objectId - Object ID to check
+     * @returns {boolean} - True if this is a secret door
+     */
+    _isSecretDoor(objectId) {
+        // Secret doors: 0x147 (closed), 0x14F (open), and 0x150-0x15F (various secret door types)
+        return objectId === 0x147 || objectId === 0x14F || 
+               (objectId >= 0x150 && objectId <= 0x15F);
+    }
+    
+    /**
+     * Check if a save object matches a secret in the base game
+     * @param {Object} saveObj - Save game object
+     * @param {Array} baseSecrets - Base game secrets array
+     * @returns {Object|null} - Matching base secret or null
+     */
+    _findMatchingSecret(saveObj, baseSecrets) {
+        if (!baseSecrets || !Array.isArray(baseSecrets)) {
+            return null;
+        }
+        
+        const objId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+        if (!this._isSecretDoor(objId)) {
+            return null;
+        }
+        
+        const saveX = saveObj.tile_x !== undefined ? saveObj.tile_x : 0;
+        const saveY = saveObj.tile_y !== undefined ? saveObj.tile_y : 0;
+        
+        // Find a secret at the same tile position (x, y)
+        // Secrets are map features and don't have z-coordinates in the same way as objects,
+        // so we match by tile_x and tile_y only, ignoring z
+        for (const secret of baseSecrets) {
+            const secretX = secret.tile_x !== undefined ? secret.tile_x : 0;
+            const secretY = secret.tile_y !== undefined ? secret.tile_y : 0;
+            
+            // Match by tile position only (x, y) - ignore z for secrets
+            if (secretX === saveX && secretY === saveY) {
+                // Check if it's a secret door type - be more flexible with matching
+                const isSecretDoor = secret.type === 'secret_door' || 
+                                    secret.category === 'secret_doors' ||
+                                    secret.category === 'secret_door' ||
+                                    (secret.type && secret.type.includes('secret'));
+                
+                if (isSecretDoor) {
+                    return secret;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    _compareObjectLists(levelNum, baseList, saveList, isNpc = false, baseSecrets = null) {
         // Create maps by object index (id) for efficient lookup
         const baseById = new Map();
         const saveById = new Map();
+        
+        // Create position-based maps for fallback matching (exact position: x,y,z,object_id)
+        // Map structure: positionKey -> array of objects (multiple items can share position)
+        const baseByPosition = new Map();
+        const saveByPosition = new Map();
         
         for (const obj of baseList) {
             const id = obj.id;
             if (id !== undefined && id !== null) {
                 baseById.set(id, obj);
+                
+                // Add to position map
+                const posKey = this._getPositionKey(obj);
+                if (!baseByPosition.has(posKey)) {
+                    baseByPosition.set(posKey, []);
+                }
+                baseByPosition.get(posKey).push(obj);
             }
         }
         
@@ -329,25 +409,29 @@ class SaveGameComparator {
             const id = obj.id;
             if (id !== undefined && id !== null) {
                 saveById.set(id, obj);
+                
+                // Add to position map
+                const posKey = this._getPositionKey(obj);
+                if (!saveByPosition.has(posKey)) {
+                    saveByPosition.set(posKey, []);
+                }
+                saveByPosition.get(posKey).push(obj);
             }
         }
+        
+        // Track which save objects have been matched (by id or position) to prevent duplicate matches
+        const matchedSaveIds = new Set();
         
         // Process all base objects
         for (const [id, baseObj] of baseById) {
             if (saveById.has(id)) {
+                matchedSaveIds.add(id);
                 const saveObj = saveById.get(id);
                 
                 // Check if the object type changed (different item in same slot)
                 // Use normalized comparison for paired types (open/closed doors, switch states)
                 const baseObjId = baseObj.object_id !== undefined ? baseObj.object_id : 0;
                 const saveObjId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
-                
-                // Debug: log switch/button comparisons
-                if ((baseObjId >= 0x170 && baseObjId <= 0x17F) || (saveObjId >= 0x170 && saveObjId <= 0x17F)) {
-                    console.log(`Switch comparison: base=0x${baseObjId.toString(16)}, save=0x${saveObjId.toString(16)}, ` +
-                                `normalized: ${this._normalizeObjectId(baseObjId).toString(16)} vs ${this._normalizeObjectId(saveObjId).toString(16)}, ` +
-                                `same=${this._areSameObjectType(baseObjId, saveObjId)}`);
-                }
                 
                 if (!this._areSameObjectType(baseObjId, saveObjId)) {
                     // Object was replaced with a different type - treat as removed + added
@@ -445,24 +529,120 @@ class SaveGameComparator {
                     });
                 }
             } else {
-                // Object removed (exists in base but not in save)
-                this.changes[levelNum].removed.push({
-                    change_type: ChangeType.REMOVED,
-                    object_id: baseObj.object_id || 0,
-                    level: levelNum,
-                    base_data: baseObj,
-                    save_data: null,
-                    base_index: id,
-                    save_index: null,
-                    is_npc: isNpc,
-                    changed_properties: []
-                });
+                // Object not found by id in save - try position-based matching as fallback
+                const posKey = this._getPositionKey(baseObj);
+                const saveObjectsAtPosition = saveByPosition.get(posKey) || [];
+                
+                // Find an unmatched save object at the exact same position with same object_id
+                let matchedSaveObj = null;
+                for (const saveObj of saveObjectsAtPosition) {
+                    if (!matchedSaveIds.has(saveObj.id)) {
+                        // Check that object_id matches (already in posKey, but verify)
+                        const baseObjId = baseObj.object_id !== undefined ? baseObj.object_id : 0;
+                        const saveObjId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+                        
+                        if (this._areSameObjectType(baseObjId, saveObjId)) {
+                            matchedSaveObj = saveObj;
+                            matchedSaveIds.add(saveObj.id); // Mark as matched to prevent reuse
+                            break; // Match found, stop searching
+                        }
+                    }
+                }
+                
+                if (matchedSaveObj) {
+                    // Found matching object at exact same position - same object, different index
+                    // Process it as if it was matched by id
+                    const saveObj = matchedSaveObj;
+                    const baseObjId = baseObj.object_id !== undefined ? baseObj.object_id : 0;
+                    const saveObjId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+                    
+                    // Check for position and property changes
+                    const positionChange = this._getPositionChange(baseObj, saveObj);
+                    const propertyChanges = this._getChangedProperties(baseObj, saveObj);
+                    
+                    // If object_id changed (e.g., door opened/closed), add that as a state change
+                    if (baseObj.object_id !== saveObj.object_id) {
+                        propertyChanges.push({
+                            property: 'state',
+                            displayName: 'State',
+                            from: this._getObjectStateName(baseObj.object_id),
+                            to: this._getObjectStateName(saveObj.object_id)
+                        });
+                    }
+                    
+                    if (positionChange) {
+                        // Object moved (though position matched, z might differ)
+                        this.changes[levelNum].moved.push({
+                            change_type: ChangeType.MOVED,
+                            object_id: baseObj.object_id || 0,
+                            level: levelNum,
+                            base_data: baseObj,
+                            save_data: saveObj,
+                            base_index: id,
+                            save_index: saveObj.id,
+                            is_npc: isNpc,
+                            position_change: positionChange,
+                            changed_properties: propertyChanges
+                        });
+                    } else if (propertyChanges.length > 0) {
+                        // Object modified (properties changed but position same)
+                        this.changes[levelNum].modified.push({
+                            change_type: ChangeType.MODIFIED,
+                            object_id: baseObj.object_id || 0,
+                            level: levelNum,
+                            base_data: baseObj,
+                            save_data: saveObj,
+                            base_index: id,
+                            save_index: saveObj.id,
+                            is_npc: isNpc,
+                            changed_properties: propertyChanges
+                        });
+                    } else {
+                        // Object unchanged (different index but everything else same)
+                        this.changes[levelNum].unchanged.push({
+                            change_type: ChangeType.UNCHANGED,
+                            object_id: baseObj.object_id || 0,
+                            level: levelNum,
+                            base_data: baseObj,
+                            save_data: saveObj,
+                            base_index: id,
+                            save_index: saveObj.id,
+                            is_npc: isNpc,
+                            changed_properties: []
+                        });
+                    }
+                } else {
+                    // Object truly removed (not found at same position either)
+                    this.changes[levelNum].removed.push({
+                        change_type: ChangeType.REMOVED,
+                        object_id: baseObj.object_id || 0,
+                        level: levelNum,
+                        base_data: baseObj,
+                        save_data: null,
+                        base_index: id,
+                        save_index: null,
+                        is_npc: isNpc,
+                        changed_properties: []
+                    });
+                }
             }
         }
         
-        // Find added objects (in save but not in base)
+        // Find added objects (in save but not in base, and not already matched by position)
         for (const [id, saveObj] of saveById) {
-            if (!baseById.has(id)) {
+            if (!baseById.has(id) && !matchedSaveIds.has(id)) {
+                // Check if this is a secret door that matches a secret in base game
+                // If so, don't show it as "added" since secrets are handled separately
+                const objId = saveObj.object_id !== undefined ? saveObj.object_id : 0;
+                if (this._isSecretDoor(objId)) {
+                    const matchingSecret = baseSecrets ? this._findMatchingSecret(saveObj, baseSecrets) : null;
+                    if (matchingSecret) {
+                        // This secret door exists in base.secrets, so skip it
+                        continue;
+                    }
+                }
+                
+                // Object truly added (not matched by id, position, or base secrets)
                 this.changes[levelNum].added.push({
                     change_type: ChangeType.ADDED,
                     object_id: saveObj.object_id || 0,
@@ -508,14 +688,15 @@ class SaveGameComparator {
             
             const baseObjects = baseLevel.objects || [];
             const baseNpcs = baseLevel.npcs || [];
+            const baseSecrets = baseLevel.secrets || [];
             const saveObjects = saveLevel.objects || [];
             const saveNpcs = saveLevel.npcs || [];
             
-            // Compare objects
-            this._compareObjectLists(levelNum, baseObjects, saveObjects, false);
+            // Compare objects (pass base secrets to filter out secret doors that match base secrets)
+            this._compareObjectLists(levelNum, baseObjects, saveObjects, false, baseSecrets);
             
             // Compare NPCs
-            this._compareObjectLists(levelNum, baseNpcs, saveNpcs, true);
+            this._compareObjectLists(levelNum, baseNpcs, saveNpcs, true, null);
         }
         
         return this.changes;

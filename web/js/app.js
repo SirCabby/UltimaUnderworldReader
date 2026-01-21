@@ -1573,6 +1573,11 @@ function renderMarkers() {
     
     // Collect objects - show if category matches OR if container holds items matching selected categories
     level.objects.forEach(obj => {
+        // Skip secret doors that match base secrets (they're shown as secrets, not objects)
+        if (isSecretDoorMatchingBaseSecret(obj, level)) {
+            return;
+        }
+        
         const objCategoryMatch = state.filters.categories.has(obj.category);
         const hasMatchingContents = hasContentMatchingCategory(obj.contents);
         
@@ -2364,6 +2369,51 @@ function hasContentMatchingCategory(contents) {
         if (item.contents && item.contents.length > 0) {
             if (hasContentMatchingCategory(item.contents)) {
                 return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Check if an object is a secret door that matches a secret in the base game
+ * If so, it should be hidden from the objects list (since it's shown as a secret)
+ * @param {Object} obj - Object to check
+ * @param {Object} level - Level data containing secrets
+ * @returns {boolean} - True if object should be hidden (matches a secret)
+ */
+function isSecretDoorMatchingBaseSecret(obj, level) {
+    if (!obj || !level || !level.secrets) {
+        return false;
+    }
+    
+    const objId = obj.object_id !== undefined ? obj.object_id : 0;
+    
+    // Check if this is a secret door object ID
+    const isSecretDoor = objId === 0x147 || objId === 0x14F || 
+                        (objId >= 0x150 && objId <= 0x15F);
+    
+    if (!isSecretDoor) {
+        return false;
+    }
+    
+    const objX = obj.tile_x !== undefined ? obj.tile_x : 0;
+    const objY = obj.tile_y !== undefined ? obj.tile_y : 0;
+    
+    // Check if there's a matching secret at the same tile position
+    for (const secret of level.secrets) {
+        const secretX = secret.tile_x !== undefined ? secret.tile_x : 0;
+        const secretY = secret.tile_y !== undefined ? secret.tile_y : 0;
+        
+        if (secretX === objX && secretY === objY) {
+            // Check if it's a secret door type
+            const isSecretDoorType = secret.type === 'secret_door' || 
+                                    secret.category === 'secret_doors' ||
+                                    secret.category === 'secret_door';
+            
+            if (isSecretDoorType) {
+                return true; // This object matches a secret, hide it
             }
         }
     }
@@ -3933,6 +3983,11 @@ function renderVisibleObjectsPane() {
     
     // Collect objects
     level.objects.forEach(obj => {
+        // Skip secret doors that match base secrets (they're shown as secrets, not objects)
+        if (isSecretDoorMatchingBaseSecret(obj, level)) {
+            return;
+        }
+        
         const objCategoryMatch = state.filters.categories.has(obj.category);
         const hasMatchingContents = hasContentMatchingCategory(obj.contents);
         
@@ -5399,6 +5454,8 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
     });
     const objectsAtTile = level.objects.filter(o => {
         if (o.tile_x !== tileX || o.tile_y !== tileY) return false;
+        // Skip secret doors that match base secrets (they're shown as secrets, not objects)
+        if (isSecretDoorMatchingBaseSecret(o, level)) return false;
         if (state.filters.enchantedOnly && !isEnchanted(o)) return false;
         if (state.filters.ownedFilter === 'only' && !isOwned(o)) return false;
         if (state.filters.ownedFilter === 'exclude' && isOwned(o)) return false;
