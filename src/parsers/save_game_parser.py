@@ -15,6 +15,7 @@ from .strings_parser import StringsParser
 from .objects_parser import ObjectsParser, CommonObjectsParser
 from ..extractors.item_extractor import ItemExtractor
 from ..utils import parse_item_name
+from ..constants import NPC_ATTITUDES
 
 
 class SaveGameParser:
@@ -183,6 +184,9 @@ class SaveGameParser:
                 
                 if is_npc:
                     # Process as NPC
+                    # Get attitude name from constants (0=hostile, 1=upset, 2=mellow, 3=friendly)
+                    attitude_name = NPC_ATTITUDES.get(obj.npc_attitude, f'unknown({obj.npc_attitude})')
+                    
                     npc_data = {
                         'id': idx,
                         'object_id': obj.item_id,
@@ -193,17 +197,27 @@ class SaveGameParser:
                         'z': obj.z_pos,
                         'hp': obj.npc_hp,
                         'level': obj.npc_level,
-                        'attitude': 'unknown',  # Would need to decode attitude
+                        'attitude': attitude_name,
                         'has_conversation': obj.npc_whoami > 0,
                         'conversation_slot': obj.npc_whoami,
                     }
                     npcs_by_level[level_num].append(npc_data)
                 else:
                     # Process as regular object
-                    # Determine quantity
+                    # Determine quantity - matching main exporter logic
                     quantity = 0
                     if obj.is_quantity:
                         quantity = obj.quantity_or_link
+                    
+                    # Items that always have quantity (gems, coins):
+                    quantity_capable_items = [
+                        0x0A2,  # Ruby
+                        0x0A3,  # Red gem
+                        0x0A4,  # Small blue gem (tiny blue gem)
+                        0x0A6,  # Sapphire
+                        0x0A7,  # Emerald
+                    ]
+                    can_have_quantity = obj.item_id in quantity_capable_items
                     
                     # Get category using the same logic as the main extractor.
                     # This keeps save-game categories consistent with the base-game data.
@@ -226,8 +240,19 @@ class SaveGameParser:
                         'owner': obj.owner,
                     }
                     
-                    if quantity > 0:
+                    # Add quantity - matching main exporter logic
+                    # is_quantity flag means quantity_or_link holds a count
+                    # quantity >= 512 means it's enchantment data, not a real quantity
+                    if obj.is_quantity and quantity > 0 and quantity < 512:
                         obj_data['quantity'] = quantity
+                    # Coins (0xA0) and gold coins (0xA1) always have quantity - default to 1
+                    elif obj.item_id in (0xA0, 0xA1):
+                        obj_data['quantity'] = 1
+                    # For quantity-capable items, only use quantity when is_quantity is true
+                    # When is_quantity is false, quantity_or_link contains a link value, not a quantity
+                    elif can_have_quantity:
+                        # Default to 1 for a single gem when is_quantity is false
+                        obj_data['quantity'] = 1
                     
                     objects_by_level[level_num].append(obj_data)
         

@@ -47,6 +47,14 @@ const SaveParser = {
         SLOPE_S: 7,
         SLOPE_E: 8,
         SLOPE_W: 9
+    },
+    
+    // NPC attitude values (0=hostile, 1=upset, 2=mellow, 3=friendly)
+    NPC_ATTITUDES: {
+        0: 'hostile',
+        1: 'upset',
+        2: 'mellow',
+        3: 'friendly'
     }
 };
 
@@ -752,6 +760,9 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
             const npcName = baseNpcInfo ? baseNpcInfo.name : typeName;
             const creatureType = baseNpcInfo ? baseNpcInfo.creature_type : typeName;
             
+            // Get attitude name from constants (0=hostile, 1=upset, 2=mellow, 3=friendly)
+            const attitudeName = SaveParser.NPC_ATTITUDES[obj.npc_attitude] || `unknown(${obj.npc_attitude})`;
+            
             // Process as NPC
             npcs.push({
                 id: idx,
@@ -763,7 +774,7 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
                 z: obj.z_pos,
                 hp: obj.npc_hp,
                 level: obj.npc_level,
-                attitude: 'unknown',
+                attitude: attitudeName,
                 has_conversation: obj.npc_whoami > 0,
                 conversation_slot: obj.npc_whoami
             });
@@ -832,8 +843,10 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
                 // Coins always have quantity, default to 1
                 objData.quantity = 1;
             } else if (isQuantityCapable) {
-                // For quantity-capable items, default to 1 if quantity is 0
-                objData.quantity = obj.quantity_or_link > 0 ? obj.quantity_or_link : 1;
+                // For quantity-capable items, only use quantity_or_link when is_quantity is true
+                // When is_quantity is false, quantity_or_link contains a link value, not a quantity
+                // Default to 1 for a single gem
+                objData.quantity = 1;
             }
             
             objects.push(objData);
