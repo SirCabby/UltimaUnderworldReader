@@ -664,6 +664,115 @@ async function loadSaveGame(files) {
  * Switch between saves or base game
  * @param {string|null} saveName - Save folder name, or null/empty string for base game
  */
+/**
+ * Enrich a save game object with metadata from base game
+ * This preserves features like image_path, category, description, etc.
+ * @param {Object} saveObj - Save game object to enrich
+ * @param {Object} baseLevel - Base game level data
+ * @param {boolean} isNpc - Whether this is an NPC
+ * @returns {Object} - Enriched object
+ */
+function enrichSaveGameObject(saveObj, baseLevel, isNpc) {
+    if (!saveObj || !baseLevel) return saveObj;
+    
+    // If we have base_data from change tracking, use that for metadata (most reliable)
+    let baseObj = saveObj.base_data || null;
+    
+    // If no base_data, try to find matching base game object
+    if (!baseObj) {
+        const objId = saveObj.object_id || 0;
+        const tileX = saveObj.tile_x || 0;
+        const tileY = saveObj.tile_y || 0;
+        
+        if (isNpc) {
+            // For NPCs, match by object_id (creature type) and position
+            baseObj = (baseLevel.npcs || []).find(npc => 
+                (npc.object_id === objId || npc.object_id === saveObj.object_id) &&
+                npc.tile_x === tileX && 
+                npc.tile_y === tileY
+            );
+            
+            // If no exact match, try matching just by object_id (for moved NPCs)
+            if (!baseObj) {
+                baseObj = (baseLevel.npcs || []).find(npc => 
+                    npc.object_id === objId || npc.object_id === saveObj.object_id
+                );
+            }
+        } else {
+            // For objects, match by object_id and position
+            baseObj = (baseLevel.objects || []).find(obj => 
+                (obj.object_id === objId || obj.object_id === saveObj.object_id) &&
+                obj.tile_x === tileX && 
+                obj.tile_y === tileY
+            );
+            
+            // If no exact match, try matching just by object_id (for moved objects)
+            if (!baseObj) {
+                baseObj = (baseLevel.objects || []).find(obj => 
+                    obj.object_id === objId || obj.object_id === saveObj.object_id
+                );
+            }
+        }
+    }
+    
+    // Merge base game metadata into save game object
+    // Preserve save game state (position, properties, etc.) but add base metadata
+    const enriched = { ...saveObj };
+    
+    if (baseObj) {
+        // Preserve metadata that doesn't change in save games (always use base if available)
+        if (baseObj.image_path !== undefined) enriched.image_path = baseObj.image_path;
+        if (baseObj.category !== undefined) enriched.category = baseObj.category;
+        // Description: use save game if it exists (might have changed), otherwise use base
+        if (!enriched.description && baseObj.description !== undefined) {
+            enriched.description = baseObj.description;
+        }
+        // Effect: use save game if it exists, otherwise use base
+        if (!enriched.effect && baseObj.effect !== undefined) {
+            enriched.effect = baseObj.effect;
+        }
+        // Name: use save game if it exists, otherwise use base
+        if (!enriched.name && baseObj.name !== undefined) {
+            enriched.name = baseObj.name;
+        }
+        // Merge extra_info, preserving save game changes but adding base defaults
+        if (baseObj.extra_info !== undefined) {
+            enriched.extra_info = { ...baseObj.extra_info, ...(saveObj.extra_info || {}) };
+        }
+        
+        // Recursively enrich container contents
+        if (saveObj.contents && Array.isArray(saveObj.contents) && saveObj.contents.length > 0) {
+            // Save game has contents - enrich each item
+            enriched.contents = saveObj.contents.map(item => 
+                enrichSaveGameObject(item, baseLevel, false)
+            );
+        } else if (baseObj.contents && Array.isArray(baseObj.contents) && baseObj.contents.length > 0) {
+            // Save game doesn't have contents but base does - use base contents
+            // This handles cases where container was emptied or contents weren't parsed
+            enriched.contents = baseObj.contents.map(item => 
+                enrichSaveGameObject(item, baseLevel, false)
+            );
+        }
+        
+        // Recursively enrich NPC inventory
+        if (isNpc) {
+            if (saveObj.inventory && Array.isArray(saveObj.inventory) && saveObj.inventory.length > 0) {
+                // Save game has inventory - enrich each item
+                enriched.inventory = saveObj.inventory.map(item => 
+                    enrichSaveGameObject(item, baseLevel, false)
+                );
+            } else if (baseObj.inventory && Array.isArray(baseObj.inventory) && baseObj.inventory.length > 0) {
+                // Save game doesn't have inventory but base does - use base inventory
+                enriched.inventory = baseObj.inventory.map(item => 
+                    enrichSaveGameObject(item, baseLevel, false)
+                );
+            }
+        }
+    }
+    
+    return enriched;
+}
+
 function switchSaveGame(saveName) {
     if (!saveName || saveName === '') {
         // Switch to base game
@@ -689,12 +798,34 @@ function switchSaveGame(saveName) {
         }
         
         // Merge save data into state.data (replace levels with save game levels)
-        // Keep categories and metadata from base
-        state.data.levels = save.saveData.levels.map(level => ({
-            ...level,
-            // Preserve secrets from base game if they exist
-            secrets: state.saveGame.baseData.levels[level.level]?.secrets || []
-        }));
+        // Keep categories and metadata from base, and enrich objects with base metadata
+        state.data.levels = save.saveData.levels.map(level => {
+            const baseLevel = state.saveGame.baseData.levels[level.level];
+            if (!baseLevel) {
+                return {
+                    ...level,
+                    secrets: []
+                };
+            }
+            
+            // Enrich objects with base game metadata
+            const enrichedObjects = (level.objects || []).map(obj => 
+                enrichSaveGameObject(obj, baseLevel, false)
+            );
+            
+            // Enrich NPCs with base game metadata
+            const enrichedNpcs = (level.npcs || []).map(npc => 
+                enrichSaveGameObject(npc, baseLevel, true)
+            );
+            
+            return {
+                ...level,
+                objects: enrichedObjects,
+                npcs: enrichedNpcs,
+                // Preserve secrets from base game if they exist
+                secrets: baseLevel.secrets || []
+            };
+        });
         state.saveGame.currentSaveName = saveName;
     }
     
