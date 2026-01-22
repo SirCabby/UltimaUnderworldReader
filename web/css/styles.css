@@ -192,14 +192,31 @@ body {
 .save-game-toggle {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 4px;
     font-size: 0.85rem;
     color: var(--text-secondary);
     cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.save-game-toggle:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
 }
 
 .save-game-toggle input[type="checkbox"] {
     cursor: pointer;
+    margin: 0;
+}
+
+.save-game-toggle .toggle-icon {
+    font-size: 1.1rem;
+    font-weight: bold;
+    line-height: 1;
+    user-select: none;
 }
 
 .search-box {

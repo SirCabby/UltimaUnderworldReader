@@ -130,6 +130,7 @@ const state = {
         currentSaveName: null,  // null = base game, string = save folder name
         saves: {},              // { folderName: { saveData, changes } }
         baseData: null,         // Original base game data (backup)
+        showChangesBadges: true,  // Whether to show change-type colored badges on map
     },
 };
 
@@ -468,6 +469,8 @@ const elements = {
     saveGameInput: null,
     loadSaveBtn: null,
     saveGameSelector: null,
+    showChangesBadgesToggle: null,
+    showChangesBadgesCheckbox: null,
 };
 
 // ============================================================================
@@ -555,6 +558,8 @@ function cacheElements() {
     elements.saveGameInput = document.getElementById('save-game-input');
     elements.loadSaveBtn = document.getElementById('load-save-btn');
     elements.saveGameSelector = document.getElementById('save-game-selector');
+    elements.showChangesBadgesToggle = document.getElementById('show-changes-badges-toggle');
+    elements.showChangesBadgesCheckbox = document.getElementById('show-changes-badges-checkbox');
 }
 
 async function loadData() {
@@ -867,12 +872,24 @@ function updateSaveGameUI() {
         if (elements.changeTypesFilter) {
             elements.changeTypesFilter.style.display = '';
         }
+        // Show badge toggle when save game is loaded
+        if (elements.showChangesBadgesToggle) {
+            elements.showChangesBadgesToggle.style.display = '';
+        }
+        // Sync toggle checkbox state
+        if (elements.showChangesBadgesCheckbox) {
+            elements.showChangesBadgesCheckbox.checked = state.saveGame.showChangesBadges;
+        }
     } else {
         elements.saveGameSelector.value = '';
         elements.saveGameSelector.classList.remove('loaded');
         // Hide change types filter when no save game is loaded
         if (elements.changeTypesFilter) {
             elements.changeTypesFilter.style.display = 'none';
+        }
+        // Hide badge toggle when no save game is loaded
+        if (elements.showChangesBadgesToggle) {
+            elements.showChangesBadgesToggle.style.display = 'none';
         }
         // Reset change types filter state when switching to base game
         state.filters.changeTypes = new Set(['added', 'removed', 'moved', 'modified', 'unchanged']);
@@ -991,6 +1008,14 @@ function setupEventListeners() {
         elements.saveGameSelector.addEventListener('change', (e) => {
             const selectedValue = e.target.value;
             switchSaveGame(selectedValue || null);
+        });
+    }
+    
+    // Badge toggle
+    if (elements.showChangesBadgesCheckbox) {
+        elements.showChangesBadgesCheckbox.addEventListener('change', (e) => {
+            state.saveGame.showChangesBadges = e.target.checked;
+            renderMarkers();
         });
     }
     
@@ -1723,7 +1748,8 @@ function renderMarkers() {
     });
     
     // Collect removed objects when a save game is loaded and 'removed' filter is active
-    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed')) {
+    // Only show removed items if showChangesBadges is enabled
+    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed') && state.saveGame.showChangesBadges) {
         const currentSave = state.saveGame.saves[state.saveGame.currentSaveName];
         if (currentSave && currentSave.changes && currentSave.changes[state.currentLevel]) {
             const levelChanges = currentSave.changes[state.currentLevel];
@@ -1872,14 +1898,17 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
         }
     });
     // Add change indicator classes (prioritize added > moved > modified > removed)
-    if (changeTypes.has('added')) {
-        group.classList.add('marker-added');
-    } else if (changeTypes.has('moved')) {
-        group.classList.add('marker-moved');
-    } else if (changeTypes.has('modified')) {
-        group.classList.add('marker-modified');
-    } else if (changeTypes.has('removed')) {
-        group.classList.add('marker-removed');
+    // Only apply if showChangesBadges is enabled
+    if (state.saveGame.showChangesBadges) {
+        if (changeTypes.has('added')) {
+            group.classList.add('marker-added');
+        } else if (changeTypes.has('moved')) {
+            group.classList.add('marker-moved');
+        } else if (changeTypes.has('modified')) {
+            group.classList.add('marker-modified');
+        } else if (changeTypes.has('removed')) {
+            group.classList.add('marker-removed');
+        }
     }
     
     group.dataset.tileX = tileX;
@@ -2883,8 +2912,8 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     if (itemIsBridge) group.classList.add('bridge-marker');
     if (itemIsStairs) group.classList.add('stairs-marker');
     
-    // Add change indicator classes
-    if (changeType) {
+    // Add change indicator classes (only if showChangesBadges is enabled)
+    if (changeType && state.saveGame.showChangesBadges) {
         group.classList.add(`marker-${changeType}`);
     }
     
@@ -2908,7 +2937,8 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     hoverArea.classList.add('tile-hover-area');
     
     // Check if this is a removed item (needs special X marker)
-    const isRemoved = changeType === 'removed' || item.change_type === 'removed';
+    // Only show removed X marker if showChangesBadges is enabled
+    const isRemoved = (changeType === 'removed' || item.change_type === 'removed') && state.saveGame.showChangesBadges;
     
     // Create the visual marker
     let marker;
@@ -4128,7 +4158,8 @@ function renderVisibleObjectsPane() {
     });
     
     // Collect removed objects when a save game is loaded and 'removed' filter is active
-    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed')) {
+    // Only show removed items if showChangesBadges is enabled
+    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed') && state.saveGame.showChangesBadges) {
         const currentSave = state.saveGame.saves[state.saveGame.currentSaveName];
         if (currentSave && currentSave.changes && currentSave.changes[state.currentLevel]) {
             const levelChanges = currentSave.changes[state.currentLevel];
