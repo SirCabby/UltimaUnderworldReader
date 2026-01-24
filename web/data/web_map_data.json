@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-21T22:47:41.287126",
+    "generated": "2026-01-23T19:17:17.543199",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -1225,47 +1225,47 @@
     },
     "304": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "305": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "306": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "307": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "308": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "309": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "310": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "311": {
       "name": "book",
-      "category": "readable_scrolls_books"
+      "category": "books"
     },
     "312": {
       "name": "scroll",
-      "category": "readable_scrolls_books"
+      "category": "scrolls"
     },
     "313": {
       "name": "scroll",
-      "category": "readable_scrolls_books"
+      "category": "scrolls"
     },
     "314": {
       "name": "scroll",
-      "category": "readable_scrolls_books"
+      "category": "scrolls"
     },
     "315": {
       "name": "map",
@@ -1273,19 +1273,19 @@
     },
     "316": {
       "name": "scroll",
-      "category": "readable_scrolls_books"
+      "category": "scrolls"
     },
     "317": {
       "name": "scroll",
-      "category": "readable_scrolls_books"
+      "category": "scrolls"
     },
     "318": {
       "name": "scroll",
-      "category": "readable_scrolls_books"
+      "category": "scrolls"
     },
     "319": {
       "name": "scroll",
-      "category": "readable_scrolls_books"
+      "category": "scrolls"
     },
     "320": {
       "name": "door",
@@ -2093,9 +2093,14 @@
       "color": "#f783ac"
     },
     {
-      "id": "readable_scrolls_books",
-      "name": "Books & Scrolls",
-      "color": "#e0c8a0"
+      "id": "books",
+      "name": "Readable Books",
+      "color": "#e8d4b8"
+    },
+    {
+      "id": "scrolls",
+      "name": "Readable Scrolls",
+      "color": "#d4c4a8"
     },
     {
       "id": "spell_scrolls",
@@ -3207,7 +3212,7 @@
           "tile_x": 57,
           "tile_y": 48,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_318.png",
@@ -3298,7 +3303,7 @@
           "tile_x": 12,
           "tile_y": 20,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_318.png",
@@ -7674,7 +7679,7 @@
             {
               "object_id": 312,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_312.png",
               "description": "My dearest Alfred:\nGo into the Abyss knowing that I will not forget thee. As bitter as the Baron's justice dost seem, tis better than a hangman's noose. No matter the passing of years, I will await thy return. Yours forever,\n                 Sandra",
@@ -8141,6 +8146,7 @@
           "hp": 71,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -8155,6 +8161,7 @@
           "hp": 54,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8169,6 +8176,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8183,6 +8191,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8197,6 +8206,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8211,6 +8221,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8225,6 +8236,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8239,6 +8251,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8253,6 +8266,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8267,6 +8281,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8281,6 +8296,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8295,6 +8311,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8309,6 +8326,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8323,6 +8341,7 @@
           "hp": 9,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8337,6 +8356,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8351,6 +8371,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8365,6 +8386,7 @@
           "hp": 22,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8379,6 +8401,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8393,6 +8416,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 66,
           "inventory": [
@@ -8418,6 +8442,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8432,6 +8457,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8446,6 +8472,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8460,6 +8487,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8474,6 +8502,7 @@
           "hp": 9,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8488,6 +8517,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8502,6 +8532,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8516,6 +8547,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8530,6 +8562,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8544,13 +8577,14 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 10,
           "inventory": [
             {
               "object_id": 318,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_318.png",
               "description": "This recipe for worm stew requires port, a green mushroom, a dead rotworm, and a bowl to mix them in.",
@@ -8570,6 +8604,7 @@
           "hp": 55,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 9,
           "inventory": [
@@ -8595,6 +8630,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 65
         },
@@ -8609,6 +8645,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8623,6 +8660,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8637,6 +8675,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8651,6 +8690,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 64
         },
@@ -8665,6 +8705,7 @@
           "hp": 32,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 7
         },
@@ -8679,6 +8720,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8693,6 +8735,7 @@
           "hp": 43,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 67
         },
@@ -8707,6 +8750,7 @@
           "hp": 22,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8721,6 +8765,7 @@
           "hp": 34,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 20
         },
@@ -8735,6 +8780,7 @@
           "hp": 50,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 19
         },
@@ -8749,6 +8795,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8763,6 +8810,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8777,6 +8825,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8791,6 +8840,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8805,6 +8855,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8819,6 +8870,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 8,
           "inventory": [
@@ -8843,6 +8895,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8857,6 +8910,7 @@
           "hp": 3,
           "level": 4,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8871,6 +8925,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -8885,6 +8940,7 @@
           "hp": 4,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         }
@@ -11535,7 +11591,7 @@
           "tile_x": 36,
           "tile_y": 38,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_319.png",
@@ -11550,7 +11606,7 @@
           "tile_x": 52,
           "tile_y": 20,
           "z": 72,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_314.png",
@@ -11565,7 +11621,7 @@
           "tile_x": 34,
           "tile_y": 48,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_313.png",
@@ -11580,7 +11636,7 @@
           "tile_x": 62,
           "tile_y": 39,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_316.png",
@@ -12268,7 +12324,7 @@
             {
               "object_id": 317,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_317.png",
               "description": "Remove Bet from a Resist Blows spell for better protection.",
@@ -12638,7 +12694,7 @@
                 {
                   "object_id": 312,
                   "name": "scroll",
-                  "category": "readable_scrolls_books",
+                  "category": "scrolls",
                   "quantity": 1,
                   "image_path": "images/extracted/objects/object_312.png",
                   "description": "These blueprints are indecipherable.",
@@ -15044,6 +15100,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15058,6 +15115,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15072,6 +15130,7 @@
           "hp": 29,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -15102,6 +15161,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15116,6 +15176,7 @@
           "hp": 32,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15130,6 +15191,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15144,6 +15206,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15158,6 +15221,7 @@
           "hp": 25,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15172,6 +15236,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15186,6 +15251,7 @@
           "hp": 27,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15200,6 +15266,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15214,6 +15281,7 @@
           "hp": 29,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15228,6 +15296,7 @@
           "hp": 32,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15242,6 +15311,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15256,6 +15326,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15270,6 +15341,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15284,6 +15356,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15298,6 +15371,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15312,6 +15386,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15326,6 +15401,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15340,6 +15416,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15354,6 +15431,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15368,6 +15446,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15382,6 +15461,7 @@
           "hp": 15,
           "level": 4,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15396,6 +15476,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15410,6 +15491,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15424,6 +15506,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -15450,6 +15533,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15464,6 +15548,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15478,6 +15563,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15492,6 +15578,7 @@
           "hp": 4,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15506,6 +15593,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15520,6 +15608,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 89
         },
@@ -15534,6 +15623,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15548,6 +15638,7 @@
           "hp": 48,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15562,6 +15653,7 @@
           "hp": 49,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15576,6 +15668,7 @@
           "hp": 27,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 90,
           "inventory": [
@@ -15602,6 +15695,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15616,6 +15710,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15630,6 +15725,7 @@
           "hp": 34,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15644,6 +15740,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15658,6 +15755,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15672,6 +15770,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15686,6 +15785,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15700,6 +15800,7 @@
           "hp": 97,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15714,6 +15815,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15728,6 +15830,7 @@
           "hp": 22,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -15742,6 +15845,7 @@
           "hp": 50,
           "level": 4,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 21,
           "inventory": [
@@ -15802,6 +15906,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 110
         },
@@ -15816,6 +15921,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 88
         },
@@ -15830,6 +15936,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 1
         },
@@ -15844,6 +15951,7 @@
           "hp": 121,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 2,
           "inventory": [
@@ -15930,6 +16038,7 @@
           "hp": 211,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 3,
           "inventory": [
@@ -17126,7 +17235,7 @@
             {
               "object_id": 305,
               "name": "book",
-              "category": "readable_scrolls_books",
+              "category": "books",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_305.png",
               "description": "Speak SAHF to gain tracking.",
@@ -18263,7 +18372,7 @@
             {
               "object_id": 318,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_318.png",
               "description": "TRIED THIS LEVER! MANY R...",
@@ -18760,7 +18869,7 @@
           "tile_x": 22,
           "tile_y": 6,
           "z": 72,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_306.png",
@@ -19818,7 +19927,7 @@
             {
               "object_id": 316,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_316.png",
               "description": "Look for Thieves hideout behind storage room",
@@ -19864,7 +19973,7 @@
           "tile_x": 23,
           "tile_y": 43,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_309.png",
@@ -20796,7 +20905,7 @@
           "tile_x": 22,
           "tile_y": 6,
           "z": 72,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_314.png",
@@ -21191,7 +21300,7 @@
           "tile_x": 49,
           "tile_y": 38,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_314.png",
@@ -21842,6 +21951,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -21856,6 +21966,7 @@
           "hp": 34,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -21870,6 +21981,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -21884,6 +21996,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -21898,6 +22011,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -21912,6 +22026,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -21926,6 +22041,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 112,
           "inventory": [
@@ -21997,6 +22113,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": true,
           "conversation_slot": 112
         },
@@ -22011,6 +22128,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22025,6 +22143,7 @@
           "hp": 80,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 113,
           "inventory": [
@@ -22065,6 +22184,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22079,6 +22199,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22093,6 +22214,7 @@
           "hp": 4,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22107,6 +22229,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22121,6 +22244,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22135,6 +22259,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22149,6 +22274,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22163,6 +22289,7 @@
           "hp": 78,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22177,6 +22304,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22191,6 +22319,7 @@
           "hp": 82,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22205,6 +22334,7 @@
           "hp": 87,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22219,6 +22349,7 @@
           "hp": 65,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22233,6 +22364,7 @@
           "hp": 90,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22247,6 +22379,7 @@
           "hp": 67,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22261,6 +22394,7 @@
           "hp": 79,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22275,6 +22409,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22289,6 +22424,7 @@
           "hp": 101,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22303,6 +22439,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22317,6 +22454,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22331,6 +22469,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22345,6 +22484,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22359,6 +22499,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22373,6 +22514,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22387,13 +22529,14 @@
           "hp": 48,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 114,
           "inventory": [
             {
               "object_id": 318,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_318.png",
               "description": "Wanderer\n   Thanking you much, I can lizardman rune-spell talk.  For  walk water, Ylem Por do.",
@@ -22413,6 +22556,7 @@
           "hp": 9,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22427,6 +22571,7 @@
           "hp": 49,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 112,
           "inventory": [
@@ -22501,6 +22646,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22515,6 +22661,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 16,
           "inventory": [
@@ -22566,6 +22713,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22580,6 +22728,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22594,6 +22743,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22608,6 +22758,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22622,6 +22773,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22636,6 +22788,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22650,6 +22803,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22664,6 +22818,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22678,6 +22833,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22692,6 +22848,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22706,6 +22863,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22720,6 +22878,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22734,6 +22893,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22748,6 +22908,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22762,6 +22923,7 @@
           "hp": 27,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22776,6 +22938,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22790,6 +22953,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22804,6 +22968,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22818,6 +22983,7 @@
           "hp": 38,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22832,6 +22998,7 @@
           "hp": 32,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22846,6 +23013,7 @@
           "hp": 34,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22860,6 +23028,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -22874,6 +23043,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -22900,6 +23070,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 24
         },
@@ -22914,6 +23085,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 15
         },
@@ -22928,6 +23100,7 @@
           "hp": 61,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 28,
           "inventory": [
@@ -23156,7 +23329,7 @@
           "tile_x": 4,
           "tile_y": 33,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_319.png",
@@ -23171,7 +23344,7 @@
           "tile_x": 4,
           "tile_y": 34,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_313.png",
@@ -23186,7 +23359,7 @@
           "tile_x": 4,
           "tile_y": 34,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -23393,7 +23566,7 @@
           "tile_x": 46,
           "tile_y": 20,
           "z": 0,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_312.png",
@@ -23869,7 +24042,7 @@
           "tile_x": 59,
           "tile_y": 2,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_314.png",
@@ -23911,7 +24084,7 @@
           "tile_x": 4,
           "tile_y": 34,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_313.png",
@@ -23926,7 +24099,7 @@
           "tile_x": 4,
           "tile_y": 33,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_312.png",
@@ -25016,7 +25189,7 @@
           "tile_x": 38,
           "tile_y": 45,
           "z": 40,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -25420,7 +25593,7 @@
             {
               "object_id": 314,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_314.png",
               "description": "Gratlashuns, Sethar, you done might strng by pertecting us.  Thnks",
@@ -25545,7 +25718,7 @@
           "tile_x": 60,
           "tile_y": 26,
           "z": 64,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_318.png",
@@ -25960,7 +26133,7 @@
           "tile_x": 10,
           "tile_y": 44,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_314.png",
@@ -26079,7 +26252,7 @@
           "tile_x": 4,
           "tile_y": 33,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_319.png",
@@ -26501,7 +26674,7 @@
           "tile_x": 12,
           "tile_y": 21,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_316.png",
@@ -26552,7 +26725,7 @@
           "tile_x": 4,
           "tile_y": 21,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_309.png",
@@ -27203,7 +27376,7 @@
           "tile_x": 22,
           "tile_y": 9,
           "z": 64,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -27344,7 +27517,7 @@
           "tile_x": 39,
           "tile_y": 18,
           "z": 64,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_313.png",
@@ -27574,7 +27747,7 @@
             {
               "object_id": 314,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_314.png",
               "description": "Lakshi -\n I am writing to discuss with you the possibility of your performing a small service for me, which in the end would be beneficial to ourselves and the Abyss as a whole.  If you could have several of your subjects do some small favors for me, I would be indebted to you for quite some time.\n P.S.  Just tell my messenger your response - he can be trusted.",
@@ -29468,6 +29641,7 @@
           "hp": 43,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 143
         },
@@ -29482,6 +29656,7 @@
           "hp": 57,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29496,6 +29671,7 @@
           "hp": 22,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29510,6 +29686,7 @@
           "hp": 51,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 144,
           "inventory": [
@@ -29542,6 +29719,7 @@
           "hp": 56,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 147
         },
@@ -29556,6 +29734,7 @@
           "hp": 54,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 140
         },
@@ -29570,6 +29749,7 @@
           "hp": 95,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": true,
           "conversation_slot": 142,
           "inventory": [
@@ -29630,6 +29810,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29644,6 +29825,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29658,6 +29840,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29672,6 +29855,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29686,6 +29870,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29700,6 +29885,7 @@
           "hp": 9,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29714,6 +29900,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29728,6 +29915,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29742,6 +29930,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29756,6 +29945,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29770,6 +29960,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29784,6 +29975,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29798,6 +29990,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29812,6 +30005,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29826,6 +30020,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29840,6 +30035,7 @@
           "hp": 22,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29854,6 +30050,7 @@
           "hp": 25,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29868,6 +30065,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29882,6 +30080,7 @@
           "hp": 175,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29896,6 +30095,7 @@
           "hp": 71,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29910,6 +30110,7 @@
           "hp": 89,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29924,6 +30125,7 @@
           "hp": 96,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29938,6 +30140,7 @@
           "hp": 75,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -29964,6 +30167,7 @@
           "hp": 38,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 146
         },
@@ -29978,6 +30182,7 @@
           "hp": 25,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -29992,6 +30197,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30006,6 +30212,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30020,6 +30227,7 @@
           "hp": 9,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30034,6 +30242,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30048,6 +30257,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30062,6 +30272,7 @@
           "hp": 83,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30076,6 +30287,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30090,6 +30302,7 @@
           "hp": 46,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 138
         },
@@ -30104,6 +30317,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 139
         },
@@ -30118,6 +30332,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 141
         },
@@ -30132,6 +30347,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 149
         },
@@ -30146,6 +30362,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 148
         },
@@ -30160,6 +30377,7 @@
           "hp": 230,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 12,
           "inventory": [
@@ -30201,6 +30419,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30215,6 +30434,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30229,6 +30449,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30243,6 +30464,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30257,6 +30479,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30271,6 +30494,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30285,6 +30509,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30299,6 +30524,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30313,6 +30539,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30327,6 +30554,7 @@
           "hp": 81,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30341,6 +30569,7 @@
           "hp": 82,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30355,6 +30584,7 @@
           "hp": 150,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 17,
           "inventory": [
@@ -30378,6 +30608,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30392,6 +30623,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30406,6 +30638,7 @@
           "hp": 44,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30420,6 +30653,7 @@
           "hp": 48,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30434,6 +30668,7 @@
           "hp": 29,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -30448,6 +30683,7 @@
           "hp": 43,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 18
         },
@@ -30462,6 +30698,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 137
         },
@@ -30476,6 +30713,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 136,
           "inventory": [
@@ -31729,7 +31967,7 @@
           "tile_x": 17,
           "tile_y": 24,
           "z": 80,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_317.png",
@@ -31744,7 +31982,7 @@
           "tile_x": 55,
           "tile_y": 41,
           "z": 0,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_316.png",
@@ -31773,7 +32011,7 @@
             {
               "object_id": 307,
               "name": "book",
-              "category": "readable_scrolls_books",
+              "category": "books",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_307.png",
               "description": "Thief's Guide volume 3\nScaling Walls--Art or Science?",
@@ -31820,7 +32058,7 @@
             {
               "object_id": 304,
               "name": "book",
-              "category": "readable_scrolls_books",
+              "category": "books",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_304.png",
               "description": "Thief's Guide volume 1\nPicking Locks--What Bellowing AAM Won't Tell You",
@@ -37369,6 +37607,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37383,6 +37622,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37397,6 +37637,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37411,6 +37652,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37425,6 +37667,7 @@
           "hp": 34,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37439,6 +37682,7 @@
           "hp": 32,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37453,6 +37697,7 @@
           "hp": 86,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37467,6 +37712,7 @@
           "hp": 121,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37481,6 +37727,7 @@
           "hp": 71,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37495,6 +37742,7 @@
           "hp": 69,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37509,6 +37757,7 @@
           "hp": 65,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37523,6 +37772,7 @@
           "hp": 57,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37537,6 +37787,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37551,13 +37802,14 @@
           "hp": 63,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
             {
               "object_id": 305,
               "name": "book",
-              "category": "readable_scrolls_books",
+              "category": "books",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_305.png",
               "description": "Thief's Guide volume 2\nStealth--What to do After MUL",
@@ -37585,6 +37837,7 @@
           "hp": 67,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37599,6 +37852,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37613,6 +37867,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -37627,7 +37882,7 @@
                 {
                   "object_id": 307,
                   "name": "book",
-                  "category": "readable_scrolls_books",
+                  "category": "books",
                   "quantity": 1,
                   "image_path": "images/extracted/objects/object_307.png",
                   "description": "Thief's Guide volume 4\nTraps--Beyond ROMM to Nuts and Bolts",
@@ -37670,6 +37925,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37684,6 +37940,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37698,6 +37955,7 @@
           "hp": 3,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37712,6 +37970,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37726,6 +37985,7 @@
           "hp": 60,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 162
         },
@@ -37740,6 +38000,7 @@
           "hp": 50,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 161,
           "inventory": [
@@ -37780,6 +38041,7 @@
           "hp": 43,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 6,
           "inventory": [
@@ -37840,6 +38102,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 5
         },
@@ -37854,6 +38117,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37868,6 +38132,7 @@
           "hp": 33,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37882,6 +38147,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37896,6 +38162,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37910,6 +38177,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37924,6 +38192,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37938,6 +38207,7 @@
           "hp": 60,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37952,6 +38222,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37966,6 +38237,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37980,6 +38252,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -37994,6 +38267,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38008,6 +38282,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38022,6 +38297,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38036,6 +38312,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38050,6 +38327,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38064,6 +38342,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38078,6 +38357,7 @@
           "hp": 60,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38092,6 +38372,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38106,6 +38387,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38120,6 +38402,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38134,6 +38417,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38148,6 +38432,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38162,6 +38447,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -38176,6 +38462,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 23
         },
@@ -38190,6 +38477,7 @@
           "hp": 51,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 4
         }
@@ -41692,7 +41980,7 @@
             {
               "object_id": 316,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_316.png",
               "description": "How to summon?  Kal... Kal what?  No Xen runestone... Mani perhaps? Must experiment in controlled environment...",
@@ -41732,7 +42020,7 @@
           "tile_x": 35,
           "tile_y": 56,
           "z": 88,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_304.png",
@@ -42349,7 +42637,7 @@
           "tile_x": 12,
           "tile_y": 47,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -42551,7 +42839,7 @@
           "tile_x": 12,
           "tile_y": 43,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_311.png",
@@ -42627,7 +42915,7 @@
           "tile_x": 8,
           "tile_y": 37,
           "z": 72,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_310.png",
@@ -42684,7 +42972,7 @@
           "tile_x": 12,
           "tile_y": 47,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_306.png",
@@ -42823,7 +43111,7 @@
           "tile_x": 42,
           "tile_y": 38,
           "z": 80,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_317.png",
@@ -43277,7 +43565,7 @@
           "tile_x": 7,
           "tile_y": 46,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_305.png",
@@ -43292,7 +43580,7 @@
           "tile_x": 8,
           "tile_y": 46,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_305.png",
@@ -43307,7 +43595,7 @@
           "tile_x": 7,
           "tile_y": 46,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_309.png",
@@ -43337,7 +43625,7 @@
           "tile_x": 12,
           "tile_y": 47,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_309.png",
@@ -43352,7 +43640,7 @@
           "tile_x": 12,
           "tile_y": 51,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -43367,7 +43655,7 @@
           "tile_x": 12,
           "tile_y": 51,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -43382,7 +43670,7 @@
           "tile_x": 12,
           "tile_y": 51,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -43397,7 +43685,7 @@
           "tile_x": 11,
           "tile_y": 51,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_306.png",
@@ -43412,7 +43700,7 @@
           "tile_x": 11,
           "tile_y": 51,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_306.png",
@@ -44074,6 +44362,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44088,6 +44377,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44102,6 +44392,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44116,6 +44407,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44130,6 +44422,7 @@
           "hp": 52,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 207
         },
@@ -44144,6 +44437,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44158,6 +44452,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44172,6 +44467,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44186,6 +44482,7 @@
           "hp": 73,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -44250,6 +44547,7 @@
           "hp": 52,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 194
         },
@@ -44264,6 +44562,7 @@
           "hp": 57,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44278,6 +44577,7 @@
           "hp": 32,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44292,6 +44592,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44306,6 +44607,7 @@
           "hp": 27,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44320,6 +44622,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 193
         },
@@ -44334,6 +44637,7 @@
           "hp": 76,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44348,6 +44652,7 @@
           "hp": 67,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44362,6 +44667,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 191
         },
@@ -44376,6 +44682,7 @@
           "hp": 74,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44390,6 +44697,7 @@
           "hp": 49,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -44435,6 +44743,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 192
         },
@@ -44449,6 +44758,7 @@
           "hp": 90,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44463,6 +44773,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44477,6 +44788,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44491,6 +44803,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44505,6 +44818,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44519,6 +44833,7 @@
           "hp": 4,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44533,6 +44848,7 @@
           "hp": 4,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44547,6 +44863,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44561,6 +44878,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44575,6 +44893,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44589,6 +44908,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44603,6 +44923,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44617,6 +44938,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44631,6 +44953,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44645,6 +44968,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44659,6 +44983,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44673,6 +44998,7 @@
           "hp": 56,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44687,6 +45013,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44701,6 +45028,7 @@
           "hp": 58,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44715,6 +45043,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 14,
           "inventory": [
@@ -44738,6 +45067,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 13
         },
@@ -44752,6 +45082,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 190,
           "inventory": [
@@ -44775,6 +45106,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44789,6 +45121,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44803,6 +45136,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44817,6 +45151,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44831,6 +45166,7 @@
           "hp": 56,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 188
         },
@@ -44845,6 +45181,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44859,6 +45196,7 @@
           "hp": 61,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 185
         },
@@ -44873,6 +45211,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 184
         },
@@ -44887,6 +45226,7 @@
           "hp": 50,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 189
         },
@@ -44901,6 +45241,7 @@
           "hp": 57,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": true,
           "conversation_slot": 187
         },
@@ -44915,6 +45256,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44929,6 +45271,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -44943,6 +45286,7 @@
           "hp": 125,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 22,
           "inventory": [
@@ -45661,7 +46005,7 @@
             {
               "object_id": 314,
               "name": "scroll",
-              "category": "readable_scrolls_books",
+              "category": "scrolls",
               "quantity": 1,
               "image_path": "images/extracted/objects/object_314.png",
               "description": "Garamon, forgive me! I'll revive thee when it's through.",
@@ -46393,7 +46737,7 @@
           "tile_x": 48,
           "tile_y": 8,
           "z": 93,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -46408,7 +46752,7 @@
           "tile_x": 48,
           "tile_y": 5,
           "z": 93,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_312.png",
@@ -46435,7 +46779,7 @@
           "tile_x": 46,
           "tile_y": 8,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_309.png",
@@ -46450,7 +46794,7 @@
           "tile_x": 46,
           "tile_y": 8,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_304.png",
@@ -46543,7 +46887,7 @@
           "tile_x": 45,
           "tile_y": 6,
           "z": 101,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_319.png",
@@ -46592,7 +46936,7 @@
           "tile_x": 45,
           "tile_y": 7,
           "z": 104,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_313.png",
@@ -48017,7 +48361,7 @@
           "tile_x": 46,
           "tile_y": 5,
           "z": 96,
-          "category": "readable_scrolls_books",
+          "category": "books",
           "object_class": "book",
           "detailed_category": "readable_book",
           "image_path": "images/extracted/objects/object_307.png",
@@ -48505,7 +48849,7 @@
           "tile_x": 24,
           "tile_y": 62,
           "z": 0,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_312.png",
@@ -48847,7 +49191,7 @@
           "tile_x": 38,
           "tile_y": 9,
           "z": 88,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_313.png",
@@ -48890,7 +49234,7 @@
           "tile_x": 54,
           "tile_y": 54,
           "z": 80,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_318.png",
@@ -49038,7 +49382,7 @@
           "tile_x": 16,
           "tile_y": 53,
           "z": 88,
-          "category": "readable_scrolls_books",
+          "category": "scrolls",
           "object_class": "scroll",
           "detailed_category": "readable_scroll",
           "image_path": "images/extracted/objects/object_319.png",
@@ -51176,6 +51520,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51190,6 +51535,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51204,6 +51550,7 @@
           "hp": 5,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51218,6 +51565,7 @@
           "hp": 7,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51232,6 +51580,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51246,6 +51595,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51260,6 +51610,7 @@
           "hp": 6,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51274,6 +51625,7 @@
           "hp": 72,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51288,6 +51640,7 @@
           "hp": 8,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51302,6 +51655,7 @@
           "hp": 49,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 217
         },
@@ -51316,6 +51670,7 @@
           "hp": 78,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 222
         },
@@ -51330,6 +51685,7 @@
           "hp": 27,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 213
         },
@@ -51344,6 +51700,7 @@
           "hp": 48,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 222
         },
@@ -51358,6 +51715,7 @@
           "hp": 52,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51372,6 +51730,7 @@
           "hp": 56,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51386,6 +51745,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51400,6 +51760,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51414,6 +51775,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51428,6 +51790,7 @@
           "hp": 52,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51442,6 +51805,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 221
         },
@@ -51456,6 +51820,7 @@
           "hp": 138,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51470,6 +51835,7 @@
           "hp": 60,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 222
         },
@@ -51484,6 +51850,7 @@
           "hp": 34,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51498,6 +51865,7 @@
           "hp": 115,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51512,6 +51880,7 @@
           "hp": 32,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0,
           "inventory": [
@@ -51560,6 +51929,7 @@
           "hp": 61,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51574,6 +51944,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 222
         },
@@ -51588,6 +51959,7 @@
           "hp": 85,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51602,6 +51974,7 @@
           "hp": 80,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 220
         },
@@ -51616,6 +51989,7 @@
           "hp": 77,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51630,6 +52004,7 @@
           "hp": 84,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 209
         },
@@ -51644,6 +52019,7 @@
           "hp": 72,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51658,6 +52034,7 @@
           "hp": 78,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 219
         },
@@ -51672,6 +52049,7 @@
           "hp": 120,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": true,
           "conversation_slot": 231,
           "inventory": [
@@ -51730,6 +52108,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51744,6 +52123,7 @@
           "hp": 70,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51758,6 +52138,7 @@
           "hp": 70,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51772,6 +52153,7 @@
           "hp": 64,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51786,6 +52168,7 @@
           "hp": 67,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51800,6 +52183,7 @@
           "hp": 59,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51814,6 +52198,7 @@
           "hp": 74,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51828,6 +52213,7 @@
           "hp": 51,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51842,6 +52228,7 @@
           "hp": 56,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51856,6 +52243,7 @@
           "hp": 97,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 219
         },
@@ -51870,6 +52258,7 @@
           "hp": 77,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51884,6 +52273,7 @@
           "hp": 75,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51898,6 +52288,7 @@
           "hp": 57,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51912,6 +52303,7 @@
           "hp": 83,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51926,6 +52318,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -51940,6 +52333,7 @@
           "hp": 77,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 209
         },
@@ -51954,6 +52348,7 @@
           "hp": 83,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 209
         },
@@ -51968,6 +52363,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51982,6 +52378,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -51996,6 +52393,7 @@
           "hp": 79,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -52010,6 +52408,7 @@
           "hp": 56,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 210
         },
@@ -52024,6 +52423,7 @@
           "hp": 50,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52038,6 +52438,7 @@
           "hp": 41,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52052,6 +52453,7 @@
           "hp": 65,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52066,6 +52468,7 @@
           "hp": 113,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52080,6 +52483,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52094,6 +52498,7 @@
           "hp": 58,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52108,6 +52513,7 @@
           "hp": 49,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52122,6 +52528,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52136,6 +52543,7 @@
           "hp": 67,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52150,6 +52558,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52164,6 +52573,7 @@
           "hp": 85,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52178,6 +52588,7 @@
           "hp": 49,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 215,
           "inventory": [
@@ -52203,6 +52614,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 211
         },
@@ -52217,6 +52629,7 @@
           "hp": 44,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52231,6 +52644,7 @@
           "hp": 52,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 212,
           "inventory": [
@@ -52254,6 +52668,7 @@
           "hp": 50,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 214,
           "inventory": [
@@ -52277,6 +52692,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 218
         },
@@ -52291,6 +52707,7 @@
           "hp": 88,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 220
         },
@@ -52305,6 +52722,7 @@
           "hp": 80,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 220
         },
@@ -52319,6 +52737,7 @@
           "hp": 60,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -52333,6 +52752,7 @@
           "hp": 60,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -52347,6 +52767,7 @@
           "hp": 94,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": true,
           "conversation_slot": 216,
           "inventory": [
@@ -52372,6 +52793,7 @@
           "hp": 85,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 255
         },
@@ -52386,6 +52808,7 @@
           "hp": 54,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -52400,6 +52823,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 208
         }
@@ -59584,6 +60008,7 @@
           "hp": 54,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": true,
           "conversation_slot": 232,
           "inventory": [
@@ -59663,6 +60088,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59677,6 +60103,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59691,6 +60118,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59705,6 +60133,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59719,6 +60148,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59733,6 +60163,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59747,6 +60178,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59761,6 +60193,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59775,6 +60208,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59789,6 +60223,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59803,6 +60238,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59817,6 +60253,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59831,6 +60268,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59845,6 +60283,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59859,6 +60298,7 @@
           "hp": 9,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59873,6 +60313,7 @@
           "hp": 250,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 248
         },
@@ -59887,6 +60328,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59901,6 +60343,7 @@
           "hp": 9,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59915,6 +60358,7 @@
           "hp": 12,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59929,6 +60373,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59943,6 +60388,7 @@
           "hp": 70,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59957,6 +60403,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59971,6 +60418,7 @@
           "hp": 10,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59985,6 +60433,7 @@
           "hp": 97,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -59999,6 +60448,7 @@
           "hp": 82,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60013,6 +60463,7 @@
           "hp": 95,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60027,6 +60478,7 @@
           "hp": 70,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60041,6 +60493,7 @@
           "hp": 70,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60055,6 +60508,7 @@
           "hp": 62,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60069,6 +60523,7 @@
           "hp": 70,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60083,6 +60538,7 @@
           "hp": 95,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60097,6 +60553,7 @@
           "hp": 106,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60111,6 +60568,7 @@
           "hp": 78,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60125,6 +60583,7 @@
           "hp": 87,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60139,6 +60598,7 @@
           "hp": 112,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60153,6 +60613,7 @@
           "hp": 87,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60167,6 +60628,7 @@
           "hp": 61,
           "level": 4,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60181,6 +60643,7 @@
           "hp": 23,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60195,6 +60658,7 @@
           "hp": 98,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60209,6 +60673,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60223,6 +60688,7 @@
           "hp": 85,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60237,6 +60703,7 @@
           "hp": 121,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60251,6 +60718,7 @@
           "hp": 25,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60265,6 +60733,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60279,6 +60748,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60293,6 +60763,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60307,6 +60778,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60321,6 +60793,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60335,6 +60808,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60349,6 +60823,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60363,6 +60838,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60377,6 +60853,7 @@
           "hp": 65,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60391,6 +60868,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60405,6 +60883,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60419,6 +60898,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60433,6 +60913,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60447,6 +60928,7 @@
           "hp": 75,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60461,6 +60943,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60475,6 +60958,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60489,6 +60973,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60503,6 +60988,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60517,6 +61003,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60531,6 +61018,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60545,6 +61033,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60559,6 +61048,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60573,6 +61063,7 @@
           "hp": 18,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60587,6 +61078,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60601,6 +61093,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60615,6 +61108,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60629,6 +61123,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60643,6 +61138,7 @@
           "hp": 51,
           "level": 4,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60657,6 +61153,7 @@
           "hp": 53,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60671,6 +61168,7 @@
           "hp": 56,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60685,6 +61183,7 @@
           "hp": 42,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60699,6 +61198,7 @@
           "hp": 57,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60713,6 +61213,7 @@
           "hp": 54,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60727,6 +61228,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60741,6 +61243,7 @@
           "hp": 59,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60755,6 +61258,7 @@
           "hp": 39,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60769,6 +61273,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60783,6 +61288,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60797,6 +61303,7 @@
           "hp": 27,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60811,6 +61318,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60825,6 +61333,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60839,6 +61348,7 @@
           "hp": 33,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60853,6 +61363,7 @@
           "hp": 15,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60867,6 +61378,7 @@
           "hp": 45,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60881,6 +61393,7 @@
           "hp": 71,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60895,6 +61408,7 @@
           "hp": 67,
           "level": 4,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60909,6 +61423,7 @@
           "hp": 78,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60923,6 +61438,7 @@
           "hp": 47,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60937,6 +61453,7 @@
           "hp": 60,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60951,6 +61468,7 @@
           "hp": 58,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60965,6 +61483,7 @@
           "hp": 200,
           "level": 0,
           "attitude": "friendly",
+          "attitude_raw": 3,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60979,6 +61498,7 @@
           "hp": 41,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -60993,6 +61513,7 @@
           "hp": 144,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -61007,6 +61528,7 @@
           "hp": 117,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -61021,6 +61543,7 @@
           "hp": 40,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -61035,6 +61558,7 @@
           "hp": 76,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -61049,6 +61573,7 @@
           "hp": 107,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -61063,6 +61588,7 @@
           "hp": 50,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -61077,6 +61603,7 @@
           "hp": 140,
           "level": 0,
           "attitude": "hostile",
+          "attitude_raw": 0,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -61091,6 +61618,7 @@
           "hp": 65,
           "level": 0,
           "attitude": "upset",
+          "attitude_raw": 1,
           "has_conversation": false,
           "conversation_slot": 0
         }
@@ -63006,6 +63534,7 @@
           "hp": 164,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 248
         },
@@ -63020,6 +63549,7 @@
           "hp": 25,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63034,6 +63564,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63048,6 +63579,7 @@
           "hp": 33,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63062,6 +63594,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63076,6 +63609,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63090,6 +63624,7 @@
           "hp": 29,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63104,6 +63639,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63118,6 +63654,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 243
         },
@@ -63132,6 +63669,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63146,6 +63684,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63160,6 +63699,7 @@
           "hp": 16,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63174,6 +63714,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63188,6 +63729,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63202,6 +63744,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63216,6 +63759,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63230,6 +63774,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63244,6 +63789,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 247
         },
@@ -63258,6 +63804,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 243
         },
@@ -63272,6 +63819,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63286,6 +63834,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63300,6 +63849,7 @@
           "hp": 37,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63314,6 +63864,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 244
         },
@@ -63328,6 +63879,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 246
         },
@@ -63342,6 +63894,7 @@
           "hp": 11,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63356,6 +63909,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63370,6 +63924,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 245
         },
@@ -63384,6 +63939,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63398,6 +63954,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63412,6 +63969,7 @@
           "hp": 25,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 243
         },
@@ -63426,6 +63984,7 @@
           "hp": 33,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 246
         },
@@ -63440,6 +63999,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 246
         },
@@ -63454,6 +64014,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63468,6 +64029,7 @@
           "hp": 26,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 243
         },
@@ -63482,6 +64044,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 243
         },
@@ -63496,6 +64059,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -63510,6 +64074,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 246
         },
@@ -63524,6 +64089,7 @@
           "hp": 35,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63538,6 +64104,7 @@
           "hp": 33,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63552,6 +64119,7 @@
           "hp": 0,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63566,6 +64134,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63580,6 +64149,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63594,6 +64164,7 @@
           "hp": 34,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63608,6 +64179,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 244
         },
@@ -63622,6 +64194,7 @@
           "hp": 0,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 246
         },
@@ -63636,6 +64209,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 243
         },
@@ -63650,6 +64224,7 @@
           "hp": 27,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 244
         },
@@ -63664,6 +64239,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 244
         },
@@ -63678,6 +64254,7 @@
           "hp": 36,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63692,6 +64269,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63706,6 +64284,7 @@
           "hp": 31,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63720,6 +64299,7 @@
           "hp": 0,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63734,6 +64314,7 @@
           "hp": 13,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63748,6 +64329,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63762,6 +64344,7 @@
           "hp": 20,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63776,6 +64359,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63790,6 +64374,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63804,6 +64389,7 @@
           "hp": 0,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 0
         },
@@ -63818,6 +64404,7 @@
           "hp": 29,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 243
         },
@@ -63832,6 +64419,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -63846,6 +64434,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 244
         },
@@ -63860,6 +64449,7 @@
           "hp": 0,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 241
         },
@@ -63874,6 +64464,7 @@
           "hp": 30,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63888,6 +64479,7 @@
           "hp": 25,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63902,6 +64494,7 @@
           "hp": 21,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 245
         },
@@ -63916,6 +64509,7 @@
           "hp": 24,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 244
         },
@@ -63930,6 +64524,7 @@
           "hp": 19,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63944,6 +64539,7 @@
           "hp": 14,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 247
         },
@@ -63958,6 +64554,7 @@
           "hp": 22,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         },
@@ -63972,6 +64569,7 @@
           "hp": 17,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 246
         },
@@ -63986,6 +64584,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 240
         },
@@ -64000,6 +64599,7 @@
           "hp": 28,
           "level": 0,
           "attitude": "mellow",
+          "attitude_raw": 2,
           "has_conversation": false,
           "conversation_slot": 242
         }

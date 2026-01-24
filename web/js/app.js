@@ -57,7 +57,7 @@ const CONFIG = {
  */
 const CATEGORY_GROUPS = {
     npcs: ['npcs_named', 'npcs_friendly', 'npcs_hostile'],
-    items: ['quest', 'runes', 'weapons', 'armor', 'keys', 'containers', 'spell_scrolls', 'potions', 'wands', 'food', 'treasure', 'light', 'misc', 'readable_scrolls_books', 'useless_item'],
+    items: ['quest', 'runes', 'weapons', 'armor', 'keys', 'containers', 'spell_scrolls', 'potions', 'wands', 'food', 'treasure', 'light', 'misc', 'scrolls', 'books', 'useless_item'],
     world: ['stairs', 'shrines', 'secret_doors', 'doors_locked', 'doors_unlocked', 'storage', 'switches', 'traps', 'triggers', 'boulders', 'illusory_walls', 'writings', 'gravestones', 'bridges', 'furniture', 'scenery', 'texture_objects', 'animations']
 };
 
@@ -130,7 +130,6 @@ const state = {
         currentSaveName: null,  // null = base game, string = save folder name
         saves: {},              // { folderName: { saveData, changes } }
         baseData: null,         // Original base game data (backup)
-        showChangesBadges: true,  // Whether to show change-type colored badges on map
     },
 };
 
@@ -469,8 +468,6 @@ const elements = {
     saveGameInput: null,
     loadSaveBtn: null,
     saveGameSelector: null,
-    showChangesBadgesToggle: null,
-    showChangesBadgesCheckbox: null,
 };
 
 // ============================================================================
@@ -558,8 +555,6 @@ function cacheElements() {
     elements.saveGameInput = document.getElementById('save-game-input');
     elements.loadSaveBtn = document.getElementById('load-save-btn');
     elements.saveGameSelector = document.getElementById('save-game-selector');
-    elements.showChangesBadgesToggle = document.getElementById('show-changes-badges-toggle');
-    elements.showChangesBadgesCheckbox = document.getElementById('show-changes-badges-checkbox');
 }
 
 async function loadData() {
@@ -669,115 +664,6 @@ async function loadSaveGame(files) {
  * Switch between saves or base game
  * @param {string|null} saveName - Save folder name, or null/empty string for base game
  */
-/**
- * Enrich a save game object with metadata from base game
- * This preserves features like image_path, category, description, etc.
- * @param {Object} saveObj - Save game object to enrich
- * @param {Object} baseLevel - Base game level data
- * @param {boolean} isNpc - Whether this is an NPC
- * @returns {Object} - Enriched object
- */
-function enrichSaveGameObject(saveObj, baseLevel, isNpc) {
-    if (!saveObj || !baseLevel) return saveObj;
-    
-    // If we have base_data from change tracking, use that for metadata (most reliable)
-    let baseObj = saveObj.base_data || null;
-    
-    // If no base_data, try to find matching base game object
-    if (!baseObj) {
-        const objId = saveObj.object_id || 0;
-        const tileX = saveObj.tile_x || 0;
-        const tileY = saveObj.tile_y || 0;
-        
-        if (isNpc) {
-            // For NPCs, match by object_id (creature type) and position
-            baseObj = (baseLevel.npcs || []).find(npc => 
-                (npc.object_id === objId || npc.object_id === saveObj.object_id) &&
-                npc.tile_x === tileX && 
-                npc.tile_y === tileY
-            );
-            
-            // If no exact match, try matching just by object_id (for moved NPCs)
-            if (!baseObj) {
-                baseObj = (baseLevel.npcs || []).find(npc => 
-                    npc.object_id === objId || npc.object_id === saveObj.object_id
-                );
-            }
-        } else {
-            // For objects, match by object_id and position
-            baseObj = (baseLevel.objects || []).find(obj => 
-                (obj.object_id === objId || obj.object_id === saveObj.object_id) &&
-                obj.tile_x === tileX && 
-                obj.tile_y === tileY
-            );
-            
-            // If no exact match, try matching just by object_id (for moved objects)
-            if (!baseObj) {
-                baseObj = (baseLevel.objects || []).find(obj => 
-                    obj.object_id === objId || obj.object_id === saveObj.object_id
-                );
-            }
-        }
-    }
-    
-    // Merge base game metadata into save game object
-    // Preserve save game state (position, properties, etc.) but add base metadata
-    const enriched = { ...saveObj };
-    
-    if (baseObj) {
-        // Preserve metadata that doesn't change in save games (always use base if available)
-        if (baseObj.image_path !== undefined) enriched.image_path = baseObj.image_path;
-        if (baseObj.category !== undefined) enriched.category = baseObj.category;
-        // Description: use save game if it exists (might have changed), otherwise use base
-        if (!enriched.description && baseObj.description !== undefined) {
-            enriched.description = baseObj.description;
-        }
-        // Effect: use save game if it exists, otherwise use base
-        if (!enriched.effect && baseObj.effect !== undefined) {
-            enriched.effect = baseObj.effect;
-        }
-        // Name: use save game if it exists, otherwise use base
-        if (!enriched.name && baseObj.name !== undefined) {
-            enriched.name = baseObj.name;
-        }
-        // Merge extra_info, preserving save game changes but adding base defaults
-        if (baseObj.extra_info !== undefined) {
-            enriched.extra_info = { ...baseObj.extra_info, ...(saveObj.extra_info || {}) };
-        }
-        
-        // Recursively enrich container contents
-        if (saveObj.contents && Array.isArray(saveObj.contents) && saveObj.contents.length > 0) {
-            // Save game has contents - enrich each item
-            enriched.contents = saveObj.contents.map(item => 
-                enrichSaveGameObject(item, baseLevel, false)
-            );
-        } else if (baseObj.contents && Array.isArray(baseObj.contents) && baseObj.contents.length > 0) {
-            // Save game doesn't have contents but base does - use base contents
-            // This handles cases where container was emptied or contents weren't parsed
-            enriched.contents = baseObj.contents.map(item => 
-                enrichSaveGameObject(item, baseLevel, false)
-            );
-        }
-        
-        // Recursively enrich NPC inventory
-        if (isNpc) {
-            if (saveObj.inventory && Array.isArray(saveObj.inventory) && saveObj.inventory.length > 0) {
-                // Save game has inventory - enrich each item
-                enriched.inventory = saveObj.inventory.map(item => 
-                    enrichSaveGameObject(item, baseLevel, false)
-                );
-            } else if (baseObj.inventory && Array.isArray(baseObj.inventory) && baseObj.inventory.length > 0) {
-                // Save game doesn't have inventory but base does - use base inventory
-                enriched.inventory = baseObj.inventory.map(item => 
-                    enrichSaveGameObject(item, baseLevel, false)
-                );
-            }
-        }
-    }
-    
-    return enriched;
-}
-
 function switchSaveGame(saveName) {
     if (!saveName || saveName === '') {
         // Switch to base game
@@ -803,34 +689,12 @@ function switchSaveGame(saveName) {
         }
         
         // Merge save data into state.data (replace levels with save game levels)
-        // Keep categories and metadata from base, and enrich objects with base metadata
-        state.data.levels = save.saveData.levels.map(level => {
-            const baseLevel = state.saveGame.baseData.levels[level.level];
-            if (!baseLevel) {
-                return {
-                    ...level,
-                    secrets: []
-                };
-            }
-            
-            // Enrich objects with base game metadata
-            const enrichedObjects = (level.objects || []).map(obj => 
-                enrichSaveGameObject(obj, baseLevel, false)
-            );
-            
-            // Enrich NPCs with base game metadata
-            const enrichedNpcs = (level.npcs || []).map(npc => 
-                enrichSaveGameObject(npc, baseLevel, true)
-            );
-            
-            return {
-                ...level,
-                objects: enrichedObjects,
-                npcs: enrichedNpcs,
-                // Preserve secrets from base game if they exist
-                secrets: baseLevel.secrets || []
-            };
-        });
+        // Keep categories and metadata from base
+        state.data.levels = save.saveData.levels.map(level => ({
+            ...level,
+            // Preserve secrets from base game if they exist
+            secrets: state.saveGame.baseData.levels[level.level]?.secrets || []
+        }));
         state.saveGame.currentSaveName = saveName;
     }
     
@@ -872,24 +736,12 @@ function updateSaveGameUI() {
         if (elements.changeTypesFilter) {
             elements.changeTypesFilter.style.display = '';
         }
-        // Show badge toggle when save game is loaded
-        if (elements.showChangesBadgesToggle) {
-            elements.showChangesBadgesToggle.style.display = '';
-        }
-        // Sync toggle checkbox state
-        if (elements.showChangesBadgesCheckbox) {
-            elements.showChangesBadgesCheckbox.checked = state.saveGame.showChangesBadges;
-        }
     } else {
         elements.saveGameSelector.value = '';
         elements.saveGameSelector.classList.remove('loaded');
         // Hide change types filter when no save game is loaded
         if (elements.changeTypesFilter) {
             elements.changeTypesFilter.style.display = 'none';
-        }
-        // Hide badge toggle when no save game is loaded
-        if (elements.showChangesBadgesToggle) {
-            elements.showChangesBadgesToggle.style.display = 'none';
         }
         // Reset change types filter state when switching to base game
         state.filters.changeTypes = new Set(['added', 'removed', 'moved', 'modified', 'unchanged']);
@@ -1008,14 +860,6 @@ function setupEventListeners() {
         elements.saveGameSelector.addEventListener('change', (e) => {
             const selectedValue = e.target.value;
             switchSaveGame(selectedValue || null);
-        });
-    }
-    
-    // Badge toggle
-    if (elements.showChangesBadgesCheckbox) {
-        elements.showChangesBadgesCheckbox.addEventListener('change', (e) => {
-            state.saveGame.showChangesBadges = e.target.checked;
-            renderMarkers();
         });
     }
     
@@ -1748,8 +1592,7 @@ function renderMarkers() {
     });
     
     // Collect removed objects when a save game is loaded and 'removed' filter is active
-    // Only show removed items if showChangesBadges is enabled
-    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed') && state.saveGame.showChangesBadges) {
+    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed')) {
         const currentSave = state.saveGame.saves[state.saveGame.currentSaveName];
         if (currentSave && currentSave.changes && currentSave.changes[state.currentLevel]) {
             const levelChanges = currentSave.changes[state.currentLevel];
@@ -1898,17 +1741,14 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
         }
     });
     // Add change indicator classes (prioritize added > moved > modified > removed)
-    // Only apply if showChangesBadges is enabled
-    if (state.saveGame.showChangesBadges) {
-        if (changeTypes.has('added')) {
-            group.classList.add('marker-added');
-        } else if (changeTypes.has('moved')) {
-            group.classList.add('marker-moved');
-        } else if (changeTypes.has('modified')) {
-            group.classList.add('marker-modified');
-        } else if (changeTypes.has('removed')) {
-            group.classList.add('marker-removed');
-        }
+    if (changeTypes.has('added')) {
+        group.classList.add('marker-added');
+    } else if (changeTypes.has('moved')) {
+        group.classList.add('marker-moved');
+    } else if (changeTypes.has('modified')) {
+        group.classList.add('marker-modified');
+    } else if (changeTypes.has('removed')) {
+        group.classList.add('marker-removed');
     }
     
     group.dataset.tileX = tileX;
@@ -2912,8 +2752,8 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     if (itemIsBridge) group.classList.add('bridge-marker');
     if (itemIsStairs) group.classList.add('stairs-marker');
     
-    // Add change indicator classes (only if showChangesBadges is enabled)
-    if (changeType && state.saveGame.showChangesBadges) {
+    // Add change indicator classes
+    if (changeType) {
         group.classList.add(`marker-${changeType}`);
     }
     
@@ -2937,8 +2777,7 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     hoverArea.classList.add('tile-hover-area');
     
     // Check if this is a removed item (needs special X marker)
-    // Only show removed X marker if showChangesBadges is enabled
-    const isRemoved = (changeType === 'removed' || item.change_type === 'removed') && state.saveGame.showChangesBadges;
+    const isRemoved = changeType === 'removed' || item.change_type === 'removed';
     
     // Create the visual marker
     let marker;
@@ -4158,8 +3997,7 @@ function renderVisibleObjectsPane() {
     });
     
     // Collect removed objects when a save game is loaded and 'removed' filter is active
-    // Only show removed items if showChangesBadges is enabled
-    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed') && state.saveGame.showChangesBadges) {
+    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed')) {
         const currentSave = state.saveGame.saves[state.saveGame.currentSaveName];
         if (currentSave && currentSave.changes && currentSave.changes[state.currentLevel]) {
             const levelChanges = currentSave.changes[state.currentLevel];

@@ -756,14 +756,14 @@ class JsonExporter:
             # Consumables
             'food': 'food',
             'potion': 'potions',
-            # Books & Scrolls - combined into single category
-            'scroll': 'readable_scrolls_books',
-            'book': 'readable_scrolls_books',
-            'readable_scroll': 'readable_scrolls_books',
-            'readable_book': 'readable_scrolls_books',
+            # Books & Scrolls - now split
+            'scroll': 'scrolls',
+            'book': 'books',
+            'readable_scroll': 'scrolls',
+            'readable_book': 'books',
             'quest_book': 'quest',  # Quest books like Book of Honesty
             'spell_scroll': 'spell_scrolls',
-            'map': 'readable_scrolls_books',  # Maps shown with readable scrolls & books
+            'map': 'books',  # Maps shown with books
             # Light sources
             'light_source': 'light',
             # Runes (talismans/virtue keys are quest items)
@@ -1654,6 +1654,7 @@ class JsonExporter:
                 'hp': npc_dict.get('stats', {}).get('hp', 0),
                 'level': npc_dict.get('stats', {}).get('level', 0),
                 'attitude': npc_dict.get('behavior', {}).get('attitude_name', 'unknown'),
+                'attitude_raw': npc_dict.get('behavior', {}).get('attitude', 0),  # Store raw value (0-3)
                 'has_conversation': conv_slot > 0 and (conversations is not None and conv_slot in conversations),
                 'conversation_slot': conv_slot,
             }
@@ -1705,7 +1706,8 @@ class JsonExporter:
                 {'id': 'food', 'name': 'Food', 'color': '#a9e34b'},
                 {'id': 'potions', 'name': 'Potions', 'color': '#f783ac'},
                 # Books & Scrolls
-                {'id': 'readable_scrolls_books', 'name': 'Books & Scrolls', 'color': '#e0c8a0'},
+                {'id': 'books', 'name': 'Readable Books', 'color': '#e8d4b8'},
+                {'id': 'scrolls', 'name': 'Readable Scrolls', 'color': '#d4c4a8'},
                 {'id': 'spell_scrolls', 'name': 'Spell Scrolls', 'color': '#da77f2'},
                 {'id': 'writings', 'name': 'Writings', 'color': '#d4c4a8'},
                 {'id': 'gravestones', 'name': 'Gravestones', 'color': '#c4a484'},
