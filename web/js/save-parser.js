@@ -928,8 +928,23 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
                 category: category,
                 is_enchanted: isEnchanted,
                 quality: obj.quality,
-                owner: obj.owner
+                // Preserve raw values (owner/quality are used for multiple non-ownership purposes)
+                quality_raw: obj.quality,
+                owner_raw: obj.owner
             };
+
+            // Only set semantic `owner` when eligible under centralized ownership rules.
+            // (Prevents keys/traps/triggers/stairs/animations/etc from looking "owned".)
+            if (window.Ownership && typeof window.Ownership.isNeverOwned === 'function') {
+                if (!window.Ownership.isNeverOwned(objData) && obj.owner > 0) {
+                    objData.owner = obj.owner;
+                }
+            } else {
+                // Fallback (should not normally be used)
+                if (obj.owner > 0) {
+                    objData.owner = obj.owner;
+                }
+            }
 
             // Doors: add extra_info for lock + health/type/status (matches base export)
             if (isDoorObjectId(obj.item_id)) {

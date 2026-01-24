@@ -2234,7 +2234,7 @@ function showStackedTooltip(e, items, tileX, tileY) {
         }
         
         // Show owner information for items (item belongs to an NPC - taking it is stealing)
-        if (!isSecret && !isNpc && item.owner && item.owner > 0) {
+        if (!isSecret && !isNpc && isOwned(item)) {
             const ownerDiv = document.createElement('div');
             ownerDiv.style.cssText = 'font-size: 0.7rem; color: #fab005; margin-top: 2px;';
             const ownerName = item.owner_name || `NPC #${item.owner}`;
@@ -2609,6 +2609,11 @@ function isEnchanted(item) {
  * Excludes types that can never have owners: traps, triggers, secret doors, stairs, useless items, and item 0x1ca
  */
 function isOwned(item) {
+    // Centralized ownership semantics live in js/ownership.js
+    if (window.Ownership && typeof window.Ownership.isOwned === 'function') {
+        return window.Ownership.isOwned(item);
+    }
+
     // Items that can never have owners (even if owner field is set)
     if (!item) return false;
     
@@ -3414,7 +3419,7 @@ function showTooltip(e, item, isNpc) {
     } else {
         html += `<div class="tooltip-info">${formatCategory(item.category)}</div>`;
         // Show owner information (item belongs to an NPC - taking it is stealing)
-        if (item.owner && item.owner > 0) {
+        if (isOwned(item)) {
             const ownerName = item.owner_name || `NPC #${item.owner}`;
             html += `<div class="tooltip-info" style="color: #fab005; font-size: 0.85rem;">⚠️ Owned by ${escapeHtml(ownerName)}</div>`;
         }
@@ -4561,7 +4566,7 @@ function renderVisibleObjectsPane() {
                     enchantLine += `<div style="color: #fcc419; font-size: 0.7rem; margin-top: 2px;">📦 Qty: ${item.quantity}</div>`;
                 }
                 // Show ownership information
-                if (item.owner && item.owner > 0) {
+                if (isOwned(item)) {
                     const ownerName = item.owner_name || `NPC #${item.owner}`;
                     enchantLine += `<div style="color: #fab005; font-size: 0.7rem; margin-top: 2px;">⚠️ Owned by ${escapeHtml(ownerName)}</div>`;
                 }
@@ -4877,7 +4882,7 @@ function renderObjectDetails(item, isNpc) {
         }
         
         // Show owner information (item belongs to an NPC - taking it is stealing)
-        if (item.owner && item.owner > 0) {
+        if (isOwned(item)) {
             const ownerName = item.owner_name || `NPC #${item.owner}`;
             html += `
                 <div class="detail-row">
@@ -5067,7 +5072,7 @@ function renderContainerContents(contents, depth = 0, parentContainer = null) {
         }
         
         // Show owner information (item belongs to an NPC - taking it is stealing)
-        if (item.owner && item.owner > 0) {
+        if (isOwned(item)) {
             const ownerDiv = document.createElement('div');
             ownerDiv.style.cssText = 'color: #fab005; font-size: 0.7rem; margin-top: 2px;';
             const ownerName = item.owner_name || `NPC #${item.owner}`;
@@ -5225,7 +5230,7 @@ function renderNpcInventory(inventory, parentNpc = null) {
         }
         
         // Show owner information (item belongs to an NPC - taking it is stealing)
-        if (item.owner && item.owner > 0) {
+        if (isOwned(item)) {
             const ownerDiv = document.createElement('div');
             ownerDiv.style.cssText = 'color: #fab005; font-size: 0.7rem; margin-top: 2px;';
             const ownerName = item.owner_name || `NPC #${item.owner}`;
@@ -5368,7 +5373,7 @@ function selectInventoryItem(item, parentNpc = null) {
     }
     
     // Show owner information (item belongs to an NPC - taking it is stealing)
-    if (item.owner && item.owner > 0) {
+    if (isOwned(item)) {
         const ownerName = item.owner_name || `NPC #${item.owner}`;
         html += `
             <div class="detail-row">
@@ -5580,7 +5585,7 @@ function selectContainerItem(item, parentContainer = null) {
     }
     
     // Show owner information (item belongs to an NPC - taking it is stealing)
-    if (item.owner && item.owner > 0) {
+    if (isOwned(item)) {
         const ownerName = item.owner_name || `NPC #${item.owner}`;
         html += `
             <div class="detail-row">
@@ -5847,7 +5852,7 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             statsLine += `<div style="font-size: 0.75rem; color: #fcc419;">📦 Qty: ${obj.quantity}</div>`;
         }
         // Show ownership information
-        if (obj.owner && obj.owner > 0) {
+        if (isOwned(obj)) {
             const ownerName = obj.owner_name || `NPC #${obj.owner}`;
             statsLine += `<div style="font-size: 0.75rem; color: #fab005;">⚠️ Owned by ${escapeHtml(ownerName)}</div>`;
         }

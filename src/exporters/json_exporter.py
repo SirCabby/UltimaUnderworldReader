@@ -1575,7 +1575,23 @@ class JsonExporter:
             # Texture map objects, traps, and triggers should not have ownership attributes
             from ..constants import is_special_tmap
             from ..constants.traps import is_trap, is_trigger
-            if owner > 0 and not (0x100 <= obj_id <= 0x10E) and not is_special_tmap(obj_id) and not is_trap(obj_id) and not is_trigger(obj_id):
+            # Explicit object ids that must never expose ownership semantics in the web UI,
+            # even if they have a non-zero raw owner field.
+            never_owned_object_ids = {
+                0x1CA,  # 458 - silver tree
+                0x0C2, 0x0C3,  # skulls
+                0x0C4, 0x0C5,  # bones
+                0x0C6, 0x0DC,  # pile of bones (variants)
+            }
+
+            if (
+                owner > 0
+                and obj_id not in never_owned_object_ids
+                and not (0x100 <= obj_id <= 0x10E)  # keys use owner for lock id
+                and not is_special_tmap(obj_id)
+                and not is_trap(obj_id)
+                and not is_trigger(obj_id)
+            ):
                 web_obj['owner'] = owner
                 owner_name = get_owner_name(owner, obj_id, level, npcs)
                 if owner_name:
@@ -1584,8 +1600,9 @@ class JsonExporter:
             # For traps and triggers, store quality and owner for debugging and message lookup
             # These are needed for text_string_trap and tell_trap message index calculation
             if is_trap(obj_id) or is_trigger(obj_id):
-                web_obj['quality'] = quality
-                web_obj['owner'] = owner
+                # Export these as raw fields to avoid UI misinterpreting them as ownership.
+                web_obj['quality_raw'] = quality
+                web_obj['owner_raw'] = owner
             
             # Include extra_info for special object types (potions, doors, etc.)
             extra_info = item_dict.get('extra_info', {})

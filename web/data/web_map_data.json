@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-24T14:21:41.422930",
+    "generated": "2026-01-24T15:33:48.364082",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -2377,8 +2377,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_400.png",
           "description": "Message: \"The doors are securely locked.\"",
-          "quality": 0,
-          "owner": 3
+          "quality_raw": 0,
+          "owner_raw": 3
         },
         {
           "id": 550,
@@ -2472,8 +2472,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -2559,8 +2557,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=5, param=6)",
-          "quality": 5,
-          "owner": 6
+          "quality_raw": 5,
+          "owner_raw": 6
         },
         {
           "id": 571,
@@ -2574,8 +2572,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=5, param=9)",
-          "quality": 5,
-          "owner": 9
+          "quality_raw": 5,
+          "owner_raw": 9
         },
         {
           "id": 573,
@@ -2762,8 +2760,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_197.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -2778,8 +2774,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -2794,8 +2788,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -2836,8 +2828,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates cave bat",
-          "quality": 31,
-          "owner": 0
+          "quality_raw": 31,
+          "owner_raw": 0
         },
         {
           "id": 596,
@@ -2893,8 +2885,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates giant rat",
-          "quality": 40,
-          "owner": 0
+          "quality_raw": 40,
+          "owner_raw": 0
         },
         {
           "id": 600,
@@ -2908,8 +2900,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates giant spider",
-          "quality": 50,
-          "owner": 0
+          "quality_raw": 50,
+          "owner_raw": 0
         },
         {
           "id": 601,
@@ -3045,8 +3037,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
           "quantity": 1,
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -3172,8 +3162,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=3, param=0)",
-          "quality": 3,
-          "owner": 0
+          "quality_raw": 3,
+          "owner_raw": 0
         },
         {
           "id": 623,
@@ -3200,8 +3190,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=3, param=0)",
-          "quality": 3,
-          "owner": 0
+          "quality_raw": 3,
+          "owner_raw": 0
         },
         {
           "id": 627,
@@ -3215,8 +3205,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=3, param=0)",
-          "quality": 3,
-          "owner": 0
+          "quality_raw": 3,
+          "owner_raw": 0
         },
         {
           "id": 628,
@@ -3230,8 +3220,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=3, param=0)",
-          "quality": 3,
-          "owner": 0
+          "quality_raw": 3,
+          "owner_raw": 0
         },
         {
           "id": 630,
@@ -3245,8 +3235,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates goblin",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 631,
@@ -3290,8 +3280,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles door at (42, 51)",
-          "quality": 47,
-          "owner": 51
+          "quality_raw": 47,
+          "owner_raw": 51
         },
         {
           "id": 635,
@@ -3305,8 +3295,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles portcullis at (15, 34)",
-          "quality": 15,
-          "owner": 34
+          "quality_raw": 15,
+          "owner_raw": 34
         },
         {
           "id": 640,
@@ -3921,8 +3911,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -4075,8 +4063,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 34,
-          "owner_name": "gray goblins",
           "weight": 0.4
         },
         {
@@ -4263,8 +4249,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates goblin",
-          "quality": 3,
-          "owner": 33
+          "quality_raw": 3,
+          "owner_raw": 33
         },
         {
           "id": 717,
@@ -5531,8 +5517,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
           "quantity": 1,
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -5547,8 +5531,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -5563,8 +5545,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
           "quantity": 1,
-          "owner": 34,
-          "owner_name": "gray goblins",
           "weight": 0.4
         },
         {
@@ -5579,8 +5559,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates flesh slug",
-          "quality": 45,
-          "owner": 0
+          "quality_raw": 45,
+          "owner_raw": 0
         },
         {
           "id": 815,
@@ -5719,8 +5699,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 2 at (7, 38)",
           "stairs_dest_level": 2,
-          "quality": 8,
-          "owner": 35
+          "quality_raw": 8,
+          "owner_raw": 35
         },
         {
           "id": 826,
@@ -6171,8 +6151,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
           "quantity": 1,
-          "owner": 34,
-          "owner_name": "gray goblins",
           "weight": 0.4
         },
         {
@@ -6800,8 +6778,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -6815,8 +6791,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_195.png",
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -6855,8 +6829,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
-          "owner": 34,
-          "owner_name": "gray goblins",
           "weight": 0.4
         },
         {
@@ -6870,8 +6842,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
-          "owner": 34,
-          "owner_name": "gray goblins",
           "weight": 0.4
         },
         {
@@ -6886,8 +6856,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_400.png",
           "description": "Message: \"Peering into the crystal ball, a vision of a strange world appears. Bizarre creatures float through space. A green path, flanked by a black void on either side, runs off into the distance. Somehow you know the path leads to Britannia.\"",
-          "quality": 0,
-          "owner": 1
+          "quality_raw": 0,
+          "owner_raw": 1
         },
         {
           "id": 912,
@@ -6900,8 +6870,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
-          "owner": 34,
-          "owner_name": "gray goblins",
           "weight": 0.4
         },
         {
@@ -7291,8 +7259,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 2 at (47, 53)",
           "stairs_dest_level": 2,
-          "quality": 47,
-          "owner": 52
+          "quality_raw": 47,
+          "owner_raw": 52
         },
         {
           "id": 944,
@@ -7306,8 +7274,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 2 at (47, 53)",
-          "quality": 47,
-          "owner": 53
+          "quality_raw": 47,
+          "owner_raw": 53
         },
         {
           "id": 945,
@@ -7503,9 +7471,7 @@
           "object_class": "quest_item",
           "detailed_category": "quest_item",
           "image_path": "images/extracted/objects/object_458.png",
-          "quantity": 1,
-          "owner": 13,
-          "owner_name": "rotworms"
+          "quantity": 1
         },
         {
           "id": 968,
@@ -7543,8 +7509,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -7558,8 +7522,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_195.png",
-          "owner": 47,
-          "owner_name": "ghouls",
           "weight": 0.4
         },
         {
@@ -7573,8 +7535,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
-          "owner": 47,
-          "owner_name": "ghouls",
           "weight": 0.4
         },
         {
@@ -7588,8 +7548,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -7603,8 +7561,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
-          "owner": 13,
-          "owner_name": "rotworms",
           "weight": 0.4
         },
         {
@@ -7656,8 +7612,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -7687,8 +7641,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -7766,8 +7718,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Teleport to Level 2 at (35, 20)",
-          "quality": 35,
-          "owner": 20
+          "quality_raw": 35,
+          "owner_raw": 20
         },
         {
           "id": 987,
@@ -7835,8 +7787,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Teleport to Level 2 at (35, 20)",
           "stairs_dest_level": 2,
-          "quality": 27,
-          "owner": 20
+          "quality_raw": 27,
+          "owner_raw": 20
         },
         {
           "id": 993,
@@ -8293,8 +8245,6 @@
           "object_class": "scenery",
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
-          "owner": 34,
-          "owner_name": "gray goblins",
           "weight": 0.4
         },
         {
@@ -8383,8 +8333,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 2 at (7, 38)",
-          "quality": 7,
-          "owner": 38
+          "quality_raw": 7,
+          "owner_raw": 38
         }
       ],
       "npcs": [
@@ -9426,8 +9376,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Fires arrow S (damage ~10)",
-          "quality": 49,
-          "owner": 16
+          "quality_raw": 49,
+          "owner_raw": 16
         },
         {
           "id": 576,
@@ -9553,8 +9503,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 12 damage",
-          "quality": 12,
-          "owner": 0
+          "quality_raw": 12,
+          "owner_raw": 0
         },
         {
           "id": 596,
@@ -9568,8 +9518,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Teleport to Level 3 at (25, 10)",
-          "quality": 25,
-          "owner": 10
+          "quality_raw": 25,
+          "owner_raw": 10
         },
         {
           "id": 599,
@@ -9631,8 +9581,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 7 damage",
-          "quality": 49,
-          "owner": 2
+          "quality_raw": 49,
+          "owner_raw": 2
         },
         {
           "id": 604,
@@ -9646,8 +9596,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 7 damage",
-          "quality": 7,
-          "owner": 0
+          "quality_raw": 7,
+          "owner_raw": 0
         },
         {
           "id": 605,
@@ -10418,8 +10368,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates goblin",
-          "quality": 31,
-          "owner": 58
+          "quality_raw": 31,
+          "owner_raw": 58
         },
         {
           "id": 662,
@@ -10433,8 +10383,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates goblin",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 663,
@@ -10448,8 +10398,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates goblin",
-          "quality": 32,
-          "owner": 57
+          "quality_raw": 32,
+          "owner_raw": 57
         },
         {
           "id": 664,
@@ -10463,8 +10413,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates goblin",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 665,
@@ -10861,8 +10811,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates headless",
-          "quality": 50,
-          "owner": 0
+          "quality_raw": 50,
+          "owner_raw": 0
         },
         {
           "id": 695,
@@ -11466,8 +11416,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates wolf spider",
-          "quality": 53,
-          "owner": 0
+          "quality_raw": 53,
+          "owner_raw": 0
         },
         {
           "id": 738,
@@ -11758,8 +11708,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=2, param=0)",
-          "quality": 2,
-          "owner": 0
+          "quality_raw": 2,
+          "owner_raw": 0
         },
         {
           "id": 760,
@@ -11972,8 +11922,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_386.png",
           "description": "Fires arrow S (damage ~10)",
-          "quality": 10,
-          "owner": 20
+          "quality_raw": 10,
+          "owner_raw": 20
         },
         {
           "id": 781,
@@ -12441,8 +12391,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 12 damage",
-          "quality": 34,
-          "owner": 5
+          "quality_raw": 34,
+          "owner_raw": 5
         },
         {
           "id": 808,
@@ -12872,8 +12822,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles portcullis at (13, 30)",
-          "quality": 13,
-          "owner": 30
+          "quality_raw": 13,
+          "owner_raw": 30
         },
         {
           "id": 850,
@@ -13104,8 +13054,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Changes to OPEN height=7",
-          "quality": 7,
-          "owner": 34
+          "quality_raw": 7,
+          "owner_raw": 34
         },
         {
           "id": 870,
@@ -13119,8 +13069,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 871,
@@ -13213,8 +13163,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Opens door at (27, 57)",
-          "quality": 27,
-          "owner": 57
+          "quality_raw": 27,
+          "owner_raw": 57
         },
         {
           "id": 878,
@@ -13228,8 +13178,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_392.png",
           "description": "Opens door at (27, 57)",
-          "quality": 1,
-          "owner": 0
+          "quality_raw": 1,
+          "owner_raw": 0
         },
         {
           "id": 879,
@@ -13267,8 +13217,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 29,
-          "owner": 49
+          "quality_raw": 29,
+          "owner_raw": 49
         },
         {
           "id": 881,
@@ -13282,8 +13232,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 882,
@@ -13297,8 +13247,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 28,
-          "owner": 49
+          "quality_raw": 28,
+          "owner_raw": 49
         },
         {
           "id": 883,
@@ -13312,8 +13262,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 884,
@@ -13327,8 +13277,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 26,
-          "owner": 49
+          "quality_raw": 26,
+          "owner_raw": 49
         },
         {
           "id": 885,
@@ -13342,8 +13292,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 886,
@@ -13357,8 +13307,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 25,
-          "owner": 49
+          "quality_raw": 25,
+          "owner_raw": 49
         },
         {
           "id": 887,
@@ -13372,8 +13322,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 888,
@@ -13387,8 +13337,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 889,
@@ -13402,8 +13352,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 29,
-          "owner": 50
+          "quality_raw": 29,
+          "owner_raw": 50
         },
         {
           "id": 890,
@@ -13417,8 +13367,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 28,
-          "owner": 50
+          "quality_raw": 28,
+          "owner_raw": 50
         },
         {
           "id": 891,
@@ -13432,8 +13382,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 892,
@@ -13447,8 +13397,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 26,
-          "owner": 50
+          "quality_raw": 26,
+          "owner_raw": 50
         },
         {
           "id": 893,
@@ -13462,8 +13412,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 894,
@@ -13477,8 +13427,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 25,
-          "owner": 50
+          "quality_raw": 25,
+          "owner_raw": 50
         },
         {
           "id": 895,
@@ -13492,8 +13442,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 896,
@@ -13507,8 +13457,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 26,
-          "owner": 52
+          "quality_raw": 26,
+          "owner_raw": 52
         },
         {
           "id": 897,
@@ -13522,8 +13472,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 898,
@@ -13537,8 +13487,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 27,
-          "owner": 52
+          "quality_raw": 27,
+          "owner_raw": 52
         },
         {
           "id": 899,
@@ -13552,8 +13502,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 900,
@@ -13567,8 +13517,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 28,
-          "owner": 52
+          "quality_raw": 28,
+          "owner_raw": 52
         },
         {
           "id": 901,
@@ -13582,8 +13532,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 902,
@@ -13597,8 +13547,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 29,
-          "owner": 52
+          "quality_raw": 29,
+          "owner_raw": 52
         },
         {
           "id": 903,
@@ -13612,8 +13562,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 904,
@@ -13627,8 +13577,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 27,
-          "owner": 54
+          "quality_raw": 27,
+          "owner_raw": 54
         },
         {
           "id": 905,
@@ -13642,8 +13592,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 906,
@@ -13657,8 +13607,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 26,
-          "owner": 54
+          "quality_raw": 26,
+          "owner_raw": 54
         },
         {
           "id": 907,
@@ -13672,8 +13622,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 908,
@@ -13687,8 +13637,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 20 damage",
-          "quality": 25,
-          "owner": 54
+          "quality_raw": 25,
+          "owner_raw": 54
         },
         {
           "id": 909,
@@ -13702,8 +13652,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 910,
@@ -15322,8 +15272,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 3 at (42, 61)",
           "stairs_dest_level": 3,
-          "quality": 42,
-          "owner": 61
+          "quality_raw": 42,
+          "owner_raw": 61
         },
         {
           "id": 1009,
@@ -15355,8 +15305,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Teleport to Level 1 at (26, 20)",
           "stairs_dest_level": 1,
-          "quality": 33,
-          "owner": 20
+          "quality_raw": 33,
+          "owner_raw": 20
         },
         {
           "id": 1011,
@@ -15370,8 +15320,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 3 at (42, 61)",
-          "quality": 42,
-          "owner": 61
+          "quality_raw": 42,
+          "owner_raw": 61
         },
         {
           "id": 1013,
@@ -15420,8 +15370,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 1 at (8, 34)",
           "stairs_dest_level": 1,
-          "quality": 8,
-          "owner": 37
+          "quality_raw": 8,
+          "owner_raw": 37
         },
         {
           "id": 1016,
@@ -15435,8 +15385,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 1 at (8, 34)",
-          "quality": 8,
-          "owner": 34
+          "quality_raw": 8,
+          "owner_raw": 34
         },
         {
           "id": 1018,
@@ -15450,8 +15400,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Teleport to Level 1 at (26, 20)",
-          "quality": 26,
-          "owner": 20
+          "quality_raw": 26,
+          "owner_raw": 20
         },
         {
           "id": 1019,
@@ -15483,8 +15433,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 3 at (5, 2)",
           "stairs_dest_level": 3,
-          "quality": 3,
-          "owner": 2
+          "quality_raw": 3,
+          "owner_raw": 2
         },
         {
           "id": 1022,
@@ -15498,8 +15448,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 3 at (5, 2)",
-          "quality": 5,
-          "owner": 2
+          "quality_raw": 5,
+          "owner_raw": 2
         },
         {
           "id": 1023,
@@ -16538,8 +16488,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_195.png",
           "quantity": 1,
-          "owner": 6,
-          "owner_name": "green goblins",
           "weight": 0.4
         },
         {
@@ -16570,8 +16518,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Changes to SOLID height=1, texture=45",
-          "quality": 57,
-          "owner": 53
+          "quality_raw": 57,
+          "owner_raw": 53
         },
         {
           "id": 539,
@@ -16585,8 +16533,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=1, texture=45",
-          "quality": 1,
-          "owner": 45
+          "quality_raw": 1,
+          "owner_raw": 45
         },
         {
           "id": 540,
@@ -16650,8 +16598,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Message: \"The dank, malodorous stench of this underground swamp invades your revolted nostrils. You recoil from the wave of fetid odor.\"",
-          "quality": 39,
-          "owner": 53
+          "quality_raw": 39,
+          "owner_raw": 53
         },
         {
           "id": 546,
@@ -16710,8 +16658,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 551,
@@ -16991,8 +16939,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 578,
@@ -17035,8 +16983,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_388.png",
           "description": "Opens pit trap",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 587,
@@ -17050,8 +16998,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 588,
@@ -17365,8 +17313,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Message: \"The dank, malodorous stench of this underground swamp invades your revolted nostrils. You recoil from the wave of fetid odor.\"",
-          "quality": 39,
-          "owner": 53
+          "quality_raw": 39,
+          "owner_raw": 53
         },
         {
           "id": 616,
@@ -17498,8 +17446,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 2 at (42, 59)",
           "stairs_dest_level": 2,
-          "quality": 42,
-          "owner": 59
+          "quality_raw": 42,
+          "owner_raw": 59
         },
         {
           "id": 626,
@@ -17565,8 +17513,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates fighter",
-          "quality": 35,
-          "owner": 0
+          "quality_raw": 35,
+          "owner_raw": 0
         },
         {
           "id": 631,
@@ -17616,8 +17564,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Message: \"The dank, malodorous stench of this underground swamp invades your revolted nostrils. You recoil from the wave of fetid odor.\"",
-          "quality": 39,
-          "owner": 53
+          "quality_raw": 39,
+          "owner_raw": 53
         },
         {
           "id": 637,
@@ -17661,8 +17609,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 2 at (42, 59)",
-          "quality": 42,
-          "owner": 59
+          "quality_raw": 42,
+          "owner_raw": 59
         },
         {
           "id": 642,
@@ -17886,8 +17834,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates headless",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 659,
@@ -18039,8 +17987,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 24,
-          "owner_name": "feral trolls",
           "weight": 0.4
         },
         {
@@ -18507,8 +18453,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates fighter",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 703,
@@ -18652,8 +18598,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_195.png",
           "quantity": 1,
-          "owner": 8,
-          "owner_name": "reapers",
           "weight": 0.4
         },
         {
@@ -18682,8 +18626,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_195.png",
           "quantity": 1,
-          "owner": 8,
-          "owner_name": "reapers",
           "weight": 0.4
         },
         {
@@ -19510,8 +19452,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_400.png",
           "description": "Message: \"The dank, malodorous stench of this underground swamp invades your revolted nostrils. You recoil from the wave of fetid odor.\"",
-          "quality": 4,
-          "owner": 0
+          "quality_raw": 4,
+          "owner_raw": 0
         },
         {
           "id": 783,
@@ -19619,8 +19561,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 794,
@@ -19678,8 +19620,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (48, 55)",
-          "quality": 48,
-          "owner": 55
+          "quality_raw": 48,
+          "owner_raw": 55
         },
         {
           "id": 798,
@@ -19760,8 +19702,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates giant rat",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 804,
@@ -19855,8 +19797,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
           "quantity": 1,
-          "owner": 24,
-          "owner_name": "feral trolls",
           "weight": 0.4
         },
         {
@@ -20032,8 +19972,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 1,
-          "owner": 10
+          "quality_raw": 1,
+          "owner_raw": 10
         },
         {
           "id": 828,
@@ -20047,8 +19987,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 4 damage",
-          "quality": 4,
-          "owner": 1
+          "quality_raw": 4,
+          "owner_raw": 1
         },
         {
           "id": 829,
@@ -20062,8 +20002,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 1,
-          "owner": 10
+          "quality_raw": 1,
+          "owner_raw": 10
         },
         {
           "id": 830,
@@ -20121,8 +20061,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Message: \"The dank, malodorous stench of this underground swamp invades your revolted nostrils. You recoil from the wave of fetid odor.\"",
-          "quality": 39,
-          "owner": 53
+          "quality_raw": 39,
+          "owner_raw": 53
         },
         {
           "id": 834,
@@ -20201,8 +20141,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Message: \"The dank, malodorous stench of this underground swamp invades your revolted nostrils. You recoil from the wave of fetid odor.\"",
-          "quality": 39,
-          "owner": 53
+          "quality_raw": 39,
+          "owner_raw": 53
         },
         {
           "id": 840,
@@ -20407,8 +20347,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_398.png",
           "description": "Checks door_unlocked == 0",
-          "quality": 0,
-          "owner": 6
+          "quality_raw": 0,
+          "owner_raw": 6
         },
         {
           "id": 861,
@@ -20801,8 +20741,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles door at (6, 8)",
-          "quality": 6,
-          "owner": 8
+          "quality_raw": 6,
+          "owner_raw": 8
         },
         {
           "id": 888,
@@ -20816,8 +20756,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles door at (6, 8)",
-          "quality": 6,
-          "owner": 8
+          "quality_raw": 6,
+          "owner_raw": 8
         },
         {
           "id": 889,
@@ -20831,8 +20771,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles door at (3, 19)",
-          "quality": 6,
-          "owner": 8
+          "quality_raw": 6,
+          "owner_raw": 8
         },
         {
           "id": 892,
@@ -21165,8 +21105,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (7, 61)",
           "stairs_dest_level": 4,
-          "quality": 7,
-          "owner": 62
+          "quality_raw": 7,
+          "owner_raw": 62
         },
         {
           "id": 913,
@@ -21181,8 +21121,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (7, 50)",
           "stairs_dest_level": 4,
-          "quality": 7,
-          "owner": 50
+          "quality_raw": 7,
+          "owner_raw": 50
         },
         {
           "id": 914,
@@ -21209,8 +21149,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates giant spider",
-          "quality": 35,
-          "owner": 0
+          "quality_raw": 35,
+          "owner_raw": 0
         },
         {
           "id": 916,
@@ -21224,8 +21164,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (7, 61)",
-          "quality": 7,
-          "owner": 61
+          "quality_raw": 7,
+          "owner_raw": 61
         },
         {
           "id": 917,
@@ -21239,8 +21179,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (7, 50)",
-          "quality": 7,
-          "owner": 50
+          "quality_raw": 7,
+          "owner_raw": 50
         },
         {
           "id": 919,
@@ -21254,8 +21194,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates vampire bat",
-          "quality": 29,
-          "owner": 0
+          "quality_raw": 29,
+          "owner_raw": 0
         },
         {
           "id": 920,
@@ -21286,8 +21226,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates goblin",
-          "quality": 54,
-          "owner": 0
+          "quality_raw": 54,
+          "owner_raw": 0
         },
         {
           "id": 922,
@@ -21413,8 +21353,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -21429,8 +21367,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -21458,8 +21394,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 25,
-          "owner_name": "fire elementals",
           "weight": 0.4
         },
         {
@@ -21474,8 +21408,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_195.png",
           "quantity": 1,
-          "owner": 25,
-          "owner_name": "fire elementals",
           "weight": 0.4
         },
         {
@@ -21605,8 +21537,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates wolf spider",
-          "quality": 54,
-          "owner": 0
+          "quality_raw": 54,
+          "owner_raw": 0
         },
         {
           "id": 947,
@@ -21728,8 +21660,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates headless",
-          "quality": 60,
-          "owner": 0
+          "quality_raw": 60,
+          "owner_raw": 0
         },
         {
           "id": 952,
@@ -21966,8 +21898,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=1",
-          "quality": 1,
-          "owner": 63
+          "quality_raw": 1,
+          "owner_raw": 63
         },
         {
           "id": 970,
@@ -21981,8 +21913,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=6, texture=62",
-          "quality": 22,
-          "owner": 62
+          "quality_raw": 22,
+          "owner_raw": 62
         },
         {
           "id": 972,
@@ -22010,8 +21942,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (44, 48) [same level]",
           "stairs_dest_level": 4,
-          "quality": 47,
-          "owner": 53
+          "quality_raw": 47,
+          "owner_raw": 53
         },
         {
           "id": 974,
@@ -22025,8 +21957,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (44, 48) [same level]",
-          "quality": 44,
-          "owner": 48
+          "quality_raw": 44,
+          "owner_raw": 48
         },
         {
           "id": 975,
@@ -22040,8 +21972,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (26, 55) [same level]",
-          "quality": 38,
-          "owner": 50
+          "quality_raw": 38,
+          "owner_raw": 50
         },
         {
           "id": 976,
@@ -22055,8 +21987,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (26, 55) [same level]",
-          "quality": 26,
-          "owner": 55
+          "quality_raw": 26,
+          "owner_raw": 55
         },
         {
           "id": 977,
@@ -22131,8 +22063,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (23, 36)",
           "stairs_dest_level": 4,
-          "quality": 23,
-          "owner": 36
+          "quality_raw": 23,
+          "owner_raw": 36
         },
         {
           "id": 982,
@@ -22146,8 +22078,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (23, 36)",
-          "quality": 23,
-          "owner": 36
+          "quality_raw": 23,
+          "owner_raw": 36
         },
         {
           "id": 983,
@@ -22248,8 +22180,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets lever_activated = 0",
-          "quality": 0,
-          "owner": 7
+          "quality_raw": 0,
+          "owner_raw": 7
         },
         {
           "id": 994,
@@ -22263,8 +22195,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates skeleton",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 1000,
@@ -22278,8 +22210,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_398.png",
           "description": "Checks door_unlocked == 0",
-          "quality": 0,
-          "owner": 6
+          "quality_raw": 0,
+          "owner_raw": 6
         },
         {
           "id": 1002,
@@ -22307,8 +22239,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (42, 2)",
           "stairs_dest_level": 4,
-          "quality": 42,
-          "owner": 3
+          "quality_raw": 42,
+          "owner_raw": 3
         },
         {
           "id": 1004,
@@ -22322,8 +22254,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (42, 2)",
-          "quality": 42,
-          "owner": 2
+          "quality_raw": 42,
+          "owner_raw": 2
         },
         {
           "id": 1005,
@@ -22354,8 +22286,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (37, 9)",
-          "quality": 37,
-          "owner": 9
+          "quality_raw": 37,
+          "owner_raw": 9
         },
         {
           "id": 1009,
@@ -22369,8 +22301,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 1010,
@@ -22427,8 +22359,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 2 at (5, 3)",
           "stairs_dest_level": 2,
-          "quality": 5,
-          "owner": 4
+          "quality_raw": 5,
+          "owner_raw": 4
         },
         {
           "id": 1014,
@@ -22442,8 +22374,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 2 at (5, 3)",
-          "quality": 5,
-          "owner": 3
+          "quality_raw": 5,
+          "owner_raw": 3
         },
         {
           "id": 1015,
@@ -22470,8 +22402,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 1018,
@@ -22592,8 +22524,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         }
       ],
       "npcs": [
@@ -24187,8 +24119,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=2, param=0)",
-          "quality": 2,
-          "owner": 0
+          "quality_raw": 2,
+          "owner_raw": 0
         },
         {
           "id": 511,
@@ -24444,8 +24376,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates giant rat",
-          "quality": 49,
-          "owner": 0
+          "quality_raw": 49,
+          "owner_raw": 0
         },
         {
           "id": 530,
@@ -24459,8 +24391,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates mongbat",
-          "quality": 40,
-          "owner": 0
+          "quality_raw": 40,
+          "owner_raw": 0
         },
         {
           "id": 531,
@@ -24474,8 +24406,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates bloodworm",
-          "quality": 40,
-          "owner": 0
+          "quality_raw": 40,
+          "owner_raw": 0
         },
         {
           "id": 532,
@@ -24489,8 +24421,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 42,
-          "owner": 0
+          "quality_raw": 42,
+          "owner_raw": 0
         },
         {
           "id": 533,
@@ -24504,8 +24436,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates headless",
-          "quality": 43,
-          "owner": 0
+          "quality_raw": 43,
+          "owner_raw": 0
         },
         {
           "id": 534,
@@ -24778,8 +24710,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 567,
@@ -24793,8 +24725,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 569,
@@ -24808,8 +24740,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 570,
@@ -25461,8 +25393,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 628,
@@ -25666,8 +25598,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates coin",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 646,
@@ -26186,8 +26118,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 695,
@@ -26289,8 +26221,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Changes to OPEN height=7",
-          "quality": 56,
-          "owner": 36
+          "quality_raw": 56,
+          "owner_raw": 36
         },
         {
           "id": 704,
@@ -26304,8 +26236,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 705,
@@ -26720,8 +26652,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 3 at (7, 59)",
           "stairs_dest_level": 3,
-          "quality": 7,
-          "owner": 59
+          "quality_raw": 7,
+          "owner_raw": 59
         },
         {
           "id": 737,
@@ -26736,8 +26668,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 3 at (7, 52)",
           "stairs_dest_level": 3,
-          "quality": 7,
-          "owner": 52
+          "quality_raw": 7,
+          "owner_raw": 52
         },
         {
           "id": 738,
@@ -26751,8 +26683,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 3 at (7, 59)",
-          "quality": 7,
-          "owner": 59
+          "quality_raw": 7,
+          "owner_raw": 59
         },
         {
           "id": 739,
@@ -26766,8 +26698,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 3 at (7, 52)",
-          "quality": 7,
-          "owner": 52
+          "quality_raw": 7,
+          "owner_raw": 52
         },
         {
           "id": 740,
@@ -26833,8 +26765,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 5 at (8, 45)",
           "stairs_dest_level": 5,
-          "quality": 8,
-          "owner": 45
+          "quality_raw": 8,
+          "owner_raw": 45
         },
         {
           "id": 744,
@@ -26959,8 +26891,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 5 at (8, 45)",
-          "quality": 8,
-          "owner": 45
+          "quality_raw": 8,
+          "owner_raw": 45
         },
         {
           "id": 753,
@@ -27007,8 +26939,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 5 at (39, 26)",
           "stairs_dest_level": 5,
-          "quality": 39,
-          "owner": 26
+          "quality_raw": 39,
+          "owner_raw": 26
         },
         {
           "id": 757,
@@ -27022,8 +26954,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 5 at (39, 26)",
-          "quality": 39,
-          "owner": 26
+          "quality_raw": 39,
+          "owner_raw": 26
         },
         {
           "id": 758,
@@ -27037,8 +26969,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 5 at (54, 59)",
-          "quality": 54,
-          "owner": 59
+          "quality_raw": 54,
+          "owner_raw": 59
         },
         {
           "id": 759,
@@ -27103,8 +27035,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 5 at (54, 59)",
           "stairs_dest_level": 5,
-          "quality": 54,
-          "owner": 59
+          "quality_raw": 54,
+          "owner_raw": 59
         },
         {
           "id": 764,
@@ -27227,8 +27159,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 772,
@@ -27242,8 +27174,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 773,
@@ -27962,8 +27894,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 838,
@@ -28580,8 +28512,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_386.png",
           "description": "Fires arrow SE (damage ~6)",
-          "quality": 6,
-          "owner": 3
+          "quality_raw": 6,
+          "owner_raw": 3
         },
         {
           "id": 887,
@@ -28595,8 +28527,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Fires arrow SE (damage ~6)",
-          "quality": 56,
-          "owner": 6
+          "quality_raw": 56,
+          "owner_raw": 6
         },
         {
           "id": 888,
@@ -29920,8 +29852,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=24, param=3)",
-          "quality": 24,
-          "owner": 3
+          "quality_raw": 24,
+          "owner_raw": 3
         },
         {
           "id": 985,
@@ -29935,8 +29867,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=24, param=2)",
-          "quality": 24,
-          "owner": 2
+          "quality_raw": 24,
+          "owner_raw": 2
         },
         {
           "id": 986,
@@ -29950,8 +29882,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=24, param=1)",
-          "quality": 24,
-          "owner": 1
+          "quality_raw": 24,
+          "owner_raw": 1
         },
         {
           "id": 987,
@@ -29965,8 +29897,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=24, param=0)",
-          "quality": 24,
-          "owner": 0
+          "quality_raw": 24,
+          "owner_raw": 0
         },
         {
           "id": 988,
@@ -29981,8 +29913,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 3 at (25, 36)",
           "stairs_dest_level": 3,
-          "quality": 25,
-          "owner": 36
+          "quality_raw": 25,
+          "owner_raw": 36
         },
         {
           "id": 989,
@@ -29996,8 +29928,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 3 at (25, 36)",
-          "quality": 25,
-          "owner": 36
+          "quality_raw": 25,
+          "owner_raw": 36
         },
         {
           "id": 990,
@@ -30365,8 +30297,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 3 at (41, 2)",
-          "quality": 41,
-          "owner": 2
+          "quality_raw": 41,
+          "owner_raw": 2
         },
         {
           "id": 1017,
@@ -30381,8 +30313,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 3 at (41, 2)",
           "stairs_dest_level": 3,
-          "quality": 40,
-          "owner": 2
+          "quality_raw": 40,
+          "owner_raw": 2
         },
         {
           "id": 1018,
@@ -30397,8 +30329,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 5 at (35, 47)",
           "stairs_dest_level": 5,
-          "quality": 36,
-          "owner": 47
+          "quality_raw": 36,
+          "owner_raw": 47
         },
         {
           "id": 1019,
@@ -30412,8 +30344,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 5 at (35, 47)",
-          "quality": 35,
-          "owner": 47
+          "quality_raw": 35,
+          "owner_raw": 47
         },
         {
           "id": 1020,
@@ -30427,8 +30359,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 5 at (28, 47)",
-          "quality": 28,
-          "owner": 47
+          "quality_raw": 28,
+          "owner_raw": 47
         },
         {
           "id": 1021,
@@ -30443,8 +30375,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 5 at (28, 47)",
           "stairs_dest_level": 5,
-          "quality": 28,
-          "owner": 47
+          "quality_raw": 28,
+          "owner_raw": 47
         },
         {
           "id": 1022,
@@ -31777,8 +31709,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates headless",
-          "quality": 48,
-          "owner": 0
+          "quality_raw": 48,
+          "owner_raw": 0
         },
         {
           "id": 486,
@@ -31805,8 +31737,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates mongbat",
-          "quality": 59,
-          "owner": 0
+          "quality_raw": 59,
+          "owner_raw": 0
         },
         {
           "id": 495,
@@ -31820,8 +31752,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates ghost",
-          "quality": 54,
-          "owner": 53
+          "quality_raw": 54,
+          "owner_raw": 53
         },
         {
           "id": 496,
@@ -31835,8 +31767,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 498,
@@ -31850,8 +31782,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 500,
@@ -31865,8 +31797,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates ghost",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 505,
@@ -31880,8 +31812,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates ghost",
-          "quality": 50,
-          "owner": 0
+          "quality_raw": 50,
+          "owner_raw": 0
         },
         {
           "id": 506,
@@ -32273,8 +32205,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates fire elemental",
-          "quality": 19,
-          "owner": 50
+          "quality_raw": 19,
+          "owner_raw": 50
         },
         {
           "id": 533,
@@ -32288,8 +32220,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates fire elemental",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 534,
@@ -32303,8 +32235,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Fires arrow NE",
-          "quality": 19,
-          "owner": 46
+          "quality_raw": 19,
+          "owner_raw": 46
         },
         {
           "id": 535,
@@ -32658,8 +32590,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Casts Night Vision SE",
-          "quality": 10,
-          "owner": 45
+          "quality_raw": 10,
+          "owner_raw": 45
         },
         {
           "id": 562,
@@ -32673,8 +32605,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_390.png",
           "description": "Casts Night Vision SE",
-          "quality": 5,
-          "owner": 3
+          "quality_raw": 5,
+          "owner_raw": 3
         },
         {
           "id": 563,
@@ -32688,8 +32620,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_386.png",
           "description": "Fires arrow NE",
-          "quality": 0,
-          "owner": 17
+          "quality_raw": 0,
+          "owner_raw": 17
         },
         {
           "id": 564,
@@ -33341,8 +33273,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (11, 6) [same level]",
-          "quality": 1,
-          "owner": 28
+          "quality_raw": 1,
+          "owner_raw": 28
         },
         {
           "id": 623,
@@ -33356,8 +33288,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (11, 6) [same level]",
-          "quality": 11,
-          "owner": 6
+          "quality_raw": 11,
+          "owner_raw": 6
         },
         {
           "id": 624,
@@ -33371,8 +33303,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates ghost",
-          "quality": 55,
-          "owner": 0
+          "quality_raw": 55,
+          "owner_raw": 0
         },
         {
           "id": 628,
@@ -33386,8 +33318,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Sets lever_activated = 0",
-          "quality": 21,
-          "owner": 60
+          "quality_raw": 21,
+          "owner_raw": 60
         },
         {
           "id": 629,
@@ -33401,8 +33333,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Sets lever_activated = 0",
-          "quality": 21,
-          "owner": 60
+          "quality_raw": 21,
+          "owner_raw": 60
         },
         {
           "id": 630,
@@ -33416,8 +33348,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Sets lever_activated = 0",
-          "quality": 21,
-          "owner": 60
+          "quality_raw": 21,
+          "owner_raw": 60
         },
         {
           "id": 631,
@@ -33431,8 +33363,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Sets lever_activated = 0",
-          "quality": 21,
-          "owner": 60
+          "quality_raw": 21,
+          "owner_raw": 60
         },
         {
           "id": 632,
@@ -33446,8 +33378,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Sets lever_activated = 0",
-          "quality": 21,
-          "owner": 60
+          "quality_raw": 21,
+          "owner_raw": 60
         },
         {
           "id": 633,
@@ -33461,8 +33393,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Sets lever_activated = 0",
-          "quality": 21,
-          "owner": 60
+          "quality_raw": 21,
+          "owner_raw": 60
         },
         {
           "id": 634,
@@ -33476,8 +33408,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets lever_activated = 0",
-          "quality": 0,
-          "owner": 7
+          "quality_raw": 0,
+          "owner_raw": 7
         },
         {
           "id": 636,
@@ -33491,8 +33423,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates iron ring",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 642,
@@ -33506,8 +33438,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates ghoul",
-          "quality": 58,
-          "owner": 0
+          "quality_raw": 58,
+          "owner_raw": 0
         },
         {
           "id": 643,
@@ -33521,8 +33453,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_398.png",
           "description": "Checks puzzle_state == 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 644,
@@ -33536,8 +33468,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 645,
@@ -33551,8 +33483,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 647,
@@ -33566,8 +33498,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 648,
@@ -33581,8 +33513,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates dire ghost",
-          "quality": 52,
-          "owner": 3
+          "quality_raw": 52,
+          "owner_raw": 3
         },
         {
           "id": 649,
@@ -33609,8 +33541,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_398.png",
           "description": "Checks quest_progress == 1",
-          "quality": 1,
-          "owner": 26
+          "quality_raw": 1,
+          "owner_raw": 26
         },
         {
           "id": 651,
@@ -33624,8 +33556,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 0 damage",
-          "quality": 57,
-          "owner": 3
+          "quality_raw": 57,
+          "owner_raw": 3
         },
         {
           "id": 652,
@@ -33665,8 +33597,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (4, 27) [same level]",
-          "quality": 11,
-          "owner": 11
+          "quality_raw": 11,
+          "owner_raw": 11
         },
         {
           "id": 657,
@@ -33693,8 +33625,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (4, 27) [same level]",
-          "quality": 4,
-          "owner": 27
+          "quality_raw": 4,
+          "owner_raw": 27
         },
         {
           "id": 660,
@@ -33735,8 +33667,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dire ghost",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 662,
@@ -34041,8 +33973,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 56,
-          "owner": 0
+          "quality_raw": 56,
+          "owner_raw": 0
         },
         {
           "id": 690,
@@ -36610,8 +36542,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 0 damage",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 877,
@@ -37444,8 +37376,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 947,
@@ -37535,8 +37467,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 953,
@@ -37550,8 +37482,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 954,
@@ -37746,8 +37678,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (3, 12) [same level]",
-          "quality": 3,
-          "owner": 12
+          "quality_raw": 3,
+          "owner_raw": 12
         },
         {
           "id": 969,
@@ -37761,8 +37693,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (19, 12) [same level]",
-          "quality": 1,
-          "owner": 12
+          "quality_raw": 1,
+          "owner_raw": 12
         },
         {
           "id": 970,
@@ -37776,8 +37708,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (3, 12) [same level]",
-          "quality": 21,
-          "owner": 12
+          "quality_raw": 21,
+          "owner_raw": 12
         },
         {
           "id": 971,
@@ -37805,8 +37737,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 6 at (11, 55)",
           "stairs_dest_level": 6,
-          "quality": 12,
-          "owner": 55
+          "quality_raw": 12,
+          "owner_raw": 55
         },
         {
           "id": 973,
@@ -37820,8 +37752,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 6 at (11, 55)",
-          "quality": 11,
-          "owner": 55
+          "quality_raw": 11,
+          "owner_raw": 55
         },
         {
           "id": 974,
@@ -37835,8 +37767,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (56, 59)",
-          "quality": 56,
-          "owner": 59
+          "quality_raw": 56,
+          "owner_raw": 59
         },
         {
           "id": 975,
@@ -37851,8 +37783,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (8, 43)",
           "stairs_dest_level": 4,
-          "quality": 8,
-          "owner": 43
+          "quality_raw": 8,
+          "owner_raw": 43
         },
         {
           "id": 976,
@@ -37900,8 +37832,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (41, 26)",
-          "quality": 41,
-          "owner": 26
+          "quality_raw": 41,
+          "owner_raw": 26
         },
         {
           "id": 979,
@@ -37916,8 +37848,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (41, 26)",
           "stairs_dest_level": 4,
-          "quality": 41,
-          "owner": 26
+          "quality_raw": 41,
+          "owner_raw": 26
         },
         {
           "id": 980,
@@ -37949,8 +37881,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (56, 59)",
           "stairs_dest_level": 4,
-          "quality": 56,
-          "owner": 59
+          "quality_raw": 56,
+          "owner_raw": 59
         },
         {
           "id": 982,
@@ -37999,8 +37931,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 986,
@@ -38014,8 +37946,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (60, 32)",
-          "quality": 60,
-          "owner": 32
+          "quality_raw": 60,
+          "owner_raw": 32
         },
         {
           "id": 989,
@@ -38162,8 +38094,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (19, 12) [same level]",
-          "quality": 19,
-          "owner": 12
+          "quality_raw": 19,
+          "owner_raw": 12
         },
         {
           "id": 996,
@@ -38240,8 +38172,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (8, 43)",
-          "quality": 8,
-          "owner": 43
+          "quality_raw": 8,
+          "owner_raw": 43
         },
         {
           "id": 1001,
@@ -38280,8 +38212,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (34, 47)",
           "stairs_dest_level": 4,
-          "quality": 33,
-          "owner": 47
+          "quality_raw": 33,
+          "owner_raw": 47
         },
         {
           "id": 1003,
@@ -38353,8 +38285,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=3, texture=13",
-          "quality": 3,
-          "owner": 13
+          "quality_raw": 3,
+          "owner_raw": 13
         },
         {
           "id": 1010,
@@ -38386,8 +38318,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (30, 47)",
-          "quality": 30,
-          "owner": 47
+          "quality_raw": 30,
+          "owner_raw": 47
         },
         {
           "id": 1012,
@@ -38401,8 +38333,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 4 at (34, 47)",
-          "quality": 34,
-          "owner": 47
+          "quality_raw": 34,
+          "owner_raw": 47
         },
         {
           "id": 1013,
@@ -38533,8 +38465,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 4 at (30, 47)",
           "stairs_dest_level": 4,
-          "quality": 30,
-          "owner": 47
+          "quality_raw": 30,
+          "owner_raw": 47
         },
         {
           "id": 1020,
@@ -38572,8 +38504,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 6 at (43, 27)",
-          "quality": 43,
-          "owner": 27
+          "quality_raw": 43,
+          "owner_raw": 27
         },
         {
           "id": 1022,
@@ -38605,8 +38537,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 6 at (43, 27)",
           "stairs_dest_level": 6,
-          "quality": 43,
-          "owner": 29
+          "quality_raw": 43,
+          "owner_raw": 29
         }
       ],
       "npcs": [
@@ -41133,8 +41065,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates fire elemental",
-          "quality": 57,
-          "owner": 56
+          "quality_raw": 57,
+          "owner_raw": 56
         },
         {
           "id": 704,
@@ -41148,8 +41080,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates fire elemental",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 705,
@@ -42474,8 +42406,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 804,
@@ -42711,8 +42643,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_400.png",
           "description": "Message: \"You lift the tile up...\"",
-          "quality": 10,
-          "owner": 0
+          "quality_raw": 10,
+          "owner_raw": 0
         },
         {
           "id": 824,
@@ -42726,8 +42658,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (27, 50)",
-          "quality": 27,
-          "owner": 50
+          "quality_raw": 27,
+          "owner_raw": 50
         },
         {
           "id": 825,
@@ -42780,8 +42712,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (11, 46)",
-          "quality": 11,
-          "owner": 46
+          "quality_raw": 11,
+          "owner_raw": 46
         },
         {
           "id": 831,
@@ -42813,8 +42745,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 834,
@@ -42960,8 +42892,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 52,
-          "owner": 0
+          "quality_raw": 52,
+          "owner_raw": 0
         },
         {
           "id": 845,
@@ -42975,8 +42907,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 42,
-          "owner": 0
+          "quality_raw": 42,
+          "owner_raw": 0
         },
         {
           "id": 848,
@@ -43790,8 +43722,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (52, 31) [same level]",
-          "quality": 52,
-          "owner": 31
+          "quality_raw": 52,
+          "owner_raw": 31
         },
         {
           "id": 906,
@@ -43898,8 +43830,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (17, 42)",
-          "quality": 17,
-          "owner": 42
+          "quality_raw": 17,
+          "owner_raw": 42
         },
         {
           "id": 916,
@@ -43913,8 +43845,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 917,
@@ -43961,8 +43893,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 48,
-          "owner": 0
+          "quality_raw": 48,
+          "owner_raw": 0
         },
         {
           "id": 921,
@@ -44276,8 +44208,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=40, param=0)",
-          "quality": 40,
-          "owner": 0
+          "quality_raw": 40,
+          "owner_raw": 0
         },
         {
           "id": 946,
@@ -44304,8 +44236,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (53, 18) [same level]",
-          "quality": 53,
-          "owner": 31
+          "quality_raw": 53,
+          "owner_raw": 31
         },
         {
           "id": 950,
@@ -44319,8 +44251,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (53, 18) [same level]",
-          "quality": 53,
-          "owner": 18
+          "quality_raw": 53,
+          "owner_raw": 18
         },
         {
           "id": 951,
@@ -44335,8 +44267,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 5 at (14, 55)",
           "stairs_dest_level": 5,
-          "quality": 14,
-          "owner": 55
+          "quality_raw": 14,
+          "owner_raw": 55
         },
         {
           "id": 952,
@@ -44350,8 +44282,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 5 at (14, 55)",
-          "quality": 14,
-          "owner": 55
+          "quality_raw": 14,
+          "owner_raw": 55
         },
         {
           "id": 953,
@@ -44366,8 +44298,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 5 at (43, 31)",
           "stairs_dest_level": 5,
-          "quality": 43,
-          "owner": 28
+          "quality_raw": 43,
+          "owner_raw": 28
         },
         {
           "id": 954,
@@ -44398,8 +44330,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 5 at (43, 31)",
-          "quality": 43,
-          "owner": 31
+          "quality_raw": 43,
+          "owner_raw": 31
         },
         {
           "id": 957,
@@ -45246,8 +45178,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (19, 13)",
           "stairs_dest_level": 7,
-          "quality": 18,
-          "owner": 12
+          "quality_raw": 18,
+          "owner_raw": 12
         },
         {
           "id": 1009,
@@ -45273,8 +45205,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (19, 13)",
-          "quality": 19,
-          "owner": 13
+          "quality_raw": 19,
+          "owner_raw": 13
         },
         {
           "id": 1011,
@@ -45306,8 +45238,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (2, 61)",
           "stairs_dest_level": 7,
-          "quality": 2,
-          "owner": 61
+          "quality_raw": 2,
+          "owner_raw": 61
         },
         {
           "id": 1013,
@@ -45338,8 +45270,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (2, 61)",
-          "quality": 2,
-          "owner": 61
+          "quality_raw": 2,
+          "owner_raw": 61
         },
         {
           "id": 1015,
@@ -46514,8 +46446,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 346,
@@ -46530,8 +46462,8 @@
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (17, 29)",
           "quantity": 342,
-          "quality": 17,
-          "owner": 29
+          "quality_raw": 17,
+          "owner_raw": 29
         },
         {
           "id": 352,
@@ -46564,8 +46496,8 @@
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (43, 10)",
           "quantity": 352,
-          "quality": 43,
-          "owner": 10
+          "quality_raw": 43,
+          "owner_raw": 10
         },
         {
           "id": 354,
@@ -46579,8 +46511,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 355,
@@ -46594,8 +46526,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates gazer",
-          "quality": 42,
-          "owner": 57
+          "quality_raw": 42,
+          "owner_raw": 57
         },
         {
           "id": 356,
@@ -46609,8 +46541,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates gazer",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 358,
@@ -46805,8 +46737,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates great troll",
-          "quality": 52,
-          "owner": 59
+          "quality_raw": 52,
+          "owner_raw": 59
         },
         {
           "id": 384,
@@ -46820,8 +46752,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates great troll",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 399,
@@ -46835,8 +46767,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates ghost",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 401,
@@ -46864,8 +46796,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates ghost",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 403,
@@ -47055,8 +46987,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 8 at (12, 33)",
           "stairs_dest_level": 8,
-          "quality": 12,
-          "owner": 33
+          "quality_raw": 12,
+          "owner_raw": 33
         },
         {
           "id": 430,
@@ -47169,8 +47101,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 447,
@@ -47232,8 +47164,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 20 damage",
-          "quality": 20,
-          "owner": 0
+          "quality_raw": 20,
+          "owner_raw": 0
         },
         {
           "id": 452,
@@ -47327,8 +47259,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 8 at (12, 33)",
-          "quality": 12,
-          "owner": 33
+          "quality_raw": 12,
+          "owner_raw": 33
         },
         {
           "id": 458,
@@ -47431,8 +47363,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 10 damage",
-          "quality": 10,
-          "owner": 0
+          "quality_raw": 10,
+          "owner_raw": 0
         },
         {
           "id": 466,
@@ -47519,8 +47451,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates shadow beast",
-          "quality": 33,
-          "owner": 40
+          "quality_raw": 33,
+          "owner_raw": 40
         },
         {
           "id": 473,
@@ -47534,8 +47466,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates shadow beast",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 474,
@@ -48787,8 +48719,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates fire elemental",
-          "quality": 30,
-          "owner": 0
+          "quality_raw": 30,
+          "owner_raw": 0
         },
         {
           "id": 582,
@@ -49057,8 +48989,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles portcullis at (27, 54)",
-          "quality": 27,
-          "owner": 54
+          "quality_raw": 27,
+          "owner_raw": 54
         },
         {
           "id": 647,
@@ -49151,8 +49083,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles open portcullis at (7, 35)",
-          "quality": 7,
-          "owner": 35
+          "quality_raw": 7,
+          "owner_raw": 35
         },
         {
           "id": 661,
@@ -49191,8 +49123,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles door at (19, 4)",
-          "quality": 19,
-          "owner": 4
+          "quality_raw": 19,
+          "owner_raw": 4
         },
         {
           "id": 673,
@@ -49219,8 +49151,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 4 damage",
-          "quality": 4,
-          "owner": 0
+          "quality_raw": 4,
+          "owner_raw": 0
         },
         {
           "id": 677,
@@ -49234,8 +49166,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 681,
@@ -49304,8 +49236,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates dire ghost",
-          "quality": 51,
-          "owner": 54
+          "quality_raw": 51,
+          "owner_raw": 54
         },
         {
           "id": 689,
@@ -49319,8 +49251,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dire ghost",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 696,
@@ -49394,8 +49326,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles door at (29, 21)",
-          "quality": 29,
-          "owner": 21
+          "quality_raw": 29,
+          "owner_raw": 21
         },
         {
           "id": 710,
@@ -49505,8 +49437,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 3 damage",
-          "quality": 42,
-          "owner": 25
+          "quality_raw": 42,
+          "owner_raw": 25
         },
         {
           "id": 720,
@@ -49520,8 +49452,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 3 damage",
-          "quality": 42,
-          "owner": 25
+          "quality_raw": 42,
+          "owner_raw": 25
         },
         {
           "id": 721,
@@ -49535,8 +49467,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 3 damage",
-          "quality": 42,
-          "owner": 25
+          "quality_raw": 42,
+          "owner_raw": 25
         },
         {
           "id": 723,
@@ -49563,8 +49495,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 3 damage",
-          "quality": 42,
-          "owner": 25
+          "quality_raw": 42,
+          "owner_raw": 25
         },
         {
           "id": 725,
@@ -49595,8 +49527,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 3 damage",
-          "quality": 42,
-          "owner": 25
+          "quality_raw": 42,
+          "owner_raw": 25
         },
         {
           "id": 728,
@@ -49610,8 +49542,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 3 damage",
-          "quality": 42,
-          "owner": 25
+          "quality_raw": 42,
+          "owner_raw": 25
         },
         {
           "id": 729,
@@ -49625,8 +49557,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 3 damage",
-          "quality": 42,
-          "owner": 25
+          "quality_raw": 42,
+          "owner_raw": 25
         },
         {
           "id": 732,
@@ -49796,8 +49728,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Message: \"Welcome to the Underworld...\"",
-          "quality": 19,
-          "owner": 38
+          "quality_raw": 19,
+          "owner_raw": 38
         },
         {
           "id": 744,
@@ -49839,8 +49771,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates dread spider",
-          "quality": 15,
-          "owner": 40
+          "quality_raw": 15,
+          "owner_raw": 40
         },
         {
           "id": 747,
@@ -49854,8 +49786,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates dread spider",
-          "quality": 13,
-          "owner": 43
+          "quality_raw": 13,
+          "owner_raw": 43
         },
         {
           "id": 748,
@@ -49869,8 +49801,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 749,
@@ -49884,8 +49816,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 750,
@@ -49923,8 +49855,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (25, 35)",
-          "quality": 25,
-          "owner": 35
+          "quality_raw": 25,
+          "owner_raw": 35
         },
         {
           "id": 754,
@@ -49938,8 +49870,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Changes to SOLID height=11",
-          "quality": 15,
-          "owner": 43
+          "quality_raw": 15,
+          "owner_raw": 43
         },
         {
           "id": 755,
@@ -49953,8 +49885,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 756,
@@ -50012,8 +49944,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_390.png",
           "description": "Casts spell #14 SE",
-          "quality": 14,
-          "owner": 3
+          "quality_raw": 14,
+          "owner_raw": 3
         },
         {
           "id": 762,
@@ -50085,8 +50017,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates dread spider",
-          "quality": 11,
-          "owner": 39
+          "quality_raw": 11,
+          "owner_raw": 39
         },
         {
           "id": 767,
@@ -50100,8 +50032,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 768,
@@ -50115,8 +50047,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 41
+          "quality_raw": 11,
+          "owner_raw": 41
         },
         {
           "id": 769,
@@ -50130,8 +50062,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 770,
@@ -50172,8 +50104,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_397.png",
           "description": "Sets puzzle_state = 0",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 775,
@@ -50187,8 +50119,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Message: \"You hear the portcullis slam shut behind you!\"",
-          "quality": 24,
-          "owner": 57
+          "quality_raw": 24,
+          "owner_raw": 57
         },
         {
           "id": 776,
@@ -50202,8 +50134,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_400.png",
           "description": "Message: \"You hear the portcullis slam shut behind you!\"",
-          "quality": 12,
-          "owner": 0
+          "quality_raw": 12,
+          "owner_raw": 0
         },
         {
           "id": 785,
@@ -50314,8 +50246,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates reaper",
-          "quality": 33,
-          "owner": 8
+          "quality_raw": 33,
+          "owner_raw": 8
         },
         {
           "id": 799,
@@ -50329,8 +50261,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates reaper",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 800,
@@ -50462,8 +50394,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 824,
@@ -50477,8 +50409,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 826,
@@ -50492,8 +50424,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 828,
@@ -50507,8 +50439,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 40 damage",
-          "quality": 54,
-          "owner": 23
+          "quality_raw": 54,
+          "owner_raw": 23
         },
         {
           "id": 830,
@@ -50522,8 +50454,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 40 damage",
-          "quality": 54,
-          "owner": 23
+          "quality_raw": 54,
+          "owner_raw": 23
         },
         {
           "id": 831,
@@ -50537,8 +50469,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 3 damage",
-          "quality": 3,
-          "owner": 0
+          "quality_raw": 3,
+          "owner_raw": 0
         },
         {
           "id": 832,
@@ -50552,8 +50484,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 40 damage",
-          "quality": 54,
-          "owner": 23
+          "quality_raw": 54,
+          "owner_raw": 23
         },
         {
           "id": 833,
@@ -50582,8 +50514,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 40 damage",
-          "quality": 54,
-          "owner": 23
+          "quality_raw": 54,
+          "owner_raw": 23
         },
         {
           "id": 835,
@@ -50597,8 +50529,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates fire elemental",
-          "quality": 30,
-          "owner": 0
+          "quality_raw": 30,
+          "owner_raw": 0
         },
         {
           "id": 836,
@@ -50612,8 +50544,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 40 damage",
-          "quality": 40,
-          "owner": 0
+          "quality_raw": 40,
+          "owner_raw": 0
         },
         {
           "id": 838,
@@ -50627,8 +50559,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 840,
@@ -50642,8 +50574,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 842,
@@ -50657,8 +50589,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 844,
@@ -50672,8 +50604,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 40 damage",
-          "quality": 54,
-          "owner": 23
+          "quality_raw": 54,
+          "owner_raw": 23
         },
         {
           "id": 847,
@@ -50687,8 +50619,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 40 damage",
-          "quality": 54,
-          "owner": 23
+          "quality_raw": 54,
+          "owner_raw": 23
         },
         {
           "id": 848,
@@ -50702,8 +50634,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 850,
@@ -50717,8 +50649,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 852,
@@ -50732,8 +50664,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 854,
@@ -50747,8 +50679,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 855,
@@ -50775,8 +50707,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 858,
@@ -50790,8 +50722,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 862,
@@ -50859,8 +50791,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (36, 36)",
-          "quality": 36,
-          "owner": 36
+          "quality_raw": 36,
+          "owner_raw": 36
         },
         {
           "id": 869,
@@ -50892,8 +50824,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 872,
@@ -50907,8 +50839,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (60, 56)",
-          "quality": 60,
-          "owner": 56
+          "quality_raw": 60,
+          "owner_raw": 56
         },
         {
           "id": 887,
@@ -50922,8 +50854,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Modifies inventory (slot 8)",
-          "quality": 21,
-          "owner": 41
+          "quality_raw": 21,
+          "owner_raw": 41
         },
         {
           "id": 888,
@@ -50937,8 +50869,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Toggles open portcullis at (24, 56)",
-          "quality": 24,
-          "owner": 56
+          "quality_raw": 24,
+          "owner_raw": 56
         },
         {
           "id": 893,
@@ -50952,8 +50884,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_400.png",
           "description": "Message: \"The doors are securely locked.\"",
-          "quality": 12,
-          "owner": 3
+          "quality_raw": 12,
+          "owner_raw": 3
         },
         {
           "id": 894,
@@ -50967,8 +50899,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 896,
@@ -50982,8 +50914,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_396.png",
           "description": "Modifies inventory (slot 8)",
-          "quality": 8,
-          "owner": 17
+          "quality_raw": 8,
+          "owner_raw": 17
         },
         {
           "id": 897,
@@ -50997,8 +50929,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_400.png",
           "description": "Message: \"Welcome to the Underworld...\"",
-          "quality": 12,
-          "owner": 2
+          "quality_raw": 12,
+          "owner_raw": 2
         },
         {
           "id": 902,
@@ -51012,8 +50944,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 4 damage",
-          "quality": 43,
-          "owner": 32
+          "quality_raw": 43,
+          "owner_raw": 32
         },
         {
           "id": 904,
@@ -51099,8 +51031,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 911,
@@ -51155,8 +51087,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates dread spider",
-          "quality": 3,
-          "owner": 41
+          "quality_raw": 3,
+          "owner_raw": 41
         },
         {
           "id": 918,
@@ -51222,8 +51154,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 923,
@@ -51237,8 +51169,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (26, 40)",
-          "quality": 26,
-          "owner": 40
+          "quality_raw": 26,
+          "owner_raw": 40
         },
         {
           "id": 925,
@@ -51265,8 +51197,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates dread spider",
-          "quality": 4,
-          "owner": 43
+          "quality_raw": 4,
+          "owner_raw": 43
         },
         {
           "id": 928,
@@ -51280,8 +51212,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 930,
@@ -51312,8 +51244,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Changes to SOLID height=11",
-          "quality": 2,
-          "owner": 42
+          "quality_raw": 2,
+          "owner_raw": 42
         },
         {
           "id": 932,
@@ -51354,8 +51286,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 935,
@@ -51483,8 +51415,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 942,
@@ -51516,8 +51448,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 944,
@@ -51622,8 +51554,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (38, 30) [same level]",
-          "quality": 31,
-          "owner": 26
+          "quality_raw": 31,
+          "owner_raw": 26
         },
         {
           "id": 950,
@@ -51637,8 +51569,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (34, 20) [same level]",
-          "quality": 34,
-          "owner": 20
+          "quality_raw": 34,
+          "owner_raw": 20
         },
         {
           "id": 951,
@@ -51652,8 +51584,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (38, 30) [same level]",
-          "quality": 38,
-          "owner": 30
+          "quality_raw": 38,
+          "owner_raw": 30
         },
         {
           "id": 952,
@@ -51667,8 +51599,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (34, 20) [same level]",
-          "quality": 40,
-          "owner": 19
+          "quality_raw": 40,
+          "owner_raw": 19
         },
         {
           "id": 954,
@@ -51683,8 +51615,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 8 at (58, 50)",
           "stairs_dest_level": 8,
-          "quality": 58,
-          "owner": 52
+          "quality_raw": 58,
+          "owner_raw": 52
         },
         {
           "id": 955,
@@ -51698,8 +51630,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 8 at (58, 50)",
-          "quality": 58,
-          "owner": 50
+          "quality_raw": 58,
+          "owner_raw": 50
         },
         {
           "id": 956,
@@ -51731,8 +51663,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 8 at (60, 62)",
           "stairs_dest_level": 8,
-          "quality": 58,
-          "owner": 62
+          "quality_raw": 58,
+          "owner_raw": 62
         },
         {
           "id": 958,
@@ -51746,8 +51678,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 8 at (60, 62)",
-          "quality": 60,
-          "owner": 62
+          "quality_raw": 60,
+          "owner_raw": 62
         },
         {
           "id": 959,
@@ -51779,8 +51711,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 8 at (59, 2)",
           "stairs_dest_level": 8,
-          "quality": 59,
-          "owner": 2
+          "quality_raw": 59,
+          "owner_raw": 2
         },
         {
           "id": 961,
@@ -51794,8 +51726,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 8 at (59, 2)",
-          "quality": 59,
-          "owner": 2
+          "quality_raw": 59,
+          "owner_raw": 2
         },
         {
           "id": 962,
@@ -51809,8 +51741,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 8 at (38, 47)",
-          "quality": 38,
-          "owner": 47
+          "quality_raw": 38,
+          "owner_raw": 47
         },
         {
           "id": 963,
@@ -51842,8 +51774,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 8 at (38, 47)",
           "stairs_dest_level": 8,
-          "quality": 38,
-          "owner": 48
+          "quality_raw": 38,
+          "owner_raw": 48
         },
         {
           "id": 965,
@@ -51898,8 +51830,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to SOLID height=11",
-          "quality": 11,
-          "owner": 63
+          "quality_raw": 11,
+          "owner_raw": 63
         },
         {
           "id": 969,
@@ -52062,8 +51994,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 8 at (35, 44)",
           "stairs_dest_level": 8,
-          "quality": 35,
-          "owner": 42
+          "quality_raw": 35,
+          "owner_raw": 42
         },
         {
           "id": 979,
@@ -52077,8 +52009,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 8 at (35, 44)",
-          "quality": 35,
-          "owner": 44
+          "quality_raw": 35,
+          "owner_raw": 44
         },
         {
           "id": 980,
@@ -52093,8 +52025,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 6 at (5, 61)",
           "stairs_dest_level": 6,
-          "quality": 4,
-          "owner": 61
+          "quality_raw": 4,
+          "owner_raw": 61
         },
         {
           "id": 981,
@@ -52108,8 +52040,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 6 at (5, 61)",
-          "quality": 5,
-          "owner": 61
+          "quality_raw": 5,
+          "owner_raw": 61
         },
         {
           "id": 982,
@@ -52124,8 +52056,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 6 at (18, 10)",
           "stairs_dest_level": 6,
-          "quality": 19,
-          "owner": 11
+          "quality_raw": 19,
+          "owner_raw": 11
         },
         {
           "id": 983,
@@ -52139,8 +52071,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 6 at (18, 10)",
-          "quality": 18,
-          "owner": 10
+          "quality_raw": 18,
+          "owner_raw": 10
         },
         {
           "id": 984,
@@ -52518,8 +52450,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Changes to SOLID height=11",
-          "quality": 2,
-          "owner": 42
+          "quality_raw": 2,
+          "owner_raw": 42
         },
         {
           "id": 1000,
@@ -54422,8 +54354,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates headless",
-          "quality": 56,
-          "owner": 0
+          "quality_raw": 56,
+          "owner_raw": 0
         },
         {
           "id": 511,
@@ -54437,8 +54369,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates headless",
-          "quality": 58,
-          "owner": 0
+          "quality_raw": 58,
+          "owner_raw": 0
         },
         {
           "id": 512,
@@ -54452,8 +54384,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates dread spider",
-          "quality": 59,
-          "owner": 0
+          "quality_raw": 59,
+          "owner_raw": 0
         },
         {
           "id": 513,
@@ -54467,8 +54399,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates mongbat",
-          "quality": 58,
-          "owner": 0
+          "quality_raw": 58,
+          "owner_raw": 0
         },
         {
           "id": 514,
@@ -54482,8 +54414,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates giant rat",
-          "quality": 47,
-          "owner": 0
+          "quality_raw": 47,
+          "owner_raw": 0
         },
         {
           "id": 515,
@@ -54726,8 +54658,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates stone golem",
-          "quality": 61,
-          "owner": 47
+          "quality_raw": 61,
+          "owner_raw": 47
         },
         {
           "id": 532,
@@ -54758,8 +54690,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates earth golem",
-          "quality": 55,
-          "owner": 47
+          "quality_raw": 55,
+          "owner_raw": 47
         },
         {
           "id": 534,
@@ -54824,8 +54756,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_389.png",
           "description": "Changes to OPEN height=7",
-          "quality": 23,
-          "owner": 63
+          "quality_raw": 23,
+          "owner_raw": 63
         },
         {
           "id": 540,
@@ -54908,8 +54840,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates earth golem",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 545,
@@ -55099,8 +55031,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Removes object at (32, 33)",
-          "quality": 36,
-          "owner": 33
+          "quality_raw": 36,
+          "owner_raw": 33
         },
         {
           "id": 559,
@@ -57500,8 +57432,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
-          "owner": 34,
-          "owner_name": "ghouls",
           "weight": 0.4
         },
         {
@@ -57574,8 +57504,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_196.png",
           "quantity": 1,
-          "owner": 34,
-          "owner_name": "ghouls",
           "weight": 0.4
         },
         {
@@ -57842,8 +57770,8 @@
           "image_path": "images/extracted/objects/object_395.png",
           "description": "Removes object at (32, 33)",
           "quantity": 508,
-          "quality": 32,
-          "owner": 33
+          "quality_raw": 32,
+          "owner_raw": 33
         },
         {
           "id": 761,
@@ -58689,9 +58617,7 @@
           "object_class": "scenery",
           "detailed_category": "quest_item",
           "image_path": "images/extracted/objects/object_198.png",
-          "quantity": 1,
-          "owner": 62,
-          "owner_name": "slimes"
+          "quantity": 1
         },
         {
           "id": 821,
@@ -58890,8 +58816,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Deals 30 damage",
-          "quality": 42,
-          "owner": 32
+          "quality_raw": 42,
+          "owner_raw": 32
         },
         {
           "id": 835,
@@ -58905,8 +58831,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_384.png",
           "description": "Deals 30 damage",
-          "quality": 30,
-          "owner": 0
+          "quality_raw": 30,
+          "owner_raw": 0
         },
         {
           "id": 836,
@@ -58920,8 +58846,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Fires arrow NE",
-          "quality": 47,
-          "owner": 32
+          "quality_raw": 47,
+          "owner_raw": 32
         },
         {
           "id": 837,
@@ -58935,8 +58861,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_386.png",
           "description": "Fires arrow NE",
-          "quality": 0,
-          "owner": 17
+          "quality_raw": 0,
+          "owner_raw": 17
         },
         {
           "id": 838,
@@ -59396,8 +59322,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -60425,8 +60349,6 @@
           "detailed_category": "useless_item",
           "image_path": "images/extracted/objects/object_194.png",
           "quantity": 1,
-          "owner": 63,
-          "owner_name": "NPC #63",
           "weight": 0.4
         },
         {
@@ -60442,8 +60364,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (58, 54)",
           "stairs_dest_level": 7,
-          "quality": 58,
-          "owner": 52
+          "quality_raw": 58,
+          "owner_raw": 52
         },
         {
           "id": 958,
@@ -60457,8 +60379,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (58, 54)",
-          "quality": 58,
-          "owner": 54
+          "quality_raw": 58,
+          "owner_raw": 54
         },
         {
           "id": 959,
@@ -60490,8 +60412,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (56, 62)",
           "stairs_dest_level": 7,
-          "quality": 58,
-          "owner": 62
+          "quality_raw": 58,
+          "owner_raw": 62
         },
         {
           "id": 961,
@@ -60505,8 +60427,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (56, 62)",
-          "quality": 56,
-          "owner": 62
+          "quality_raw": 56,
+          "owner_raw": 62
         },
         {
           "id": 962,
@@ -60555,8 +60477,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (38, 50)",
           "stairs_dest_level": 7,
-          "quality": 38,
-          "owner": 49
+          "quality_raw": 38,
+          "owner_raw": 49
         },
         {
           "id": 965,
@@ -60570,8 +60492,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (38, 50)",
-          "quality": 38,
-          "owner": 50
+          "quality_raw": 38,
+          "owner_raw": 50
         },
         {
           "id": 966,
@@ -60586,8 +60508,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (35, 39)",
           "stairs_dest_level": 7,
-          "quality": 35,
-          "owner": 42
+          "quality_raw": 35,
+          "owner_raw": 42
         },
         {
           "id": 967,
@@ -60618,8 +60540,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (35, 39)",
-          "quality": 35,
-          "owner": 39
+          "quality_raw": 35,
+          "owner_raw": 39
         },
         {
           "id": 969,
@@ -61217,8 +61139,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (10, 33)",
           "stairs_dest_level": 7,
-          "quality": 10,
-          "owner": 33
+          "quality_raw": 10,
+          "owner_raw": 33
         },
         {
           "id": 1011,
@@ -61232,8 +61154,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (10, 33)",
-          "quality": 10,
-          "owner": 33
+          "quality_raw": 10,
+          "owner_raw": 33
         },
         {
           "id": 1012,
@@ -61264,8 +61186,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates gazer",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 1014,
@@ -61279,8 +61201,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates gazer",
-          "quality": 56,
-          "owner": 55
+          "quality_raw": 56,
+          "owner_raw": 55
         },
         {
           "id": 1015,
@@ -61294,8 +61216,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates reaper",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 1016,
@@ -61309,8 +61231,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates feral troll",
-          "quality": 60,
-          "owner": 49
+          "quality_raw": 60,
+          "owner_raw": 49
         },
         {
           "id": 1017,
@@ -61324,8 +61246,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates feral troll",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 1018,
@@ -61339,8 +61261,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates stone golem",
-          "quality": 0,
-          "owner": 0
+          "quality_raw": 0,
+          "owner_raw": 0
         },
         {
           "id": 1019,
@@ -61354,8 +61276,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Creates reaper",
-          "quality": 58,
-          "owner": 47
+          "quality_raw": 58,
+          "owner_raw": 47
         },
         {
           "id": 1020,
@@ -61369,8 +61291,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_391.png",
           "description": "Creates giant rat",
-          "quality": 50,
-          "owner": 0
+          "quality_raw": 50,
+          "owner_raw": 0
         },
         {
           "id": 1021,
@@ -61385,8 +61307,8 @@
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Stairs to Level 7 at (61, 2)",
           "stairs_dest_level": 7,
-          "quality": 61,
-          "owner": 2
+          "quality_raw": 61,
+          "owner_raw": 2
         },
         {
           "id": 1022,
@@ -61400,8 +61322,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Stairs to Level 7 at (61, 2)",
-          "quality": 61,
-          "owner": 2
+          "quality_raw": 61,
+          "owner_raw": 2
         },
         {
           "id": 1023,
@@ -64749,8 +64671,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (27, 23) [same level]",
-          "quality": 33,
-          "owner": 58
+          "quality_raw": 33,
+          "owner_raw": 58
         },
         {
           "id": 1010,
@@ -64764,8 +64686,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (27, 23) [same level]",
-          "quality": 20,
-          "owner": 58
+          "quality_raw": 20,
+          "owner_raw": 58
         },
         {
           "id": 1011,
@@ -64779,8 +64701,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (27, 23) [same level]",
-          "quality": 27,
-          "owner": 23
+          "quality_raw": 27,
+          "owner_raw": 23
         },
         {
           "id": 1012,
@@ -64794,8 +64716,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (27, 23) [same level]",
-          "quality": 27,
-          "owner": 23
+          "quality_raw": 27,
+          "owner_raw": 23
         },
         {
           "id": 1013,
@@ -64809,8 +64731,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (23, 58) [same level]",
-          "quality": 23,
-          "owner": 58
+          "quality_raw": 23,
+          "owner_raw": 58
         },
         {
           "id": 1014,
@@ -64824,8 +64746,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (23, 58) [same level]",
-          "quality": 2,
-          "owner": 16
+          "quality_raw": 2,
+          "owner_raw": 16
         },
         {
           "id": 1015,
@@ -64839,8 +64761,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Warp to (10, 58) [same level]",
-          "quality": 11,
-          "owner": 51
+          "quality_raw": 11,
+          "owner_raw": 51
         },
         {
           "id": 1016,
@@ -64854,8 +64776,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_385.png",
           "description": "Warp to (10, 58) [same level]",
-          "quality": 10,
-          "owner": 58
+          "quality_raw": 10,
+          "owner_raw": 58
         },
         {
           "id": 1017,
@@ -64917,8 +64839,8 @@
           "detailed_category": "trap",
           "image_path": "images/extracted/objects/object_387.png",
           "description": "Executes action (type=63, param=0)",
-          "quality": 63,
-          "owner": 0
+          "quality_raw": 63,
+          "owner_raw": 0
         },
         {
           "id": 1022,
@@ -64932,8 +64854,8 @@
           "detailed_category": "trigger",
           "image_path": "images/extracted/objects/object_416.png",
           "description": "Executes action (type=63, param=0)",
-          "quality": 52,
-          "owner": 54
+          "quality_raw": 52,
+          "owner_raw": 54
         },
         {
           "id": 1023,
