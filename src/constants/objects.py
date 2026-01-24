@@ -452,10 +452,11 @@ SPECIAL_WANDS = {
     },
 }
 
-# Note: The correct wand spell mapping logic is now implemented in the exporters.
-# When a spell object (0x120) has is_quantity=True and quantity_or_link >= 256,
-# the spell index is calculated as: quantity_or_link - 256
-# Otherwise, the spell index is: quality + 256 (if quality < 64)
+# Note: Wand spell/charge mapping is implemented in the exporters.
+# Per UW object format docs, wands (0x98-0x9B) link to a spell object (0x120):
+# - The spell object's `quality` stores remaining charges.
+# - The spell id is encoded separately (commonly via `quantity_or_link = 256 + spell_index`
+#   when `is_quantity=True`). Exporters use a small set of fallbacks for rare cases.
 
 
 def get_special_wand_info(level: int, tile_x: int, tile_y: int) -> Optional[Dict[str, str]]:

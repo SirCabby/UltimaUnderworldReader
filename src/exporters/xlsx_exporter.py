@@ -266,30 +266,35 @@ class XlsxExporter:
                                     # Check for special wands with unique spells or incorrect mappings first
                                     from ..constants import get_special_wand_info
                                     special_wand = get_special_wand_info(npc.level, obj.tile_x, obj.tile_y)
-                                    if special_wand:
-                                        item_desc = f"wand of {special_wand['name']} ({obj.quality} charges)"
-                                    elif not obj.is_quantity:
+                                    charges = obj.quality
+                                    spell = ""
+                                    if not obj.is_quantity:
                                         link = obj.quantity_or_link
                                         if link in level.objects:
                                             spell_obj = level.objects[link]
                                             if spell_obj.item_id == 0x120:
-                                                # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
-                                                # Otherwise use quality + 256 (if quality < 64)
-                                                if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
-                                                    spell_idx = spell_obj.quantity_or_link - 256
+                                                # Charges are stored on the linked spell object
+                                                charges = spell_obj.quality
+                                                # Spell id is stored separately from charges; try common encodings
+                                                v = spell_obj.quantity_or_link
+                                                candidates = []
+                                                if spell_obj.is_quantity:
+                                                    if v >= 256:
+                                                        candidates.append(v - 256)
+                                                    candidates.extend([v, v + 256, v + 144])
                                                 else:
-                                                    spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
-                                                spell = spell_names[spell_idx] if spell_idx < len(spell_names) else ""
-                                                if spell:
-                                                    item_desc = f"wand of {spell} ({obj.quality} charges)"
-                                                else:
-                                                    item_desc = f"wand ({obj.quality} charges)"
-                                            else:
-                                                item_desc = f"wand ({obj.quality} charges)"
-                                        else:
-                                            item_desc = f"wand ({obj.quality} charges)"
+                                                    candidates.extend([v, v - 256, v + 256])
+                                                for cand in candidates:
+                                                    if 0 <= cand < len(spell_names) and spell_names[cand]:
+                                                        spell = spell_names[cand]
+                                                        break
+
+                                    if special_wand:
+                                        item_desc = f"wand of {special_wand['name']} ({charges} charges)"
+                                    elif spell:
+                                        item_desc = f"wand of {spell} ({charges} charges)"
                                     else:
-                                        item_desc = f"wand ({obj.quality} charges)"
+                                        item_desc = f"wand ({charges} charges)"
                                 
                                 inv_items.append(item_desc)
                             current = obj.next_index
@@ -566,23 +571,33 @@ class XlsxExporter:
             # Check for special wands with unique spells or incorrect mappings first
             from ..constants import get_special_wand_info
             special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
-            if special_wand:
-                return f"{special_wand['name']} ({item.quality} charges)"
-            
+            charges = item.quality
+            spell = ""
             if level_parser and not item.is_quantity:
                 level = level_parser.get_level(item.level)
                 if level and item.special_link in level.objects:
                     spell_obj = level.objects[item.special_link]
                     if spell_obj.item_id == 0x120:
-                        # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
-                        # Otherwise use quality + 256 (if quality < 64)
-                        if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
-                            spell_idx = spell_obj.quantity_or_link - 256
+                        charges = spell_obj.quality
+                        v = spell_obj.quantity_or_link
+                        candidates = []
+                        if spell_obj.is_quantity:
+                            if v >= 256:
+                                candidates.append(v - 256)
+                            candidates.extend([v, v + 256, v + 144])
                         else:
-                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
-                        if spell_idx < len(spell_names) and spell_names[spell_idx]:
-                            return f"Wand of {spell_names[spell_idx]}"
-            return f"Wand (unknown spell, {item.quality} charges)"
+                            candidates.extend([v, v - 256, v + 256])
+                        for cand in candidates:
+                            if 0 <= cand < len(spell_names) and spell_names[cand]:
+                                spell = spell_names[cand]
+                                break
+            
+            if special_wand:
+                return f"{special_wand['name']} ({charges} charges)"
+            
+            if spell:
+                return f"Wand of {spell}"
+            return f"Wand (unknown spell, {charges} charges)"
         
         # Map (0x13B)
         if object_id == 0x13B:
@@ -737,25 +752,34 @@ class XlsxExporter:
         if 0x98 <= object_id <= 0x9B:
             # Check for special wands with unique spells or incorrect mappings first
             special_wand = get_special_wand_info(item.level, item.tile_x, item.tile_y)
-            if special_wand:
-                return f"{special_wand['name']} ({item.quality} charges)"
-            
+            charges = item.quality
+            spell = ""
             if level_parser and not item.is_quantity:
                 level = level_parser.get_level(item.level)
                 if level and item.special_link in level.objects:
                     spell_obj = level.objects[item.special_link]
                     if spell_obj.item_id == 0x120:
-                        # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
-                        # Otherwise use quality + 256 (if quality < 64)
-                        if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
-                            spell_idx = spell_obj.quantity_or_link - 256
+                        charges = spell_obj.quality
+                        v = spell_obj.quantity_or_link
+                        candidates = []
+                        if spell_obj.is_quantity:
+                            if v >= 256:
+                                candidates.append(v - 256)
+                            candidates.extend([v, v + 256, v + 144])
                         else:
-                            spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
-                        spell = spell_names.get(spell_idx, "")
-                        if spell:
-                            spell_with_desc = format_spell_with_description(spell)
-                            return f"{spell_with_desc} ({item.quality} charges)"
-            return f"Unknown spell ({item.quality} charges)" if item.quality > 0 else "Empty"
+                            candidates.extend([v, v - 256, v + 256])
+                        for cand in candidates:
+                            if 0 <= cand < len(spell_names) and spell_names.get(cand, ""):
+                                spell = spell_names.get(cand, "")
+                                break
+            
+            if special_wand:
+                return f"{special_wand['name']} ({charges} charges)"
+            
+            if spell:
+                spell_with_desc = format_spell_with_description(spell)
+                return f"{spell_with_desc} ({charges} charges)"
+            return f"Unknown spell ({charges} charges)" if charges > 0 else "Empty"
         
         # Keys
         if 0x100 <= object_id <= 0x10E:

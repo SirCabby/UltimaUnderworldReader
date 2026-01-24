@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-23T19:17:17.543199",
+    "generated": "2026-01-23T22:19:26.212958",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -9259,7 +9259,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_154.png",
           "description": "Wand of Magic Arrow",
-          "effect": "Magic Arrow (Magic projectile dealing 3 base damage) (40 charges)",
+          "effect": "Magic Arrow (Magic projectile dealing 3 base damage) (22 charges)",
+          "charges": 22,
           "extra_info": {
             "spell_link": 588
           }
@@ -16169,7 +16170,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_153.png",
           "description": "Wand of Acid",
-          "effect": "Acid (40 charges)",
+          "effect": "Acid (10 charges)",
+          "charges": 10,
           "extra_info": {
             "spell_link": 531
           }
@@ -17388,7 +17390,8 @@
               "quantity": 1,
               "image_path": "images/extracted/objects/object_155.png",
               "description": "Wand of Magic Arrow",
-              "effect": "Magic Arrow (Magic projectile dealing 3 base damage) (40 charges)"
+              "effect": "Magic Arrow (Magic projectile dealing 3 base damage) (7 charges)",
+              "charges": 7
             }
           ]
         },
@@ -22680,7 +22683,8 @@
                   "quantity": 1,
                   "image_path": "images/extracted/objects/object_152.png",
                   "description": "Wand of Electrical Bolt",
-                  "effect": "Electrical Bolt (40 charges)"
+                  "effect": "Electrical Bolt (3 charges)",
+                  "charges": 3
                 },
                 {
                   "object_id": 187,
@@ -24075,7 +24079,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_154.png",
           "description": "Bullfrog Wand (40 charges)",
-          "effect": "Bullfrog Wand (40 charges)"
+          "effect": "Bullfrog Wand (40 charges)",
+          "charges": 40
         },
         {
           "id": 558,
@@ -24476,7 +24481,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_154.png",
           "description": "Wand of Name Enchantment",
-          "effect": "Name Enchantment (Identify item properties) (40 charges)",
+          "effect": "Name Enchantment (Identify item properties) (11 charges)",
+          "charges": 11,
           "extra_info": {
             "spell_link": 599
           }
@@ -25025,7 +25031,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_153.png",
           "description": "Wand of Fireball",
-          "effect": "Fireball (Fire projectile dealing 16 base + 4 splash damage in area (fire type)) (40 charges)",
+          "effect": "Fireball (Fire projectile dealing 16 base + 4 splash damage in area (fire type)) (8 charges)",
+          "charges": 8,
           "extra_info": {
             "spell_link": 652
           }
@@ -27577,7 +27584,8 @@
               "quantity": 1,
               "image_path": "images/extracted/objects/object_153.png",
               "description": "Wand of Magic Arrow",
-              "effect": "Magic Arrow (Magic projectile dealing 3 base damage) (40 charges)"
+              "effect": "Magic Arrow (Magic projectile dealing 3 base damage) (12 charges)",
+              "charges": 12
             },
             {
               "object_id": 160,
@@ -27644,7 +27652,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_153.png",
           "description": "Wand of Sheet Lightning",
-          "effect": "Sheet Lightning (1-3 electric bolts dealing 8 base + 3 splash damage each) (40 charges)",
+          "effect": "Sheet Lightning (1-3 electric bolts dealing 8 base + 3 splash damage each) (2 charges)",
+          "charges": 2,
           "extra_info": {
             "spell_link": 935
           }
@@ -32429,7 +32438,8 @@
               "quantity": 1,
               "image_path": "images/extracted/objects/object_155.png",
               "description": "Wand of Electrical Bolt",
-              "effect": "Electrical Bolt (40 charges)"
+              "effect": "Electrical Bolt (14 charges)",
+              "charges": 14
             },
             {
               "object_id": 251,
@@ -38652,7 +38662,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_154.png",
           "description": "Wand of Poison",
-          "effect": "Poison (Inflicts poison on target) (40 charges)",
+          "effect": "Poison (Inflicts poison on target) (17 charges)",
+          "charges": 17,
           "extra_info": {
             "spell_link": 594
           }
@@ -40415,7 +40426,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_152.png",
           "description": "Wand of Smite Undead",
-          "effect": "Smite Undead (Deals 100 base damage to undead creatures) (40 charges)",
+          "effect": "Smite Undead (Deals 100 base damage to undead creatures) (12 charges)",
+          "charges": 12,
           "extra_info": {
             "spell_link": 730
           }
@@ -45631,7 +45643,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_154.png",
           "description": "Wand of Fireball",
-          "effect": "Fireball (Fire projectile dealing 16 base + 4 splash damage in area (fire type)) (40 charges)",
+          "effect": "Fireball (Fire projectile dealing 16 base + 4 splash damage in area (fire type)) (8 charges)",
+          "charges": 8,
           "extra_info": {
             "spell_link": 373
           }
@@ -55577,7 +55590,8 @@
           "detailed_category": "wand",
           "image_path": "images/extracted/objects/object_155.png",
           "description": "Wand of Confusion",
-          "effect": "Confusion (Enemies wander randomly instead of attacking, duration 3) (40 charges)",
+          "effect": "Confusion (Enemies wander randomly instead of attacking, duration 3) (6 charges)",
+          "charges": 6,
           "extra_info": {
             "spell_link": 696
           }
@@ -60019,7 +60033,8 @@
               "quantity": 1,
               "image_path": "images/extracted/objects/object_152.png",
               "description": "Wand of Flame Wind",
-              "effect": "Flame Wind (2-5 fire projectiles dealing 16 base + 8 splash damage each (fire type)) (40 charges)"
+              "effect": "Flame Wind (2-5 fire projectiles dealing 16 base + 8 splash damage each (fire type)) (5 charges)",
+              "charges": 5
             },
             {
               "object_id": 6,

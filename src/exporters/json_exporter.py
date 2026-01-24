@@ -257,6 +257,59 @@ class JsonExporter:
         for i, name in enumerate(spell_names_list):
             if name and name.strip():
                 spell_names[i] = name.strip()
+
+        def get_wand_spell_and_charges(
+            level_num: int,
+            is_quantity: bool,
+            wand_quality: int,
+            special_link: int,
+        ) -> tuple[str, int]:
+            """
+            Resolve wand spell name and remaining charges.
+
+            Per UW object format docs: wands (0x98-0x9B) link to a spell object (0x120).
+            The spell object's quality stores remaining charges.
+            """
+            # Fallback preserves previous behavior if link cannot be resolved.
+            charges = wand_quality
+            spell_name = ""
+
+            if not levels or is_quantity or special_link <= 0:
+                return spell_name, charges
+
+            level = levels.get(level_num)
+            if not level or special_link not in level.objects:
+                return spell_name, charges
+
+            spell_obj = level.objects[special_link]
+            if getattr(spell_obj, "item_id", None) != 0x120:
+                return spell_name, charges
+
+            charges = getattr(spell_obj, "quality", wand_quality)
+
+            # Spell id is stored separately from charges. Try known encodings.
+            v = getattr(spell_obj, "quantity_or_link", 0)
+            candidates: list[int] = []
+
+            if getattr(spell_obj, "is_quantity", False):
+                # Common encoding: quantity_or_link = 256 + spell_index
+                if v >= 256:
+                    candidates.append(v - 256)
+                # Fallbacks: raw index and common offsets used for enchantments
+                candidates.extend([v, v + 256, v + 144])
+            else:
+                # Rare/unknown: try interpreting as direct index (with simple offsets)
+                candidates.extend([v, v - 256, v + 256])
+
+            max_idx = len(spell_names_list)
+            for cand in candidates:
+                if 0 <= cand < max_idx:
+                    name = spell_names.get(cand, "")
+                    if name:
+                        spell_name = name
+                        break
+
+            return spell_name, charges
         
         def get_item_description(item, object_id: int, is_enchanted: bool, is_quantity: bool, 
                                  quantity: int, quality: int, owner: int,
@@ -320,22 +373,16 @@ class JsonExporter:
                 tile_y = getattr(item, 'tile_y', 0)
                 special_wand = get_special_wand_info(level_num, tile_x, tile_y)
                 if special_wand:
-                    return f"{special_wand['name']} ({quality} charges)"
+                    _, charges = get_wand_spell_and_charges(level_num, is_quantity, quality, special_link)
+                    return f"{special_wand['name']} ({charges} charges)"
                 
                 if levels and not is_quantity:
-                    level = levels.get(level_num)
-                    if level and special_link in level.objects:
-                        spell_obj = level.objects[special_link]
-                        if spell_obj.item_id == 0x120:
-                            # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
-                            # Otherwise use quality + 256 (if quality < 64)
-                            if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
-                                spell_idx = spell_obj.quantity_or_link - 256
-                            else:
-                                spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
-                            if spell_idx in spell_names:
-                                return f"Wand of {spell_names[spell_idx]}"
-                return f"Wand ({quality} charges)"
+                    spell, _ = get_wand_spell_and_charges(level_num, is_quantity, quality, special_link)
+                    if spell:
+                        return f"Wand of {spell}"
+                # If spell can't be resolved, at least show charges.
+                _, charges = get_wand_spell_and_charges(level_num, is_quantity, quality, special_link)
+                return f"Wand ({charges} charges)"
             
             # Map (0x13B)
             if object_id == 0x13B:
@@ -510,23 +557,13 @@ class JsonExporter:
                 tile_y = getattr(item, 'tile_y', 0)
                 special_wand = get_special_wand_info(level_num, tile_x, tile_y)
                 if special_wand:
-                    return f"{special_wand['name']} ({quality} charges)"
+                    _, charges = get_wand_spell_and_charges(level_num, is_quantity, quality, special_link)
+                    return f"{special_wand['name']} ({charges} charges)"
                 
-                if levels and not is_quantity:
-                    level = levels.get(level_num)
-                    if level and special_link in level.objects:
-                        spell_obj = level.objects[special_link]
-                        if spell_obj.item_id == 0x120:
-                            # Correct mapping logic: if spell object has is_quantity=True, use quantity_or_link - 256
-                            # Otherwise use quality + 256 (if quality < 64)
-                            if spell_obj.is_quantity and spell_obj.quantity_or_link >= 256:
-                                spell_idx = spell_obj.quantity_or_link - 256
-                            else:
-                                spell_idx = spell_obj.quality + 256 if spell_obj.quality < 64 else spell_obj.quality
-                            spell = spell_names.get(spell_idx, "")
-                            if spell:
-                                return f"{format_spell(spell)} ({quality} charges)"
-                return f"Unknown spell ({quality} charges)" if quality > 0 else "Empty"
+                spell, charges = get_wand_spell_and_charges(level_num, is_quantity, quality, special_link)
+                if spell:
+                    return f"{format_spell(spell)} ({charges} charges)"
+                return f"Unknown spell ({charges} charges)" if charges > 0 else "Empty"
             
             # Keys
             if 0x100 <= object_id <= 0x10E:
@@ -1316,6 +1353,13 @@ class JsonExporter:
                             content_item['description'] = item_desc
                         if item_effect:
                             content_item['effect'] = item_effect
+
+                        # Wands: export numeric charges (from linked spell object)
+                        if 0x98 <= item.object_id <= 0x9B:
+                            _, charges = get_wand_spell_and_charges(
+                                level_num, item.is_quantity, item.quality, item.special_link
+                            )
+                            content_item['charges'] = charges
                         
                         # Add owner information for items inside containers
                         item_owner = getattr(item, 'owner', 0)
@@ -1490,6 +1534,11 @@ class JsonExporter:
                 web_obj['description'] = item_desc
             if item_effect:
                 web_obj['effect'] = item_effect
+
+            # Wands: export numeric charges (from linked spell object)
+            if 0x98 <= obj_id <= 0x9B:
+                _, charges = get_wand_spell_and_charges(level, is_quantity, quality, special_link)
+                web_obj['charges'] = charges
             
             # Add stairs destination level if this is a stairs trigger
             if category == 'stairs' and stairs_dest_level is not None:
