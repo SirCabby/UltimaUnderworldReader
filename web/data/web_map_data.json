@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-24T00:08:45.748075",
+    "generated": "2026-01-24T00:25:34.048799",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -5704,11 +5704,11 @@
             "is_pickable": false,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed, locked"
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -5922,11 +5922,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed, locked"
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -9213,7 +9213,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -9228,7 +9231,10 @@
             "is_locked": true,
             "lock_id": 3,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -9240,7 +9246,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         }
       ],
@@ -12522,11 +12531,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed, locked"
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -31643,7 +31652,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -31655,7 +31667,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -31667,7 +31682,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -31679,7 +31697,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -31691,7 +31712,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -31703,7 +31727,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -31715,7 +31742,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         }
       ],
@@ -33691,11 +33721,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed, locked"
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -39500,7 +39530,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         }
       ],
@@ -46426,7 +46459,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -46438,7 +46474,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         }
       ],
@@ -49641,11 +49680,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed, locked"
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -49665,11 +49704,11 @@
             "is_locked": false,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed"
+            "door_status": "massive, closed"
           }
         },
         {
@@ -49743,11 +49782,11 @@
             "is_locked": false,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed"
+            "door_status": "massive, closed"
           }
         },
         {
@@ -51301,11 +51340,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed, locked"
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -51505,11 +51544,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, closed, locked"
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -54256,7 +54295,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -54268,7 +54310,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -54280,7 +54325,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -54292,7 +54340,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -54304,7 +54355,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -54316,7 +54370,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         },
         {
@@ -54328,7 +54385,10 @@
           "category": "secret_doors",
           "details": {
             "quality": 40,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy"
           }
         }
       ],

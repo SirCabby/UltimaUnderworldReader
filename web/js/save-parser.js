@@ -620,9 +620,10 @@ function buildDoorExtraInfo(obj, levelObjects) {
     // Health/type
     // Determine if this door is massive (unbreakable):
     // - object_id 0x145 (door_style_5) is inherently massive regardless of quality
+    // - object_id 0x146 (portcullis) is inherently massive regardless of quality
     // - quality==63 on any door type also indicates massive
     const rawQuality = (obj.quality !== undefined) ? obj.quality : 0;
-    const isMassiveDoor = (objId === 0x145) || (rawQuality === 63);
+    const isMassiveDoor = (objId === 0x145) || (objId === 0x146) || (rawQuality === 63);
     
     const doorMax = 40;
     const doorHealth = isMassiveDoor ? doorMax : Math.max(0, Math.min(doorMax, rawQuality));

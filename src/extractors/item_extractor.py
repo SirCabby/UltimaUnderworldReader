@@ -586,8 +586,9 @@ class ItemExtractor:
             
             # Determine if this door is massive (unbreakable):
             # - object_id 0x145 (door_style_5) is inherently massive regardless of quality
+            # - object_id 0x146 (portcullis) is inherently massive regardless of quality
             # - quality==63 on any door type also indicates massive
-            is_massive_door = (obj.item_id == 0x145) or (raw_quality == 63)
+            is_massive_door = (obj.item_id == 0x145) or (obj.item_id == 0x146) or (raw_quality == 63)
             
             # Door health is max 40 for breakable doors
             door_max = 40

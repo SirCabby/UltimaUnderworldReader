@@ -339,6 +339,27 @@ class SecretFinder:
                     else:
                         details['is_pickable'] = False
                 
+                # Extract door health (secret doors can be broken down)
+                # Secret doors use the same health system as regular doors
+                raw_quality = int(getattr(obj, "quality", 0))
+                # Secret doors are never massive (0x145), so they're always breakable
+                door_max = 40
+                door_health = max(0, min(door_max, raw_quality))
+                details['door_health'] = door_health
+                details['door_max_health'] = door_max
+                
+                # Determine condition based on health
+                if door_health <= 0:
+                    details['door_condition'] = 'broken'
+                elif door_health <= 13:
+                    details['door_condition'] = 'badly damaged'
+                elif door_health <= 26:
+                    details['door_condition'] = 'damaged'
+                elif door_health == door_max:
+                    details['door_condition'] = 'sturdy'
+                else:
+                    details['door_condition'] = 'undamaged'
+                
                 self.secrets.append(Secret(
                     secret_type="secret_door",
                     level=level_num,

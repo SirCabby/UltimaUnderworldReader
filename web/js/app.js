@@ -3062,6 +3062,13 @@ function showSecretTooltip(e, secret) {
             }
             html += `<div class="tooltip-info" style="color: #ff6b6b; font-size: 0.85rem;">${lockText}</div>`;
         }
+        // Show health for secret doors (they can be broken down)
+        if (secret.type === 'secret_door' && secret.details.door_health !== undefined) {
+            const doorHealth = secret.details.door_health;
+            const doorMax = secret.details.door_max_health !== undefined ? secret.details.door_max_health : 40;
+            const healthText = `${doorHealth}/${doorMax}`;
+            html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-accent);">Health: ${healthText}</div>`;
+        }
     }
     
     html += `<div class="tooltip-position">Tile: (${secret.tile_x}, ${secret.tile_y})</div>`;
@@ -3231,6 +3238,17 @@ function renderSecretDetails(secret) {
                 <div class="detail-row">
                     <span class="detail-label">Lock Status</span>
                     <span class="detail-value" style="color: #ff6b6b;">${lockText}</span>
+                </div>
+            `;
+        }
+        // Show health for secret doors (they can be broken down)
+        if (secret.type === 'secret_door' && secret.details.door_health !== undefined) {
+            const doorHealth = secret.details.door_health;
+            const doorMax = secret.details.door_max_health !== undefined ? secret.details.door_max_health : 40;
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Health</span>
+                    <span class="detail-value" style="font-family: var(--font-mono);">${doorHealth}/${doorMax}</span>
                 </div>
             `;
         }
@@ -4325,6 +4343,12 @@ function renderVisibleObjectsPane() {
                     }
                     enchantLine = `<div style="color: #ff6b6b; font-size: 0.7rem; margin-top: 2px;">${lockText}</div>`;
                 }
+                // Show health for secret doors (they can be broken down)
+                if (item.type === 'secret_door' && item.details && item.details.door_health !== undefined) {
+                    const doorHealth = item.details.door_health;
+                    const doorMax = item.details.door_max_health !== undefined ? item.details.door_max_health : 40;
+                    enchantLine += `<div style="color: var(--text-accent); font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">Health: ${doorHealth}/${doorMax}</div>`;
+                }
             } else if (isNpc) {
                 const isUnique = hasUniqueName(item);
                 icon = isUnique ? '⭐' : '👤';
@@ -4362,8 +4386,16 @@ function renderVisibleObjectsPane() {
                     }
                     enchantLine = `<div style="color: #ff6b6b; font-size: 0.7rem; margin-top: 2px;">${lockText}</div>`;
                 }
-                // Show lock info for keys (0x100-0x10E) - they have "Opens lock #N" in effect field
+                // Show health for doors (0x140-0x14F)
                 const objId = item.object_id || 0;
+                const isDoorObj = (objId >= 0x140 && objId <= 0x14F);
+                if (isDoorObj && item.extra_info && item.extra_info.door_health !== undefined) {
+                    const doorCond = item.extra_info.door_condition || '';
+                    const doorMax = item.extra_info.door_max_health !== undefined ? item.extra_info.door_max_health : 40;
+                    const healthText = (doorCond === 'massive') ? 'massive' : `${item.extra_info.door_health}/${doorMax}`;
+                    enchantLine += `<div style="color: var(--text-accent); font-size: 0.7rem; font-family: var(--font-mono); margin-top: 2px;">Health: ${healthText}</div>`;
+                }
+                // Show lock info for keys (0x100-0x10E) - they have "Opens lock #N" in effect field
                 if (objId >= 0x100 && objId <= 0x10E) {
                     const effectText = item.effect || '';
                     const match = effectText.match(/lock #(\d+)/i);
@@ -5786,9 +5818,18 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             ? `<div style="font-size: 0.8rem; color: var(--text-muted);">${secret.description}</div>`
             : '';
         
+        // Show health for secret doors (they can be broken down)
+        let healthInfo = '';
+        if (secret.type === 'secret_door' && secret.details && secret.details.door_health !== undefined) {
+            const doorHealth = secret.details.door_health;
+            const doorMax = secret.details.door_max_health !== undefined ? secret.details.door_max_health : 40;
+            healthInfo = `<div style="font-size: 0.75rem; color: var(--text-accent); font-family: var(--font-mono);">Health: ${doorHealth}/${doorMax}</div>`;
+        }
+        
         card.innerHTML = `
             <div class="detail-name" style="font-size: 0.9rem; color: ${typeColor};">${typeLabel}${lockInfo ? ` <span style="color: #ff6b6b;">${lockInfo}</span>` : ''}</div>
             ${descriptionHtml}
+            ${healthInfo}
             ${revealMethodInfo}
         `;
         
