@@ -6353,8 +6353,8 @@ function getTypeSpecificDetails(item) {
         return html;
     }
     
-    // Food items (0xB0-0xB9, 0xBA ale, 0xBD water, 0xBE port) - show nutrition and intoxication
-    if ((objId >= 0xB0 && objId <= 0xB9) || objId === 0xBA || objId === 0xBD || objId === 0xBE) {
+    // Food items - use category (from backend) so plants (0xCE, 0xCF), dead rotworm (0xD9), etc. are treated correctly
+    if (item.category === 'food') {
         // Show intoxication for alcoholic drinks (ale, port)
         if (item.intoxication !== undefined && item.intoxication > 0) {
             const intoxColor = item.intoxication >= 100 ? '#ff6b6b' : 
@@ -6373,8 +6373,9 @@ function getTypeSpecificDetails(item) {
             const nutritionColor = item.nutrition >= 40 ? '#69db7c' : 
                                    item.nutrition >= 20 ? '#a9e34b' : 
                                    item.nutrition > 0 ? '#fcc419' : '#ff6b6b';
-            // Special note for water (0xBD) which has no effect
-            const noEffectNote = (objId === 0xBD && item.nutrition === 0) ? ' (no effect!)' : 
+            // Special note for water (0xBD) which has no effect; use object_id for this specific ID check
+            const objIdNum = Number(item.object_id);
+            const noEffectNote = (objIdNum === 0xBD && item.nutrition === 0) ? ' (no effect!)' : 
                                  (item.nutrition === 0) ? ' (no nutrition!)' : '';
             html += `
                 <div class="detail-row">
