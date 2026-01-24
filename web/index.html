@@ -61,12 +61,16 @@
                                 <span class="filter-label">Enchanted Only</span>
                                 <span class="filter-count" id="enchanted-count">0</span>
                             </label>
-                            <label class="special-filter owned-filter">
-                                <button type="button" id="owned-filter" class="owned-filter-btn" title="Click to cycle: All Items → Owned Only → Exclude Owned">
+                            <div class="special-filter owned-items-filter" id="owned-items-filter">
+                                <div class="owned-items-header" id="owned-items-header">
                                     <span class="filter-icon">🔒</span>
-                                    <span class="filter-label" id="owned-filter-label">All Items</span>
-                                </button>
-                            </label>
+                                    <span class="filter-label" id="owned-items-label">All Items</span>
+                                    <span class="dropdown-arrow">▼</span>
+                                </div>
+                                <div class="owned-items-dropdown collapsed" id="owned-items-dropdown">
+                                    <!-- Options populated by JS -->
+                                </div>
+                            </div>
                             <div class="special-filter change-types-filter" id="change-types-filter" style="display: none;">
                                 <div class="change-types-header" id="change-types-header">
                                     <span class="filter-icon">🔀</span>
@@ -183,7 +187,7 @@
     <!-- Client-side save game parsing for static hosting (GitHub Pages) -->
     <script src="js/save-parser.js?v=8"></script>
     <script src="js/save-comparator.js?v=15"></script>
-    <script src="js/app.js?v=34"></script>
+    <script src="js/app.js?v=35"></script>
 </body>
 </html>
 

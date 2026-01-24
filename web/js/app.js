@@ -418,8 +418,8 @@ function applyRestoredStateToUI() {
         elements.enchantedFilter.checked = state.filters.enchantedOnly;
     }
     
-    // Apply owned filter button state
-    updateOwnedFilterUI();
+    // Apply owned items filter dropdown state
+    updateOwnedItemsFilterUI();
     
     // Apply change types filter checkboxes
     updateChangeTypesFilterUI();
@@ -460,8 +460,10 @@ const elements = {
     coordValue: null,
     enchantedFilter: null,
     enchantedCount: null,
-    ownedFilter: null,
-    ownedFilterLabel: null,
+    ownedItemsFilter: null,
+    ownedItemsHeader: null,
+    ownedItemsLabel: null,
+    ownedItemsDropdown: null,
     changeTypesFilter: null,
     changeTypesDropdown: null,
     changeTypesCheckboxes: {},  // Map of change type to checkbox element
@@ -501,6 +503,7 @@ async function init() {
         renderNpcFilters();
         renderItemFilters();
         renderWorldFilters();
+        setupOwnedItemsFilter();
         setupChangeTypesFilter();
         updateSaveGameUI();
         
@@ -547,11 +550,13 @@ function cacheElements() {
     elements.coordValue = document.getElementById('coord-value');
     elements.enchantedFilter = document.getElementById('enchanted-filter');
     elements.enchantedCount = document.getElementById('enchanted-count');
-    elements.ownedFilter = document.getElementById('owned-filter');
-    elements.ownedFilterLabel = document.getElementById('owned-filter-label');
+    elements.ownedItemsFilter = document.getElementById('owned-items-filter');
+    elements.ownedItemsHeader = document.getElementById('owned-items-header');
+    elements.ownedItemsLabel = document.getElementById('owned-items-label');
+    elements.ownedItemsDropdown = document.getElementById('owned-items-dropdown');
     elements.changeTypesFilter = document.getElementById('change-types-filter');
     elements.changeTypesDropdown = document.getElementById('change-types-dropdown');
-    // Change type checkboxes will be populated after DOM creation
+    // Change type and owned items checkboxes will be populated after DOM creation
     elements.saveGameInput = document.getElementById('save-game-input');
     elements.loadSaveBtn = document.getElementById('load-save-btn');
     elements.saveGameSelector = document.getElementById('save-game-selector');
@@ -838,8 +843,7 @@ function setupEventListeners() {
     // Enchanted filter
     elements.enchantedFilter.addEventListener('change', handleEnchantedFilter);
     
-    // Owned filter
-    elements.ownedFilter.addEventListener('click', handleOwnedFilter);
+    // Owned items filter - setup happens in setupOwnedItemsFilter()
     
     // Change types filter - setup happens in setupChangeTypesFilter()
     
@@ -925,6 +929,95 @@ function updateChangeTypesDropdownLabel() {
 }
 
 /**
+ * Setup the owned items filter dropdown
+ */
+function setupOwnedItemsFilter() {
+    const container = elements.ownedItemsDropdown;
+    const header = elements.ownedItemsHeader;
+    const filterDiv = elements.ownedItemsFilter;
+    if (!container || !header || !filterDiv) return;
+    
+    // Add click handler to toggle dropdown
+    header.addEventListener('click', () => {
+        container.classList.toggle('collapsed');
+        filterDiv.classList.toggle('expanded');
+    });
+    
+    const options = [
+        { value: null, label: 'All Items', icon: '📦' },
+        { value: 'only', label: 'Owned Only', icon: '🔒' },
+        { value: 'exclude', label: 'Exclude Owned', icon: '🔓' }
+    ];
+    
+    options.forEach(option => {
+        const div = document.createElement('div');
+        div.className = 'owned-item-option';
+        div.dataset.value = option.value === null ? 'all' : option.value;
+        div.innerHTML = `
+            <span class="option-indicator"></span>
+            <span class="option-icon">${option.icon}</span>
+            <span class="option-label">${option.label}</span>
+        `;
+        container.appendChild(div);
+        
+        div.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectOwnedFilterOption(option.value);
+            // Collapse dropdown after selection
+            container.classList.add('collapsed');
+            filterDiv.classList.remove('expanded');
+        });
+    });
+    
+    // Update initial state
+    updateOwnedItemsFilterUI();
+}
+
+/**
+ * Select an owned filter option
+ */
+function selectOwnedFilterOption(value) {
+    state.filters.ownedFilter = value;
+    updateOwnedItemsFilterUI();
+    renderMarkers();
+    updateStats();
+    refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+/**
+ * Update the owned items filter UI
+ */
+function updateOwnedItemsFilterUI() {
+    if (!elements.ownedItemsFilter || !elements.ownedItemsLabel || !elements.ownedItemsDropdown) return;
+    
+    // Remove all state classes
+    elements.ownedItemsFilter.classList.remove('owned-filter-only', 'owned-filter-exclude');
+    
+    // Update label and add state class
+    if (state.filters.ownedFilter === 'only') {
+        elements.ownedItemsLabel.textContent = 'Owned Only';
+        elements.ownedItemsFilter.classList.add('owned-filter-only');
+    } else if (state.filters.ownedFilter === 'exclude') {
+        elements.ownedItemsLabel.textContent = 'Exclude Owned';
+        elements.ownedItemsFilter.classList.add('owned-filter-exclude');
+    } else {
+        elements.ownedItemsLabel.textContent = 'All Items';
+    }
+    
+    // Update selected state on options
+    const options = elements.ownedItemsDropdown.querySelectorAll('.owned-item-option');
+    options.forEach(opt => {
+        const optValue = opt.dataset.value === 'all' ? null : opt.dataset.value;
+        if (optValue === state.filters.ownedFilter) {
+            opt.classList.add('selected');
+        } else {
+            opt.classList.remove('selected');
+        }
+    });
+}
+
+/**
  * Setup the change types filter dropdown
  */
 function setupChangeTypesFilter() {
@@ -998,46 +1091,6 @@ function setupChangeTypesFilter() {
     updateChangeTypesFilterUI();
 }
 
-function handleOwnedFilter(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Cycle through states: null → "only" → "exclude" → null
-    if (state.filters.ownedFilter === null || state.filters.ownedFilter === undefined) {
-        state.filters.ownedFilter = 'only';
-    } else if (state.filters.ownedFilter === 'only') {
-        state.filters.ownedFilter = 'exclude';
-    } else {
-        state.filters.ownedFilter = null;
-    }
-    
-    updateOwnedFilterUI();
-    renderMarkers();
-    updateStats();
-    refreshVisibleObjectsIfNoSelection();
-    saveFiltersToStorage();
-}
-
-function updateOwnedFilterUI() {
-    if (!elements.ownedFilter || !elements.ownedFilterLabel) return;
-    
-    const filterContainer = elements.ownedFilter.closest('.owned-filter');
-    if (!filterContainer) return;
-    
-    // Remove all state classes
-    filterContainer.classList.remove('owned-filter-only', 'owned-filter-exclude');
-    
-    // Update label and add state class
-    if (state.filters.ownedFilter === 'only') {
-        elements.ownedFilterLabel.textContent = 'Owned Only';
-        filterContainer.classList.add('owned-filter-only');
-    } else if (state.filters.ownedFilter === 'exclude') {
-        elements.ownedFilterLabel.textContent = 'Exclude Owned';
-        filterContainer.classList.add('owned-filter-exclude');
-    } else {
-        elements.ownedFilterLabel.textContent = 'All Items';
-    }
-}
 
 function handleWheel(e) {
     if (state.viewLocked) return;
