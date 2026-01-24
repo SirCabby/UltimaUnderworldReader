@@ -483,6 +483,25 @@ class ItemExtractor:
                 if location_override:
                     detailed_cat = location_override
                 
+                # Apply location-based name overrides
+                from ..constants import get_location_name_override
+                name_override = get_location_name_override(
+                    level_num, obj.tile_x, obj.tile_y, obj.item_id
+                )
+                if name_override:
+                    name = name_override
+                
+                # Apply property-based special item identification
+                # This identifies unique items by their intrinsic properties (item_id + owner, etc.)
+                # so identification works even if the item is moved
+                from ..constants import get_special_item_info
+                special_item = get_special_item_info(obj.item_id, obj.owner, name)
+                if special_item:
+                    if 'name' in special_item:
+                        name = special_item['name']
+                    if 'category' in special_item:
+                        detailed_cat = special_item['category']
+                
                 # Build extra info for special object types
                 extra_info = self._get_extra_info(obj, special_link, level.objects)
                 

@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-24T00:25:34.048799",
+    "generated": "2026-01-24T14:17:25.568479",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -58686,18 +58686,17 @@
         {
           "id": 820,
           "object_id": 198,
-          "name": "pile of bones",
+          "name": "pile of bones (Garamon's bones)",
           "tile_x": 2,
           "tile_y": 15,
           "z": 96,
-          "category": "useless_item",
+          "category": "quest",
           "object_class": "scenery",
-          "detailed_category": "useless_item",
+          "detailed_category": "quest_item",
           "image_path": "images/extracted/objects/object_198.png",
           "quantity": 1,
           "owner": 62,
-          "owner_name": "slimes",
-          "weight": 0.4
+          "owner_name": "slimes"
         },
         {
           "id": 821,

@@ -510,3 +510,96 @@ def get_location_category_override(level: int, tile_x: int, tile_y: int, item_id
         return LOCATION_CATEGORY_OVERRIDES[any_key]
     
     return None
+
+
+# Location-based name overrides
+# These override the normal name for items at specific locations
+# Key: (level, tile_x, tile_y, item_id) -> name string
+# Note: item_id can be None to match any item at that location
+LOCATION_NAME_OVERRIDES: Dict[Tuple[int, int, int, Optional[int]], str] = {
+    # (No location-based name overrides currently needed)
+}
+
+
+def get_location_name_override(level: int, tile_x: int, tile_y: int, item_id: int) -> Optional[str]:
+    """
+    Get a name override for an item at a specific location.
+    
+    Args:
+        level: The level index (0-based)
+        tile_x: X coordinate on the tilemap
+        tile_y: Y coordinate on the tilemap
+        item_id: The object type ID
+    
+    Returns:
+        Override name string, or None if no override exists
+    """
+    # First try exact match with item_id
+    exact_key = (level, tile_x, tile_y, item_id)
+    if exact_key in LOCATION_NAME_OVERRIDES:
+        return LOCATION_NAME_OVERRIDES[exact_key]
+    
+    # Then try match without item_id (None matches any item at that location)
+    any_key = (level, tile_x, tile_y, None)
+    if any_key in LOCATION_NAME_OVERRIDES:
+        return LOCATION_NAME_OVERRIDES[any_key]
+    
+    return None
+
+
+# ============================================================================
+# Special Item Identification by Intrinsic Properties
+# ============================================================================
+# These identify unique items by their intrinsic properties (item_id + owner, etc.)
+# rather than by location, so identification works even if the item is moved.
+
+# Garamon's bones: Identified by item_id=0x0C6 (pile of bones) and owner=62
+# This is the only bone in the game with owner=62, making it uniquely identifiable.
+# The bones are the remains of Garamon that can be buried in his empty grave
+# to summon his spirit and learn the mantra to banish the Slasher of Veils.
+GARAMONS_BONES_ITEM_ID = 0x0C6  # pile of bones
+GARAMONS_BONES_OWNER = 62       # unique owner value
+
+
+def is_garamons_bones(item_id: int, owner: int) -> bool:
+    """
+    Check if an item is Garamon's bones based on intrinsic properties.
+    
+    Garamon's bones are uniquely identified by:
+    - item_id = 0x0C6 (pile of bones)
+    - owner = 62 (unique - no other bone has this value)
+    
+    Args:
+        item_id: The object type ID
+        owner: The owner field value
+    
+    Returns:
+        True if this is Garamon's bones
+    """
+    return item_id == GARAMONS_BONES_ITEM_ID and owner == GARAMONS_BONES_OWNER
+
+
+def get_special_item_info(item_id: int, owner: int, base_name: str = "") -> Optional[Dict[str, str]]:
+    """
+    Get special item information based on intrinsic properties.
+    
+    This identifies unique items by their properties rather than location,
+    so the identification works even if the item is moved.
+    
+    Args:
+        item_id: The object type ID
+        owner: The owner field value
+        base_name: The original item name (used to create combined display name)
+    
+    Returns:
+        Dictionary with 'name' and 'category' overrides, or None if not a special item
+    """
+    if is_garamons_bones(item_id, owner):
+        # Show original name with special identifier: "pile of bones (Garamon's bones)"
+        display_name = f"{base_name} (Garamon's bones)" if base_name else "Garamon's bones"
+        return {
+            'name': display_name,
+            'category': 'quest_item',
+        }
+    
+    return None

@@ -39,6 +39,9 @@ from .objects import (
     POTION_EFFECTS,
     SPECIAL_WANDS,
     QUEST_BOOK_TEXT_INDICES,
+    LOCATION_NAME_OVERRIDES,
+    GARAMONS_BONES_ITEM_ID,
+    GARAMONS_BONES_OWNER,
     get_category,
     get_detailed_category,
     get_potion_effect,
@@ -50,9 +53,12 @@ from .objects import (
     is_static_container,
     is_carryable_container,
     is_quest_book,
+    is_garamons_bones,
     get_tmap_info,
     get_special_wand_info,
     get_location_category_override,
+    get_location_name_override,
+    get_special_item_info,
 )
 from .mantras import COMPLETE_MANTRAS
 from .food import (
@@ -185,9 +191,15 @@ __all__ = [
     'is_secret_door',
     'is_special_tmap',
     'is_quest_book',
+    'is_garamons_bones',
     'get_tmap_info',
     'get_special_wand_info',
     'get_location_category_override',
+    'get_location_name_override',
+    'get_special_item_info',
+    'LOCATION_NAME_OVERRIDES',
+    'GARAMONS_BONES_ITEM_ID',
+    'GARAMONS_BONES_OWNER',
     # Traps and Triggers
     'TRAP_ID_MIN',
     'TRAP_ID_MAX',
