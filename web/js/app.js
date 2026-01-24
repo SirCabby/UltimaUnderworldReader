@@ -4577,18 +4577,10 @@ function renderVisibleObjectsPane() {
             const hasInventory = isNpc && item.inventory && item.inventory.length > 0;
             const extraIcon = hasContents ? ' 📦' : (hasInventory ? ' 🎒' : '');
             
-            // Add image thumbnail for non-secret items (objects only, not NPCs)
-            // Exclude images for writings, doors, and texture map objects
+            // Add image thumbnail for non-secret items (including NPCs with images)
             let imageHtml = '';
-            if (!isSecret && !isNpc && item.image_path) {
-                // Object images - exclude writings, doors, and texture map objects
-                const objId = item.object_id || 0;
-                const isWriting = objId === 0x166;
-                const isDoor = (objId >= 0x140 && objId <= 0x14F);
-                const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
-
-                if (!isWriting && !isDoor && !isTextureMap) {
-                    imageHtml = `
+            if (!isSecret && item.image_path) {
+                imageHtml = `
                         <div class="list-item-image-container" style="flex-shrink: 0; width: 32px; height: 32px; margin-right: 8px;">
                             <img src="${escapeHtml(item.image_path)}" alt="${escapeHtml(displayName)}"
                                  class="list-item-image"
@@ -4596,7 +4588,6 @@ function renderVisibleObjectsPane() {
                                  onerror="this.style.display='none';">
                         </div>
                     `;
-                }
             }
             
             // Build change badge if save game is loaded
@@ -4674,27 +4665,18 @@ function renderObjectDetails(item, isNpc) {
     const displayName = isNpc ? (item.name || 'Unknown NPC') : getItemDisplayName(item);
     html += `<div class="detail-name">${uniqueIndicator}${displayName}</div>`;
     
-    // Display image if available (for objects only, not NPCs)
-    // Exclude images for writings, doors, and texture map objects
-    if (!isNpc && item.image_path) {
-        // Object images - exclude writings, doors, and texture map objects
-        const objId = item.object_id || 0;
-        const isWriting = objId === 0x166;
-        const isDoor = (objId >= 0x140 && objId <= 0x14F);
-        const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
-        
-        if (!isWriting && !isDoor && !isTextureMap) {
-            html += `
-                <div class="detail-image-container">
-                    <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div class="detail-image-placeholder" style="display: none;">
-                        <span class="image-placeholder-icon">🖼️</span>
-                        <span class="image-placeholder-text">No image available</span>
-                    </div>
+    // Display image if available (for objects and NPCs)
+    if (item.image_path) {
+        html += `
+            <div class="detail-image-container">
+                <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="detail-image-placeholder" style="display: none;">
+                    <span class="image-placeholder-icon">🖼️</span>
+                    <span class="image-placeholder-text">No image available</span>
                 </div>
-            `;
-        }
+            </div>
+        `;
     }
     
     if (isNpc) {
@@ -5286,34 +5268,18 @@ function selectInventoryItem(item, parentNpc = null) {
     const displayName = getItemDisplayName(item);
     html += `<div class="detail-name">${displayName}</div>`;
     
-    // Display image if available (for objects only, not NPCs)
-    // Exclude images for writings, doors, and texture map objects
+    // Display image if available
     if (item.image_path) {
-        // Object images - exclude writings, doors, and texture map objects
-        const objId = item.object_id || 0;
-        // Handle string hex values (e.g., "0x0AA" or "0AA")
-        let imageObjId = typeof objId === 'string' ? 
-            (objId.startsWith('0x') || objId.startsWith('0X') ? parseInt(objId, 16) : 
-             /^[0-9A-Fa-f]+$/.test(objId) ? parseInt(objId, 16) : parseInt(objId, 10)) : 
-            (objId || 0);
-        imageObjId = Number(imageObjId) || 0;
-        
-        const isWriting = imageObjId === 0x166;
-        const isDoor = (imageObjId >= 0x140 && imageObjId <= 0x14F);
-        const isTextureMap = (imageObjId >= 0x16E && imageObjId <= 0x16F);
-        
-        if (!isWriting && !isDoor && !isTextureMap) {
-            html += `
-                <div class="detail-image-container">
-                    <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div class="detail-image-placeholder" style="display: none;">
-                        <span class="image-placeholder-icon">🖼️</span>
-                        <span class="image-placeholder-text">No image available</span>
-                    </div>
+        html += `
+            <div class="detail-image-container">
+                <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="detail-image-placeholder" style="display: none;">
+                    <span class="image-placeholder-icon">🖼️</span>
+                    <span class="image-placeholder-text">No image available</span>
                 </div>
-            `;
-        }
+            </div>
+        `;
     }
     
     const catColor = getCategoryColor(item.category);
@@ -5463,45 +5429,18 @@ function selectContainerItem(item, parentContainer = null) {
     const displayName = getItemDisplayName(item);
     html += `<div class="detail-name">${displayName}</div>`;
     
-    // Display image if available (for objects only, not NPCs)
-    // Exclude images for writings, doors, and texture map objects
+    // Display image if available
     if (item.image_path) {
-        // Object images - exclude writings, doors, and texture map objects
-        let imageObjId = item.object_id;
-        if (imageObjId === undefined || imageObjId === null || imageObjId === '') {
-            if (item.object_id_hex) {
-                imageObjId = parseInt(item.object_id_hex, 16);
-            } else {
-                imageObjId = 0;
-            }
-        }
-        if (typeof imageObjId === 'string') {
-            if (imageObjId.startsWith('0x') || imageObjId.startsWith('0X')) {
-                imageObjId = parseInt(imageObjId, 16);
-            } else if (/^[0-9A-Fa-f]+$/.test(imageObjId)) {
-                imageObjId = parseInt(imageObjId, 16);
-            } else {
-                imageObjId = parseInt(imageObjId, 10);
-            }
-        }
-        imageObjId = Number(imageObjId) || 0;
-        
-        const isWriting = imageObjId === 0x166;
-        const isDoor = (imageObjId >= 0x140 && imageObjId <= 0x14F);
-        const isTextureMap = (imageObjId >= 0x16E && imageObjId <= 0x16F);
-        
-        if (!isWriting && !isDoor && !isTextureMap) {
-            html += `
-                <div class="detail-image-container">
-                    <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div class="detail-image-placeholder" style="display: none;">
-                        <span class="image-placeholder-icon">🖼️</span>
-                        <span class="image-placeholder-text">No image available</span>
-                    </div>
+        html += `
+            <div class="detail-image-container">
+                <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="detail-image-placeholder" style="display: none;">
+                    <span class="image-placeholder-icon">🖼️</span>
+                    <span class="image-placeholder-text">No image available</span>
                 </div>
-            `;
-        }
+            </div>
+        `;
     }
     
     const catColor = getCategoryColor(item.category);
@@ -5888,25 +5827,16 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         }
         
         // Add image thumbnail if available
-        // Exclude images for writings, doors, and texture map objects
         let locationImageHtml = '';
         if (obj.image_path) {
-            const objId = obj.object_id || 0;
-            // Exclude: writings (0x166), doors (0x140-0x14F), texture map objects (0x16E-0x16F)
-            const isWriting = objId === 0x166;
-            const isDoor = (objId >= 0x140 && objId <= 0x14F);
-            const isTextureMap = (objId >= 0x16E && objId <= 0x16F);
-            
-            if (!isWriting && !isDoor && !isTextureMap) {
-                locationImageHtml = `
-                    <div class="location-item-image-container" style="float: right; width: 40px; height: 40px; margin-left: 8px; margin-bottom: 4px;">
-                        <img src="${escapeHtml(obj.image_path)}" alt="${escapeHtml(getItemDisplayName(obj))}" 
-                             class="location-item-image" 
-                             style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
-                             onerror="this.style.display='none';">
-                    </div>
-                `;
-            }
+            locationImageHtml = `
+                <div class="location-item-image-container" style="float: right; width: 40px; height: 40px; margin-left: 8px; margin-bottom: 4px;">
+                    <img src="${escapeHtml(obj.image_path)}" alt="${escapeHtml(getItemDisplayName(obj))}" 
+                         class="location-item-image" 
+                         style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
+                         onerror="this.style.display='none';">
+                </div>
+            `;
         }
         
         // Build change badge if save game is loaded

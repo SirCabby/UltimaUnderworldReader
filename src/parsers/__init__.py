@@ -37,6 +37,14 @@ from .animation_parser import (
     AnimationFileParser,
     AnimationFrame,
 )
+from .assoc_anm_parser import (
+    AssocAnmParser,
+    NPCAnimationInfo,
+)
+from .texture_parser import (
+    TextureParser,
+    TextureData,
+)
 from .image_parser import (
     GrFileParser,
     BitmapType,
@@ -95,6 +103,12 @@ __all__ = [
     # Animations
     'AnimationFileParser',
     'AnimationFrame',
+    # Animation associations (NPC -> animation file mapping)
+    'AssocAnmParser',
+    'NPCAnimationInfo',
+    # Textures (.TR files)
+    'TextureParser',
+    'TextureData',
     # Save games
     'SaveGameParser',
     'SaveGameComparator',

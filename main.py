@@ -139,17 +139,54 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
     
     # 8. Export web map viewer data
     print("[8/8] Exporting web map viewer data...")
-    # Try to load image paths if they exist (from make web)
+    
+    # Scan for existing images from all extracted sources
+    # 1. OBJECTS.GR sprites (general objects)
     image_paths = {}
     web_images_dir = Path("web/images/extracted/objects")
     if web_images_dir.exists():
-        # Scan for existing images and build path mapping
         for img_file in web_images_dir.glob("object_*.png"):
-            # Extract object ID from filename (object_XXX.png)
             try:
                 obj_id_str = img_file.stem.replace("object_", "")
                 obj_id = int(obj_id_str, 10)
                 image_paths[obj_id] = f"images/extracted/objects/{img_file.name}"
+            except ValueError:
+                continue
+    
+    # 2. TMOBJ.GR textures (writings, gravestones, levers, etc.)
+    tmobj_image_paths = {}
+    web_tmobj_dir = Path("web/images/extracted/tmobj")
+    if web_tmobj_dir.exists():
+        for img_file in web_tmobj_dir.glob("tmobj_*.png"):
+            try:
+                idx_str = img_file.stem.replace("tmobj_", "")
+                idx = int(idx_str, 10)
+                tmobj_image_paths[idx] = f"images/extracted/tmobj/{img_file.name}"
+            except ValueError:
+                continue
+    
+    # 3. W64.TR wall textures (for special tmap objects)
+    wall_image_paths = {}
+    web_walls_dir = Path("web/images/extracted/walls")
+    if web_walls_dir.exists():
+        for img_file in web_walls_dir.glob("wall_*.png"):
+            try:
+                idx_str = img_file.stem.replace("wall_", "")
+                idx = int(idx_str, 10)
+                wall_image_paths[idx] = f"images/extracted/walls/{img_file.name}"
+            except ValueError:
+                continue
+    
+    # 4. NPC images from CRIT animations
+    npc_image_paths = {}
+    web_npc_dir = Path("web/images/extracted/npcs")
+    if web_npc_dir.exists():
+        for img_file in web_npc_dir.glob("npc_*.png"):
+            try:
+                # npc_XX.png where XX is hex NPC ID
+                npc_id_str = img_file.stem.replace("npc_", "")
+                npc_id = int(npc_id_str, 16)
+                npc_image_paths[npc_id] = f"images/extracted/npcs/{img_file.name}"
             except ValueError:
                 continue
     
@@ -158,12 +195,14 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
         npcs.npcs, 
         npcs.npc_names,
         items.item_types,
-        levels.levels,  # Pass levels for container content extraction
-        strings,  # Pass strings for rich descriptions (books, scrolls, keys, spells)
-        secrets.secrets,  # Pass secrets (illusory walls, secret doors)
-        convs.conversations,  # Pass conversations to verify dialogue scripts exist
-        image_paths,  # Pass image paths for object images
-        {}  # NPC images not currently generated
+        levels.levels,
+        strings,
+        secrets.secrets,
+        convs.conversations,
+        image_paths,
+        npc_image_paths,
+        tmobj_image_paths,
+        wall_image_paths
     )
     print(f"       Exported web map data to {web_map_path.name}")
     

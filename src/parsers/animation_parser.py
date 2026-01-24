@@ -4,18 +4,28 @@ Animation File Parser for Ultima Underworld
 Parses CrXXpage.nYY animation files that contain NPC walking/action sprites.
 These files use 5-bit RLE compression and contain multiple animation frames.
 
-Format:
-- 0x0000-0x007F: Atom to Fragment Mapping (auxiliary palette mappings)
-- 0x0080-0x027F: Offset Table (16-bit offsets to frame data, 256 entries)
-- 0x0280+: Frame data (5-bit RLE compressed)
+Based on uw-formats.txt specification (section 3.6.1):
 
-Each frame header:
+File format (variable-length header):
+- Byte 0: anim slot base
+- Byte 1: number of anim slots (=nslot)
+- Bytes 2 to nslot+1: list of segment indices
+- Byte nslot+2: number of anim segments (=nsegs)
+- Next 8*nsegs bytes: anim frame indices for each segment
+- Next byte: number of aux palettes (=npals)
+- Next npals*32 bytes: auxiliary palette indices (32 bytes each)
+- Next byte: number of frame offsets (=noffsets)
+- Next byte: compression type (always 06)
+- Next noffsets*2 bytes: absolute offsets to frame headers
+
+Each frame header (at offset from table):
 - Width (1 byte)
 - Height (1 byte)
 - Hotspot X (1 byte)
 - Hotspot Y (1 byte)
-- Compression type (1 byte, 06 = 5-bit RLE)
+- Compression type (1 byte, 06 = 5-bit RLE, 08 = 4-bit RLE)
 - Data length in words (2 bytes, Int16)
+- Frame data (RLE compressed)
 """
 
 import struct
@@ -47,6 +57,8 @@ class AnimationFileParser:
     """
     Parser for Ultima Underworld animation files (CrXXpage.nYY format).
     
+    Based on uw-formats.txt specification and UWXtract implementation.
+    
     Usage:
         parser = AnimationFileParser("Input/UW1/CRIT/CR00PAGE.N00")
         parser.parse()
@@ -54,85 +66,146 @@ class AnimationFileParser:
         # Get a frame (e.g., idle animation at angle 0, slot 0x20)
         frame = parser.get_frame(0x20)  # Or try other slots
         
-        # Convert to image (requires palette and aux palette parser)
-        img = parser.frame_to_image(frame, palette, aux_palette_parser)
+        # Convert to image (requires palette)
+        img = parser.frame_to_image(frame, palette, auxpal_index=0)
     """
     
-    ATOM_TO_FRAGMENT_OFFSET = 0x0000
-    ATOM_TO_FRAGMENT_SIZE = 0x0080  # 128 bytes
-    OFFSET_TABLE_OFFSET = 0x0080
-    OFFSET_TABLE_SIZE = 0x0200  # 512 bytes (256 entries × 2 bytes)
-    FRAME_DATA_OFFSET = 0x0280
-    
     COMPRESSION_5BIT_RLE = 0x06
-    COMPRESSION_4BIT_RLE = 0x08  # 4-bit RLE format (common in animation files)
+    COMPRESSION_4BIT_RLE = 0x08  # 4-bit RLE format
     
     def __init__(self, filepath: str | Path):
         self.filepath = Path(filepath)
         self._data: bytes = b''
         self._parsed = False
         
-        # Parsed data
-        self.atom_to_fragment: List[int] = []  # 128 entries (0x00-0x7F)
-        self.offset_table: List[int] = []  # 256 entries (offsets to frame data)
-        self.frames: Dict[int, AnimationFrame] = {}  # slot_index -> frame
+        # Header info
+        self.slot_base: int = 0
+        self.num_slots: int = 0
+        self.slot_offsets: List[int] = []  # Segment indices for each slot
+        self.num_segments: int = 0
+        self.segment_frames: List[List[int]] = []  # Frame indices for each segment
+        self.num_aux_palettes: int = 0
+        self.aux_palettes: List[List[int]] = []  # List of 32-byte auxiliary palettes
+        self.num_offsets: int = 0
+        self.frame_offsets: List[int] = []  # Absolute offsets to frame headers
+        
+        # Parsed frames
+        self.frames: Dict[int, AnimationFrame] = {}  # frame_index -> frame
+        
+        # Legacy compatibility
+        self.atom_to_fragment: List[int] = []  # Will be filled from first aux palette
+        self.offset_table: List[int] = []  # Will be filled from frame_offsets
     
     def parse(self) -> None:
-        """Parse the animation file."""
+        """Parse the animation file according to uw-formats.txt specification."""
         if not self.filepath.exists():
             return
         
         with open(self.filepath, 'rb') as f:
             self._data = f.read()
         
-        if len(self._data) < self.FRAME_DATA_OFFSET:
+        if len(self._data) < 4:  # Minimum header size
             return
         
-        # Parse atom to fragment mapping (0x0000-0x007F, 128 bytes)
-        self._parse_atom_to_fragment()
-        
-        # Parse offset table (0x0080-0x027F, 512 bytes = 256 entries × 2 bytes)
-        self._parse_offset_table()
-        
-        # Parse frames using offset table
-        self._parse_frames()
-        
-        self._parsed = True
-    
-    def _parse_atom_to_fragment(self) -> None:
-        """Parse atom to fragment mapping (auxiliary palette mappings)."""
-        self.atom_to_fragment = []
-        for i in range(self.ATOM_TO_FRAGMENT_SIZE):
-            offset = self.ATOM_TO_FRAGMENT_OFFSET + i
-            if offset < len(self._data):
-                value = struct.unpack_from('<B', self._data, offset)[0]
-                self.atom_to_fragment.append(value)
-            else:
+        try:
+            pos = 0
+            
+            # Read header
+            self.slot_base = self._data[pos]
+            pos += 1
+            self.num_slots = self._data[pos]
+            pos += 1
+            
+            if self.num_slots == 0:
+                return
+            
+            # Read slot offsets (segment indices for each slot)
+            self.slot_offsets = []
+            for i in range(self.num_slots):
+                if pos < len(self._data):
+                    self.slot_offsets.append(self._data[pos])
+                    pos += 1
+            
+            # Read number of segments
+            if pos >= len(self._data):
+                return
+            self.num_segments = self._data[pos]
+            pos += 1
+            
+            # Read segment frame indices (8 bytes per segment)
+            self.segment_frames = []
+            for i in range(self.num_segments):
+                frames = []
+                for j in range(8):
+                    if pos < len(self._data):
+                        frames.append(self._data[pos])
+                        pos += 1
+                self.segment_frames.append(frames)
+            
+            # Read number of auxiliary palettes
+            if pos >= len(self._data):
+                return
+            self.num_aux_palettes = self._data[pos]
+            pos += 1
+            
+            # Read auxiliary palettes (32 bytes each)
+            self.aux_palettes = []
+            for i in range(self.num_aux_palettes):
+                palette = []
+                for j in range(32):
+                    if pos < len(self._data):
+                        palette.append(self._data[pos])
+                        pos += 1
+                    else:
+                        palette.append(0)
+                self.aux_palettes.append(palette)
+            
+            # Read number of frame offsets
+            if pos >= len(self._data):
+                return
+            self.num_offsets = self._data[pos]
+            pos += 1
+            
+            # Read unknown byte (compression type indicator, usually 0x06)
+            if pos >= len(self._data):
+                return
+            _unknown = self._data[pos]
+            pos += 1
+            
+            # Read frame offsets (16-bit absolute offsets)
+            self.frame_offsets = []
+            for i in range(self.num_offsets):
+                if pos + 1 < len(self._data):
+                    offset = struct.unpack_from('<H', self._data, pos)[0]
+                    self.frame_offsets.append(offset)
+                    pos += 2
+                else:
+                    self.frame_offsets.append(0)
+            
+            # Legacy compatibility: fill atom_to_fragment from first aux palette
+            self.atom_to_fragment = []
+            for pal in self.aux_palettes:
+                self.atom_to_fragment.extend(pal)
+            # Pad to 128 if needed
+            while len(self.atom_to_fragment) < 128:
                 self.atom_to_fragment.append(0)
-    
-    def _parse_offset_table(self) -> None:
-        """Parse offset table (256 entries of 16-bit offsets)."""
-        self.offset_table = []
-        for i in range(256):  # 256 slots
-            offset = self.OFFSET_TABLE_OFFSET + i * 2
-            if offset + 1 < len(self._data):
-                frame_offset = struct.unpack_from('<H', self._data, offset)[0]
-                # Offset is relative to start of file, but frame data starts at 0x0280
-                # If offset is 0, this slot is unused
-                self.offset_table.append(frame_offset if frame_offset > 0 else 0)
-            else:
-                self.offset_table.append(0)
+            
+            # Legacy compatibility: fill offset_table
+            self.offset_table = self.frame_offsets.copy()
+            
+            # Parse frames
+            self._parse_frames()
+            
+            self._parsed = True
+            
+        except Exception as e:
+            # Parsing failed, file format may be different or corrupted
+            return
     
     def _parse_frames(self) -> None:
-        """Parse animation frames using the offset table."""
-        for slot_index, frame_offset in enumerate(self.offset_table):
+        """Parse animation frames using the frame offset table."""
+        for frame_index, frame_offset in enumerate(self.frame_offsets):
             if frame_offset == 0 or frame_offset >= len(self._data):
-                continue
-            
-            # Skip very small offsets (likely invalid or pointing to other data structures)
-            # Frame data typically starts at 0x0280, but valid frames might start earlier
-            # However, offsets < 0x0100 are likely invalid or point to header/table data
-            if frame_offset < 0x0100:
                 continue
             
             # Frame header is 7 bytes: width, height, hotspot_x, hotspot_y, compression, data_length
@@ -148,7 +221,6 @@ class AnimationFileParser:
                 data_length_words = struct.unpack_from('<H', self._data, frame_offset + 5)[0]
                 
                 # Validate frame header
-                # Some frames have 0 width/height which means unused, skip those
                 if width == 0 or height == 0:
                     continue
                 
@@ -156,70 +228,48 @@ class AnimationFileParser:
                 if width > 256 or height > 256:
                     continue
                 
-                # Accept multiple compression formats:
-                # 0x00 = uncompressed (common in animation files)
+                # Accept compression formats:
                 # 0x06 = 5-bit RLE (common)
-                # 0x08 = 4-bit RLE (common)
-                if compression not in (0x00, self.COMPRESSION_5BIT_RLE, self.COMPRESSION_4BIT_RLE):
-                    # Skip unsupported compression formats for now
-                    continue
-                
-                # Calculate data size in bytes based on compression type
-                if compression == 0x00:
-                    # Uncompressed: data_length is in bytes, or could be width*height for 8-bit
-                    # For now, assume it's width*height bytes for 8-bit uncompressed
-                    data_size_bytes = width * height
-                elif compression == self.COMPRESSION_5BIT_RLE:
-                    # 5-bit words: (data_length_words * 5 + 7) / 8 bytes (round up)
-                    data_size_bytes = (data_length_words * 5 + 7) // 8
-                elif compression == self.COMPRESSION_4BIT_RLE:
-                    # 4-bit RLE: data_length is in nibbles (4-bit units)
-                    # Convert nibbles to bytes: (data_length_nibbles + 1) // 2
-                    data_size_bytes = (data_length_words + 1) // 2
+                # 0x08 = 4-bit RLE (also used)
+                # Some files may have type != 6, which means 4-bit
+                if compression == self.COMPRESSION_5BIT_RLE:
+                    word_size = 5
                 else:
-                    continue  # Unknown compression type
+                    word_size = 4  # Default to 4-bit for type != 6
+                
+                # Calculate estimated data size in bytes
+                # data_length_words is the number of 4-bit or 5-bit words
+                data_size_bytes = (data_length_words * word_size + 7) // 8
                 
                 data_start = frame_offset + 7
-                data_end = data_start + data_size_bytes
                 
-                # Find the next frame offset to determine actual data size
-                # (frames may have padding/alignment, so use actual boundaries)
+                # Find the next frame offset to determine actual data boundaries
                 next_offset = len(self._data)  # Default to end of file
-                for i in range(256):
-                    check_offset = 0x0080 + i * 2
-                    if check_offset + 1 < len(self._data):
-                        next_frame_offset = struct.unpack_from('<H', self._data, check_offset)[0]
-                        if (next_frame_offset > frame_offset and 
-                            next_frame_offset < next_offset and
-                            next_frame_offset >= data_start):
-                            next_offset = next_frame_offset
+                for other_offset in self.frame_offsets:
+                    if other_offset > frame_offset and other_offset < next_offset:
+                        next_offset = other_offset
                 
                 # Use the smaller of calculated size or actual frame boundary
-                if next_offset < len(self._data):
-                    actual_data_end = min(data_end, next_offset)
-                else:
-                    actual_data_end = min(data_end, len(self._data))
+                data_end = min(data_start + data_size_bytes, next_offset, len(self._data))
+                actual_data_size = data_end - data_start
                 
-                data_size_bytes = actual_data_end - data_start
-                
-                # Validate we have reasonable data size (at least a few bytes)
-                if data_size_bytes < 4:  # At least 4 bytes for a minimal frame
+                # Need at least some data
+                if actual_data_size < 1:
                     continue
                 
-                if data_size_bytes > 0:
-                    frame_data = self._data[data_start:actual_data_end]
-                    
-                    self.frames[slot_index] = AnimationFrame(
-                        frame_index=slot_index,
-                        width=width,
-                        height=height,
-                        hotspot_x=hotspot_x,
-                        hotspot_y=hotspot_y,
-                        compression_type=compression,
-                        data_length=data_length_words,
-                        data=frame_data,
-                        data_offset=frame_offset
-                    )
+                frame_data = self._data[data_start:data_end]
+                
+                self.frames[frame_index] = AnimationFrame(
+                    frame_index=frame_index,
+                    width=width,
+                    height=height,
+                    hotspot_x=hotspot_x,
+                    hotspot_y=hotspot_y,
+                    compression_type=compression,
+                    data_length=data_length_words,
+                    data=frame_data,
+                    data_offset=frame_offset
+                )
             except Exception:
                 # Skip invalid frames
                 continue
@@ -238,14 +288,22 @@ class AnimationFileParser:
     
     def frame_to_image(self, frame: AnimationFrame, 
                       palette: List[Tuple[int, int, int]],
-                      aux_palette_parser: Optional[Any] = None) -> Optional['Image.Image']:
+                      aux_palette_parser: Optional[Any] = None,
+                      auxpal_index: int = 0) -> Optional['Image.Image']:
         """
         Convert an animation frame to a PIL Image.
         
+        Based on UWXtract's algorithm:
+        1. Decompress RLE to get atom indices (5-bit or 4-bit values)
+        2. Map atom indices through auxiliary palette to get main palette indices
+        3. Look up colors from main palette
+        
         Args:
             frame: AnimationFrame to convert
-            palette: Main 256-color palette
-            aux_palette_parser: AuxPaletteParser for loading auxiliary palettes
+            palette: Main 256-color palette (from PALS.DAT)
+            aux_palette_parser: (unused, for compatibility)
+            auxpal_index: Index of auxiliary palette within animation file (0-3).
+                         Different NPCs using the same animation file may use different palettes.
             
         Returns:
             PIL Image or None if conversion fails
@@ -253,108 +311,62 @@ class AnimationFileParser:
         if Image is None:
             return None
         
-        # Decompress based on compression type
-        if frame.compression_type == 0x00:
-            # Uncompressed 8-bit: each byte is a palette index
-            pixel_indices = list(frame.data[:frame.width * frame.height])
-            # Pad if needed
-            while len(pixel_indices) < frame.width * frame.height:
-                pixel_indices.append(0)
-        elif frame.compression_type == self.COMPRESSION_5BIT_RLE:
-            pixel_indices = self._decompress_5bit_rle(frame.data, frame.data_length, frame.width * frame.height)
-        elif frame.compression_type == self.COMPRESSION_4BIT_RLE:
-            pixel_indices = self._decompress_4bit_rle(frame.data, frame.data_length, frame.width * frame.height)
-        else:
-            return None  # Unsupported compression type
+        expected_pixels = frame.width * frame.height
         
-        if not pixel_indices or len(pixel_indices) < frame.width * frame.height:
+        # Determine word size based on compression type
+        # Type 0x06 = 5-bit, otherwise 4-bit (per uw-formats.txt)
+        if frame.compression_type == self.COMPRESSION_5BIT_RLE:
+            word_size = 5
+        else:
+            word_size = 4
+        
+        # Decompress RLE to get atom indices
+        atom_indices = self._decompress_rle(frame.data, word_size, expected_pixels)
+        
+        if not atom_indices or len(atom_indices) < expected_pixels:
             return None
         
-        # Get palette based on compression type
-        # 0x00 (uncompressed) uses 256-color palette (indices 0-255)
-        # 5-bit RLE uses 32-color palette (indices 0-31)
-        # 4-bit RLE uses 16-color palette (indices 0-15)
-        if frame.compression_type == 0x00:
-            # Uncompressed: use full 256-color main palette directly
-            final_palette_rgb = palette[:256] if len(palette) >= 256 else list(palette) + [(0, 0, 0)] * (256 - len(palette))
-        elif frame.compression_type == self.COMPRESSION_5BIT_RLE:
-            # 5-bit indices (0-31), need 32-color palette
-            final_palette_rgb = []
-            
-            if aux_palette_parser:
-                # Animation files typically use auxiliary palette 0 (default)
-                aux_pal_indices = aux_palette_parser.get_aux_palette(0)
-                
-                if aux_pal_indices and len(aux_pal_indices) >= 16:
-                    # Map aux palette indices to RGB colors from main palette
-                    for i in range(32):  # 5-bit indices are 0-31
-                        aux_idx = i % len(aux_pal_indices)  # Cycle through 16-color aux palette
-                        main_pal_idx = aux_pal_indices[aux_idx]
-                        if main_pal_idx < len(palette):
-                            final_palette_rgb.append(palette[main_pal_idx])
-                        else:
-                            final_palette_rgb.append((0, 0, 0))
-                else:
-                    final_palette_rgb = self._get_animation_palette(palette, aux_palette_parser)
-            else:
-                final_palette_rgb = self._get_animation_palette(palette, aux_palette_parser)
-            
-            # Ensure we have 32 colors
-            while len(final_palette_rgb) < 32:
-                final_palette_rgb.append((0, 0, 0))
-        else:
-            # 4-bit RLE uses 16-color palette (indices 0-15)
-            final_palette_rgb = []
-            
-            if aux_palette_parser:
-                # Use auxiliary palette 0 (default for animation files)
-                aux_pal_indices = aux_palette_parser.get_aux_palette(0)
-                
-                if aux_pal_indices and len(aux_pal_indices) >= 16:
-                    # Map aux palette indices to RGB colors from main palette
-                    for idx in aux_pal_indices[:16]:
-                        if idx < len(palette):
-                            final_palette_rgb.append(palette[idx])
-                        else:
-                            final_palette_rgb.append((0, 0, 0))
-                else:
-                    # Fallback: use first 16 colors of main palette
-                    if len(palette) >= 16:
-                        final_palette_rgb = palette[:16]
-                    else:
-                        final_palette_rgb = list(palette) + [(0, 0, 0)] * (16 - len(palette))
-            else:
-                # Fallback: use first 16 colors of main palette
-                if len(palette) >= 16:
-                    final_palette_rgb = palette[:16]
-                else:
-                    final_palette_rgb = list(palette) + [(0, 0, 0)] * (16 - len(palette))
-            
-            # Ensure we have 16 colors
-            while len(final_palette_rgb) < 16:
-                final_palette_rgb.append((0, 0, 0))
+        # Get the auxiliary palette for this NPC (maps atom indices to main palette indices)
+        aux_pal = None
+        if self.aux_palettes and auxpal_index < len(self.aux_palettes):
+            aux_pal = self.aux_palettes[auxpal_index]
+        elif self.atom_to_fragment:
+            # Legacy fallback - use atom_to_fragment
+            palette_offset = auxpal_index * 32
+            if len(self.atom_to_fragment) >= palette_offset + 32:
+                aux_pal = self.atom_to_fragment[palette_offset:palette_offset + 32]
+            elif len(self.atom_to_fragment) >= 32:
+                aux_pal = self.atom_to_fragment[:32]
         
         # Create RGBA image
         rgba = Image.new('RGBA', (frame.width, frame.height), (0, 0, 0, 0))
         pixels = rgba.load()
         
-        # Animation frames are stored top-to-bottom (not flipped like GR files)
-        # Pixel indices should be in row-major order (left to right, top to bottom)
+        # Convert atom indices to colors
         for y in range(frame.height):
             for x in range(frame.width):
                 pixel_idx = y * frame.width + x
-                if pixel_idx >= len(pixel_indices):
-                    # Out of bounds, transparent
+                if pixel_idx >= len(atom_indices):
+                    continue
+                
+                # Get atom index from decompressed data
+                atom_index = atom_indices[pixel_idx]
+                
+                # Index 0 = transparent
+                if atom_index == 0:
                     pixels[x, y] = (0, 0, 0, 0)
                     continue
                 
-                # Get pixel index from decompressed data
-                pixel_index = pixel_indices[pixel_idx]
-                if pixel_index == 0:
-                    # Index 0 = transparent
-                    pixels[x, y] = (0, 0, 0, 0)
-                elif pixel_index < len(final_palette_rgb):
-                    r, g, b = final_palette_rgb[pixel_index]
+                # Map atom index through auxiliary palette to get main palette index
+                if aux_pal and atom_index < len(aux_pal):
+                    palette_index = aux_pal[atom_index]
+                else:
+                    # Fallback: use atom index directly (likely wrong, but better than crash)
+                    palette_index = atom_index
+                
+                # Look up color from main palette
+                if palette_index < len(palette):
+                    r, g, b = palette[palette_index]
                     pixels[x, y] = (r, g, b, 255)
                 else:
                     # Out of range, use black
@@ -362,265 +374,224 @@ class AnimationFileParser:
         
         return rgba
     
-    def _decompress_5bit_rle(self, data: bytes, data_length_words: int, expected_pixels: int) -> List[int]:
+    def _decompress_rle(self, data: bytes, bits: int, expected_pixels: int) -> List[int]:
         """
-        Decompress 5-bit RLE data using the correct bit buffer algorithm.
+        Decompress RLE data using the UWXtract algorithm.
         
-        Based on Ultima Underworld format specification:
-        - Uses a bit buffer that reads bytes and extracts 5-bit codes
-        - CodeBits = 5
-        - Buffer maintains bits across byte boundaries
+        Based on UWXtract's ImageDecode4BitRLE function and uw-formats.txt.
         
         Args:
             data: Compressed data bytes
-            data_length_words: Expected number of 5-bit words
+            bits: Word size in bits (4 or 5)
+            expected_pixels: Expected number of pixels after decompression
+            
+        Returns:
+            List of pixel indices (0-15 for 4-bit, 0-31 for 5-bit)
+        """
+        # Bit extraction variables
+        bits_avail = 0
+        rawbits = 0
+        bitmask = ((1 << bits) - 1) << (8 - bits)
+        data_pos = 0
+        
+        # RLE decoding state
+        pixel_indices = []
+        stage = 0  # Count extraction stage (0-5)
+        record = 0  # Record type: 0=repeat start, 1=repeat value, 2=multiple repeat, 3=run start, 4=run value
+        count = 0
+        repeatcount = 0
+        
+        while len(pixel_indices) < expected_pixels:
+            # Get new nibble/word
+            if bits_avail < bits:
+                # Not enough bits available
+                if bits_avail > 0:
+                    nibble = ((rawbits & bitmask) >> (8 - bits_avail))
+                    nibble <<= (bits - bits_avail)
+                else:
+                    nibble = 0
+                
+                if data_pos >= len(data):
+                    break  # End of data
+                
+                rawbits = data[data_pos]
+                data_pos += 1
+                
+                shiftval = 8 - (bits - bits_avail)
+                nibble |= (rawbits >> shiftval)
+                rawbits = (rawbits << (8 - shiftval)) & 0xFF
+                bits_avail = shiftval
+            else:
+                # We still have enough bits
+                nibble = (rawbits & bitmask) >> (8 - bits)
+                bits_avail -= bits
+                rawbits = (rawbits << bits) & 0xFF
+            
+            # Process nibble based on stage (count extraction)
+            if stage == 0:
+                if nibble == 0:
+                    stage = 1
+                else:
+                    count = nibble
+                    stage = 6  # Count complete
+            elif stage == 1:
+                count = nibble
+                stage = 2
+            elif stage == 2:
+                count = (count << 4) | nibble
+                if count == 0:
+                    stage = 3
+                else:
+                    stage = 6  # Count complete
+            elif stage in (3, 4, 5):
+                count = (count << 4) | nibble
+                stage += 1
+            
+            if stage < 6:
+                continue
+            
+            # Process record based on type
+            if record == 0:  # Repeat record start
+                if count == 1:
+                    record = 3  # Skip this record; a run follows
+                elif count == 2:
+                    record = 2  # Multiple repeat records
+                else:
+                    record = 1  # Read next nibble; it's the color to repeat
+                    continue
+            elif record == 1:  # Repeat record - write color 'count' times
+                for _ in range(count):
+                    if len(pixel_indices) >= expected_pixels:
+                        break
+                    pixel_indices.append(nibble)
+                
+                if repeatcount == 0:
+                    record = 3  # Next one is a run record
+                else:
+                    repeatcount -= 1
+                    record = 0  # Continue with repeat records
+            elif record == 2:  # Multiple repeat - 'count' specifies number of repeat records
+                repeatcount = count - 1
+                record = 0
+            elif record == 3:  # Run record start - copy 'count' nibbles
+                record = 4
+                continue
+            elif record == 4:  # Run record - write nibble
+                pixel_indices.append(nibble)
+                count -= 1
+                if count == 0:
+                    record = 0  # Next one is a repeat again
+                else:
+                    continue
+            
+            stage = 0  # Reset stage for next count
+        
+        # Pad to expected size if needed
+        while len(pixel_indices) < expected_pixels:
+            pixel_indices.append(0)
+        
+        return pixel_indices[:expected_pixels]
+    
+    def _decompress_5bit_rle(self, data: bytes, data_length_words: int, expected_pixels: int) -> List[int]:
+        """
+        Decompress 5-bit RLE data.
+        
+        Args:
+            data: Compressed data bytes
+            data_length_words: Expected number of 5-bit words (for reference)
             expected_pixels: Expected number of pixels after decompression
             
         Returns:
             List of pixel indices (0-31 for 5-bit)
         """
-        # 5-bit RLE: Extract 5-bit words using a bit buffer algorithm
-        # Algorithm: ReadCode() extracts 5 bits from a buffer that maintains bits across bytes
-        words = []
-        bit_buffer = 0  # Bit buffer
-        bit_buffer_count = 0  # Number of bits in buffer
-        data_pos = 0  # Position in data byte array
-        
-        def read_code():
-            """Read next 5-bit code from bit buffer."""
-            nonlocal bit_buffer, bit_buffer_count, data_pos
-            
-            # We need 5 bits, ensure buffer has enough
-            while bit_buffer_count < 5:
-                if data_pos >= len(data):
-                    return 0  # End of data
-                # Read next byte into buffer (MSB first)
-                bit_buffer = (bit_buffer << 8) | data[data_pos]
-                bit_buffer_count += 8
-                data_pos += 1
-            
-            # Extract 5 bits from MSB of buffer
-            bit_buffer_count -= 5
-            code = (bit_buffer >> bit_buffer_count) & 0x1F
-            bit_buffer &= (1 << bit_buffer_count) - 1  # Clear extracted bits
-            
-            return code
-        
-        # Extract all 5-bit words
-        for _ in range(min(data_length_words, expected_pixels * 4)):  # Cap at reasonable limit
-            word = read_code()
-            if data_pos > len(data) and bit_buffer_count < 5:
-                break
-            words.append(word)
-            
-            if len(words) >= data_length_words:
-                break
-        
-        # Decompress RLE (similar to 4-bit RLE but with 5-bit values)
-        # Format: alternating repeat and run records, starting with repeat
-        # This is similar to the 4-bit RLE format from the image parser
-        pixel_indices = []
-        word_idx = 0
-        state = 0  # 0 = repeat_record_start, 1 = repeat_record, 2 = run_record
-        repeatcount = 0
-        
-        def get_count():
-            """Get count value, handling extended counts (5-bit values)."""
-            nonlocal word_idx
-            if word_idx >= len(words):
-                return 0
-            w = words[word_idx] & 0x1F
-            word_idx += 1
-            count = w
-            
-            if count == 0:
-                # Extended count: read more 5-bit words
-                if word_idx + 1 < len(words):
-                    w1 = words[word_idx] & 0x1F
-                    w2 = words[word_idx + 1] & 0x1F
-                    count = (w1 << 5) | w2
-                    word_idx += 2
-                    if count == 0 and word_idx + 1 < len(words):
-                        w3 = words[word_idx] & 0x1F
-                        count = (count << 5) | w3
-                        word_idx += 1
-            
-            return count
-        
-        def get_value():
-            """Get next 5-bit value."""
-            nonlocal word_idx
-            if word_idx >= len(words):
-                return 0
-            val = words[word_idx] & 0x1F
-            word_idx += 1
-            return val
-        
-        while word_idx < len(words) and len(pixel_indices) < expected_pixels:
-            if state == 0:  # repeat_record_start
-                count = get_count()
-                if count == 1:
-                    state = 2  # run_record (skip repeat, next is run)
-                elif count == 2:
-                    # Multiple repeat records
-                    repeatcount = get_count() - 1
-                    state = 0  # Stay in repeat_record_start
-                else:
-                    state = 1  # repeat_record
-            
-            elif state == 1:  # repeat_record
-                pixel_value = get_value()
-                for _ in range(min(count, expected_pixels - len(pixel_indices))):
-                    pixel_indices.append(pixel_value)
-                
-                if repeatcount == 0:
-                    state = 2  # run_record
-                else:
-                    repeatcount -= 1
-                    state = 0  # Continue with repeat records
-            
-            elif state == 2:  # run_record
-                count = get_count()
-                for _ in range(min(count, expected_pixels - len(pixel_indices))):
-                    if word_idx < len(words):
-                        pixel_indices.append(get_value())
-                    else:
-                        break
-                state = 0  # Next is repeat record
-        
-        # Pad or trim to exact size
-        if len(pixel_indices) < expected_pixels:
-            pixel_indices.extend([0] * (expected_pixels - len(pixel_indices)))
-        elif len(pixel_indices) > expected_pixels:
-            pixel_indices = pixel_indices[:expected_pixels]
-        
-        return pixel_indices
+        return self._decompress_rle(data, 5, expected_pixels)
     
     def _decompress_4bit_rle(self, data: bytes, data_length_nibbles: int, expected_pixels: int) -> List[int]:
         """
         Decompress 4-bit RLE data.
         
-        Based on the 4-bit RLE implementation from image_parser.py.
-        Format: Alternating repeat and run records, starting with repeat.
-        
         Args:
             data: Compressed data bytes
-            data_length_nibbles: Expected number of 4-bit nibbles (for reference, may not match exactly)
+            data_length_nibbles: Expected number of 4-bit nibbles (for reference)
             expected_pixels: Expected number of pixels after decompression
             
         Returns:
             List of pixel indices (0-15 for 4-bit)
         """
-        # Convert bytes to nibbles (upper nibble first, then lower nibble)
-        # This matches the format used in GR files
-        nibbles = []
-        for byte in data:
-            nibbles.append((byte >> 4) & 0x0F)  # Upper nibble first (MSB)
-            nibbles.append(byte & 0x0F)  # Lower nibble second (LSB)
-        
-        # Decode RLE (same algorithm as in image_parser.py)
-        pixel_indices = []
-        nibble_idx = 0
-        state = 0  # 0 = repeat_record_start, 1 = repeat_record, 2 = run_record
-        repeatcount = 0
-        
-        def get_count():
-            """Get count value, handling extended counts."""
-            nonlocal nibble_idx
-            if nibble_idx >= len(nibbles):
-                return 0
-            n1 = nibbles[nibble_idx]
-            nibble_idx += 1
-            count = n1
-            
-            if count == 0:
-                # Extended count: read 2 more nibbles
-                if nibble_idx + 1 < len(nibbles):
-                    n1 = nibbles[nibble_idx]
-                    n2 = nibbles[nibble_idx + 1]
-                    count = (n1 << 4) | n2
-                    nibble_idx += 2
-                    if count == 0 and nibble_idx + 2 < len(nibbles):
-                        # Even more extended: read 3 more nibbles
-                        n1 = nibbles[nibble_idx]
-                        n2 = nibbles[nibble_idx + 1]
-                        n3 = nibbles[nibble_idx + 2]
-                        count = (((n1 << 4) | n2) << 4) | n3
-                        nibble_idx += 3
-            
-            return count
-        
-        def get_nibble():
-            """Get next nibble."""
-            nonlocal nibble_idx
-            if nibble_idx >= len(nibbles):
-                return 0
-            val = nibbles[nibble_idx]
-            nibble_idx += 1
-            return val
-        
-        while nibble_idx < len(nibbles) and len(pixel_indices) < expected_pixels:
-            if state == 0:  # repeat_record_start
-                count = get_count()
-                if count == 1:
-                    state = 2  # run_record (skip repeat, next is run)
-                elif count == 2:
-                    # Multiple repeat records
-                    repeatcount = get_count() - 1
-                    state = 0  # Stay in repeat_record_start
-                else:
-                    state = 1  # repeat_record
-            
-            elif state == 1:  # repeat_record
-                pixel_value = get_nibble()
-                for _ in range(min(count, expected_pixels - len(pixel_indices))):
-                    pixel_indices.append(pixel_value)
-                
-                if repeatcount == 0:
-                    state = 2  # run_record
-                else:
-                    repeatcount -= 1
-                    state = 0  # Continue with repeat records
-            
-            elif state == 2:  # run_record
-                count = get_count()
-                for _ in range(min(count, expected_pixels - len(pixel_indices))):
-                    if nibble_idx < len(nibbles):
-                        pixel_indices.append(get_nibble())
-                    else:
-                        break
-                state = 0  # Next is repeat record
-        
-        # Pad or trim to exact size
-        if len(pixel_indices) < expected_pixels:
-            pixel_indices.extend([0] * (expected_pixels - len(pixel_indices)))
-        elif len(pixel_indices) > expected_pixels:
-            pixel_indices = pixel_indices[:expected_pixels]
-        
-        return pixel_indices
+        return self._decompress_rle(data, 4, expected_pixels)
     
     def _get_animation_palette(self, main_palette: List[Tuple[int, int, int]], 
                                aux_palette_parser: Optional[Any]) -> List[Tuple[int, int, int]]:
         """
         Get palette for animation frames (32 colors for 5-bit indices).
         
-        Animation files use 5-bit indices (0-31), but typically map through
-        auxiliary palettes. The atom_to_fragment mapping might be used.
-        For now, use a standard mapping or fallback to first 32 colors.
+        Uses the first auxiliary palette from the animation file.
         """
-        # Use atom_to_fragment mapping if available
-        if self.atom_to_fragment and len(self.atom_to_fragment) >= 32:
+        return self._get_animation_palette_by_index(main_palette, 0)
+    
+    def _get_animation_palette_by_index(self, main_palette: List[Tuple[int, int, int]], 
+                                        auxpal_index: int = 0) -> List[Tuple[int, int, int]]:
+        """
+        Get palette for animation frames using specific auxiliary palette index.
+        
+        Animation files contain auxiliary palettes (typically 4, each 32 bytes).
+        Each byte is an index into the main 256-color palette.
+        
+        Args:
+            main_palette: Main 256-color palette
+            auxpal_index: Which auxiliary palette to use (0-3)
+            
+        Returns:
+            32-color palette as list of RGB tuples
+        """
+        # Clamp auxpal_index to valid range
+        if self.aux_palettes:
+            auxpal_index = max(0, min(len(self.aux_palettes) - 1, auxpal_index))
+        else:
+            auxpal_index = 0
+        
+        # Use the correctly parsed aux_palettes if available
+        if self.aux_palettes and auxpal_index < len(self.aux_palettes):
+            aux_pal = self.aux_palettes[auxpal_index]
             anim_pal = []
-            for i in range(32):
-                atom_idx = self.atom_to_fragment[i] if i < len(self.atom_to_fragment) else i
-                if atom_idx < len(main_palette):
-                    anim_pal.append(main_palette[atom_idx])
+            for i in range(min(32, len(aux_pal))):
+                palette_idx = aux_pal[i]
+                if palette_idx < len(main_palette):
+                    anim_pal.append(main_palette[palette_idx])
                 else:
                     anim_pal.append((0, 0, 0))
+            # Pad to 32 colors if needed
+            while len(anim_pal) < 32:
+                anim_pal.append((0, 0, 0))
             return anim_pal
         
-        # Fallback: use first 32 colors of main palette
+        # Fallback: use legacy atom_to_fragment mapping
+        if self.atom_to_fragment:
+            palette_offset = auxpal_index * 32
+            palette_end = palette_offset + 32
+            
+            if len(self.atom_to_fragment) >= palette_end:
+                anim_pal = []
+                for i in range(32):
+                    atom_idx = self.atom_to_fragment[palette_offset + i]
+                    if atom_idx < len(main_palette):
+                        anim_pal.append(main_palette[atom_idx])
+                    else:
+                        anim_pal.append((0, 0, 0))
+                return anim_pal
+            elif len(self.atom_to_fragment) >= 32:
+                # Fallback: use first 32 entries
+                anim_pal = []
+                for i in range(32):
+                    atom_idx = self.atom_to_fragment[i] if i < len(self.atom_to_fragment) else i
+                    if atom_idx < len(main_palette):
+                        anim_pal.append(main_palette[atom_idx])
+                    else:
+                        anim_pal.append((0, 0, 0))
+                return anim_pal
+        
+        # Final fallback: use first 32 colors of main palette
         if len(main_palette) >= 32:
-            return main_palette[:32]
+            return list(main_palette[:32])
         else:
             return list(main_palette) + [(0, 0, 0)] * (32 - len(main_palette))

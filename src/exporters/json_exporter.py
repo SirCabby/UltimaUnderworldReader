@@ -224,7 +224,10 @@ class JsonExporter:
                             item_types: Dict = None, levels: Dict = None,
                             strings_parser = None, secrets: List = None,
                             conversations: Dict = None, image_paths: Dict[int, str] = None,
-                            npc_image_paths: Dict[int, str] = None) -> Path:
+                            npc_image_paths: Dict[int, str] = None,
+                            door_image_paths: Dict[int, str] = None,
+                            tmobj_image_paths: Dict[int, str] = None,
+                            wall_image_paths: Dict[int, str] = None) -> Path:
         """Export optimized data for the interactive web map viewer.
         
         Creates a single JSON file with all placed objects and NPCs,
@@ -241,8 +244,12 @@ class JsonExporter:
             conversations: Dict of conversation slot -> Conversation (to verify dialogue exists)
             image_paths: Dict mapping object_id -> image_path for object images
             npc_image_paths: Dict mapping npc_object_id -> image_path for NPC images
+            door_image_paths: Dict mapping door_texture_idx -> image_path for door images
+            tmobj_image_paths: Dict mapping tmobj_sprite_idx -> image_path for TMOBJ images
+            wall_image_paths: Dict mapping wall_texture_idx -> image_path for wall textures
         """
         from ..constants import SPELL_DESCRIPTIONS
+        import struct
         
         # Get string blocks for rich descriptions
         block3 = strings_parser.get_block(3) or [] if strings_parser else []  # Book/scroll text
@@ -251,6 +258,58 @@ class JsonExporter:
         spell_names_list = strings_parser.get_block(6) or [] if strings_parser else []
         block8 = strings_parser.get_block(8) or [] if strings_parser else []  # Wall/sign text (for writing/gravestones)
         block9 = strings_parser.get_block(9) or [] if strings_parser else []  # Trap messages
+        
+        # Load texture mapping tables for each level (needed for tmap object wall textures)
+        # The texture mapping maps owner field values to actual W64.TR indices
+        texture_mappings = {}  # level_num -> list of W64.TR indices (48 entries)
+        try:
+            from ..parsers.ark_parser import LevArkParser
+            from pathlib import Path
+            import os
+            
+            # Try to find LEV.ARK in common locations
+            lev_ark_path = None
+            
+            # Get the script's directory and workspace root
+            script_dir = Path(__file__).parent.parent.parent  # From src/exporters/ to project root
+            cwd = Path.cwd()
+            
+            # List of possible paths to check (relative to various base directories)
+            possible_paths = [
+                # Relative to current working directory
+                cwd / "Input" / "UW1" / "DATA" / "LEV.ARK",
+                cwd / "input" / "UW1" / "DATA" / "LEV.ARK",
+                cwd / "Input" / "UW1" / "Data" / "LEV.ARK",
+                cwd / "data" / "LEV.ARK",
+                cwd / "DATA" / "LEV.ARK",
+                # Relative to script directory (project root)
+                script_dir / "Input" / "UW1" / "DATA" / "LEV.ARK",
+                script_dir / "input" / "UW1" / "DATA" / "LEV.ARK",
+                script_dir / "Input" / "UW1" / "Data" / "LEV.ARK",
+                script_dir / "data" / "LEV.ARK",
+                script_dir / "DATA" / "LEV.ARK",
+            ]
+            
+            for path in possible_paths:
+                if path.exists():
+                    lev_ark_path = path
+                    break
+            
+            if lev_ark_path and lev_ark_path.exists():
+                ark = LevArkParser(lev_ark_path)
+                ark.parse()
+                for level_num in range(9):
+                    tex_data = ark.get_texture_mapping(level_num)
+                    if tex_data and len(tex_data) >= 96:  # 48 * 2 bytes for wall textures
+                        # Parse 48 Int16 wall texture indices
+                        wall_textures = []
+                        for i in range(48):
+                            w64_idx = struct.unpack_from('<H', tex_data, i * 2)[0]
+                            wall_textures.append(w64_idx)
+                        texture_mappings[level_num] = wall_textures
+        except Exception as e:
+            # If texture mapping loading fails, tmap objects will fall back to OBJECTS.GR
+            pass
         
         # Build spell names dict for lookups
         spell_names = {}
@@ -1527,8 +1586,59 @@ class JsonExporter:
                 'detailed_category': detailed_cat,
             }
             # Add image path if available
-            if image_paths and obj_id in image_paths:
+            # Different object types use different image sources:
+            # - Most objects: OBJECTS.GR sprites
+            # - Writings (0x166): TMOBJ.GR at index (flags + 20)
+            # - Gravestones (0x165): TMOBJ.GR at index (flags + 28)
+            # - Levers (0x161): TMOBJ.GR at index ((flags & 0x07) + 4)
+            # - Pillars (0x160): TMOBJ.GR at index (flags & 0xFF)
+            # - Switches (0x162): TMOBJ.GR at index (12 + (flags & 0x07))
+            # - Tmap objects (0x16E, 0x16F): W64.TR wall texture at index (owner)
+            
+            item_flags = getattr(item, 'flags', 0) or 0
+            
+            # Per uw-formats.txt section 6.1:
+            # - Writings (0x166): texture from tmobj.gr at image "flags" + 20
+            # - Gravestones (0x165): texture from tmobj.gr at image "flags" + 28
+            
+            # DEBUG: Check writing/tmap conditions
+            if obj_id == 0x166:
+                tmobj_idx_dbg = (item_flags & 0xFF) + 20
+                print(f"DEBUG Writing: obj_id=0x{obj_id:X}, item_flags={item_flags}, tmobj_idx={tmobj_idx_dbg}, tmobj_paths={bool(tmobj_image_paths)}, idx_in_paths={tmobj_idx_dbg in (tmobj_image_paths or {})}")
+            
+            if obj_id == 0x166 and tmobj_image_paths:  # Writing
+                tmobj_idx = (item_flags & 0xFF) + 20
+                if tmobj_idx in tmobj_image_paths:
+                    web_obj['image_path'] = tmobj_image_paths[tmobj_idx]
+            elif obj_id == 0x165 and tmobj_image_paths:  # Gravestone
+                tmobj_idx = (item_flags & 0xFF) + 28
+                if tmobj_idx in tmobj_image_paths:
+                    web_obj['image_path'] = tmobj_image_paths[tmobj_idx]
+            elif obj_id == 0x161 and tmobj_image_paths:  # Lever
+                tmobj_idx = (item_flags & 0x07) + 4
+                if tmobj_idx in tmobj_image_paths:
+                    web_obj['image_path'] = tmobj_image_paths[tmobj_idx]
+            elif obj_id == 0x160 and tmobj_image_paths:  # Pillar
+                tmobj_idx = item_flags & 0xFF
+                if tmobj_idx in tmobj_image_paths:
+                    web_obj['image_path'] = tmobj_image_paths[tmobj_idx]
+            elif obj_id == 0x162 and tmobj_image_paths:  # Switch
+                tmobj_idx = 12 + (item_flags & 0x07)
+                if tmobj_idx in tmobj_image_paths:
+                    web_obj['image_path'] = tmobj_image_paths[tmobj_idx]
+            elif obj_id in (0x16E, 0x16F) and wall_image_paths:  # Tmap objects
+                # Owner field is an index into the level's texture mapping table (0-47)
+                # The texture mapping table gives the actual W64.TR texture index
+                wall_idx = None
+                if level in texture_mappings and 0 <= owner < 48:
+                    wall_idx = texture_mappings[level][owner]
+                elif owner < 210:  # Direct fallback if no texture mapping (owner might be direct index)
+                    wall_idx = owner
+                if wall_idx is not None and wall_idx in wall_image_paths:
+                    web_obj['image_path'] = wall_image_paths[wall_idx]
+            elif image_paths and obj_id in image_paths:  # Default: OBJECTS.GR
                 web_obj['image_path'] = image_paths[obj_id]
+            
             # Only include description and effect if they have meaningful values
             if item_desc:
                 web_obj['description'] = item_desc
@@ -1726,8 +1836,12 @@ class JsonExporter:
             }
             
             # Add NPC image path if available
+            # NPCs use sprites from CRIT animation files (the actual in-game sprites)
             if npc_image_paths and obj_id in npc_image_paths:
                 web_npc['image_path'] = npc_image_paths[obj_id]
+            elif image_paths and obj_id in image_paths:
+                # Fall back to OBJECTS.GR icon if no CRIT image available
+                web_npc['image_path'] = image_paths[obj_id]
             
             # Add NPC inventory if they have items (using special_link)
             special_link = npc.special_link

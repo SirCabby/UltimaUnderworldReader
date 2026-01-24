@@ -24,6 +24,8 @@ from ..parsers.palette_parser import PaletteParser
 from ..parsers.aux_palette_parser import AuxPaletteParser
 from ..parsers.animation_parser import AnimationFileParser
 from ..parsers.objects_parser import ObjectsParser
+from ..parsers.assoc_anm_parser import AssocAnmParser
+from ..parsers.texture_parser import TextureParser
 from ..constants.npcs import get_npc_type_name
 
 
@@ -51,6 +53,15 @@ class ImageExtractor:
         self._extracted = False
         self.chr_gr: Optional[GrFileParser] = None
         self.objects_parser: Optional[ObjectsParser] = None
+        self.assoc_anm_parser: Optional[AssocAnmParser] = None
+        # Door images: door_texture_index -> image
+        self.extracted_door_images: Dict[int, Image.Image] = {}
+        self.doors_gr: Optional[GrFileParser] = None
+        # TMOBJ images: sprite_index -> image (for writings, gravestones, etc.)
+        self.extracted_tmobj_images: Dict[int, Image.Image] = {}
+        # Wall textures: texture_index -> image (for special tmap objects)
+        self.extracted_wall_textures: Dict[int, Image.Image] = {}
+        self.wall_texture_parser: Optional[TextureParser] = None
     
     def extract(self) -> bool:
         """
@@ -156,6 +167,71 @@ class ImageExtractor:
         self._extracted = True
         return extracted_count > 0
     
+    def replace_placeholder_sprites(self) -> int:
+        """
+        Replace placeholder sprites in OBJECTS.GR with actual textures from TMOBJ.GR.
+        
+        OBJECTS.GR contains placeholder text sprites ("tmap", "tmap c", etc.) for certain
+        objects that don't have inventory representations:
+        - 0x165 (gravestone): Replace with TMOBJ.GR index 28 (gravestone texture)
+        - 0x166 (writing): Replace with TMOBJ.GR index 20 (writing background texture)
+        - 0x16E (tmap_c): Replace with TMOBJ.GR index 20 (wall decal texture)
+        - 0x16F (tmap_s): Replace with TMOBJ.GR index 20 (wall decal texture)
+        
+        Returns:
+            Number of sprites replaced
+        """
+        if not PIL_AVAILABLE:
+            return 0
+        
+        # Ensure TMOBJ.GR is loaded
+        if not self.tmobj_gr:
+            tmobj_gr_path = self.data_path / "TMOBJ.GR"
+            if not tmobj_gr_path.exists():
+                print("  TMOBJ.GR not found, cannot replace placeholder sprites")
+                return 0
+            try:
+                self.tmobj_gr = GrFileParser(tmobj_gr_path)
+                self.tmobj_gr.parse()
+            except Exception as e:
+                print(f"  Error loading TMOBJ.GR: {e}")
+                return 0
+        
+        # Ensure palette is loaded
+        if not self.palette:
+            self._load_palette()
+        if not self.palette:
+            return 0
+        
+        tmobj_sprites = self.tmobj_gr.get_all_sprites()
+        replaced_count = 0
+        
+        # Define replacements: object_id -> TMOBJ.GR index
+        replacements = {
+            0x165: 28,  # Gravestone -> gravestone texture with cross
+            0x166: 20,  # Writing -> writing background texture (stone with cracks)
+            0x16E: 20,  # Special tmap (collision) -> wall decal texture
+            0x16F: 20,  # Special tmap (solid) -> wall decal texture
+        }
+        
+        for obj_id, tmobj_idx in replacements.items():
+            if tmobj_idx not in tmobj_sprites:
+                continue
+            
+            sprite = tmobj_sprites[tmobj_idx]
+            try:
+                img = self.tmobj_gr.sprite_to_image(
+                    sprite, self.palette, self.aux_palette_parser, flip_vertical=False
+                )
+                if img:
+                    self.extracted_images[obj_id] = img
+                    replaced_count += 1
+                    print(f"    Replaced object 0x{obj_id:02X} with TMOBJ.GR texture {tmobj_idx}")
+            except Exception as e:
+                print(f"    Warning: Failed to replace object 0x{obj_id:02X}: {e}")
+        
+        return replaced_count
+    
     def _load_palette(self) -> None:
         """Load palette from PALS.DAT or ALLPALS.DAT."""
         # Try ALLPALS.DAT first (may contain multiple palettes)
@@ -255,8 +331,9 @@ class ImageExtractor:
         Extract NPC sprite images (object IDs 0x40-0x7F) from animation files.
         
         NPCs use animation files in the CRIT folder (CrXXpage.nYY format).
-        Each NPC has an animation index stored in OBJECTS.DAT (byte 0 of 48-byte critter structure).
-        Extract a frame from the idle animation (slot 0x20-0x27) or walking animation (slot 0x07).
+        The mapping from NPC ID to animation file is stored in ASSOC.ANM:
+        - Bytes 0-255: 32 animation names (8 bytes each)
+        - Bytes 256-383: 64 NPC mappings (2 bytes each: anim_index, auxpal)
         
         Returns:
             True if any NPC images were successfully extracted, False otherwise
@@ -276,21 +353,6 @@ class ImageExtractor:
         if not self.aux_palette_parser:
             self._load_aux_palettes()
         
-        # Load OBJECTS.DAT to get animation indices for each NPC
-        if not self.objects_parser:
-            objects_dat_path = self.data_path / "OBJECTS.DAT"
-            if objects_dat_path.exists():
-                try:
-                    self.objects_parser = ObjectsParser(objects_dat_path)
-                    self.objects_parser.parse()
-                    print(f"  Loaded OBJECTS.DAT for animation index mapping")
-                except Exception as e:
-                    print(f"  Error parsing OBJECTS.DAT: {e}")
-                    return False
-            else:
-                print("  Error: OBJECTS.DAT not found, cannot extract NPC animation indices")
-                return False
-        
         # Check if CRIT folder exists
         crit_dir = self.data_path.parent / "CRIT"  # CRIT is typically at Input/UW1/CRIT, not Input/UW1/DATA/CRIT
         if not crit_dir.exists():
@@ -303,38 +365,37 @@ class ImageExtractor:
         
         print(f"  Using CRIT folder: {crit_dir}")
         
+        # Load ASSOC.ANM for NPC-to-animation mapping
+        assoc_anm_path = crit_dir / "ASSOC.ANM"
+        if not assoc_anm_path.exists():
+            print("  Error: ASSOC.ANM not found, cannot map NPCs to animation files")
+            return False
+        
+        if not self.assoc_anm_parser:
+            try:
+                self.assoc_anm_parser = AssocAnmParser(assoc_anm_path)
+                self.assoc_anm_parser.parse()
+                print(f"  Loaded ASSOC.ANM with {len(self.assoc_anm_parser.animation_names)} animation types")
+            except Exception as e:
+                print(f"  Error parsing ASSOC.ANM: {e}")
+                return False
+        
         extracted_frames = 0
         validated_frames = 0
         failed_validation_count = 0
         npcs_with_frames = 0
         
-        # Extract ALL frames for each NPC
-        # Use critter slot (object_id - 0x40) directly as the animation file number
-        # This is the correct mapping: critter slot maps directly to CR##PAGE file number
-        # e.g., critter slot 15 (0x4F headless) -> CR17PAGE (slot 17 in octal = 15 decimal)
-        # Wait, that doesn't match online sources which say headless uses CR24PAGE
-        # Online sources indicate the mapping is not direct
-        # For now, we'll need to use a lookup table or find the correct mapping
-        # Based on online sources: headless (0x4F, slot 15) uses CR24PAGE, reaper (0x54, slot 20) uses CR17PAGE
-        # This suggests the mapping is NOT direct (object_id - 0x40)
-        # The current code uses animation_index from OBJECTS.DAT which appears incorrect
-        # Since ASSOC.ANM format is unclear, we'll need to create a lookup table based on online sources
+        # Extract frames for each NPC using ASSOC.ANM mapping
         for npc_id in range(0x40, 0x80):  # 0x40 to 0x7F inclusive
-            critter = self.objects_parser.get_critter(npc_id)
-            if not critter:
+            # Get animation info from ASSOC.ANM
+            anim_info = self.assoc_anm_parser.get_npc_animation_info(npc_id)
+            if not anim_info:
                 continue
             
-            # Use critter slot directly for now (object_id - 0x40)
-            # This maps to CR##PAGE where ## is the slot in octal
-            # However, online sources suggest this mapping is incorrect for some NPCs
-            critter_slot = npc_id - 0x40  # Convert object ID to critter slot (0-63)
-            animation_index = critter_slot  # Use critter slot directly as animation index
             npc_name = get_npc_type_name(npc_id)
+            anim_base = anim_info.animation_filename  # e.g., "CR30PAGE"
+            auxpal_index = anim_info.auxpal_index  # Auxiliary palette to use (0-3)
             
-            # Map animation index (decimal) to animation file (CrXX where XX is octal)
-            # e.g., animation_index=1 → Cr01, animation_index=10 → Cr12 (octal)
-            # Check BOTH .N00 and .N01 page files - they contain different animation frames
-            anim_base = f"CR{animation_index:02o}PAGE"
             valid_frames_all_pages = {}
             
             # Try both .N00 and .N01 files
@@ -378,13 +439,23 @@ class ImageExtractor:
             # Extract all valid frames for this NPC from all page files
             npc_frames = {}
             first_valid_frame = None
-            # Prefer idle/standing frames (slots 0x20-0x27) for representative image
-            preferred_slots = set(range(0x20, 0x28))  # Idle animations at different angles
-            preferred_frame = None
+            # Priority slots for representative image (per uw-formats.txt):
+            # 0x24 = idle, facing towards player (0 deg) - BEST for showing NPC
+            # 0x23 = idle, 45 deg
+            # 0x25 = idle, -45 deg  
+            # 0x22 = idle, 90 deg
+            # 0x26 = idle, -90 deg
+            # 0x21 = idle, 135 deg
+            # 0x27 = idle, -135 deg
+            # 0x20 = idle, facing away (180 deg) - WORST for showing NPC
+            priority_slots = [0x24, 0x23, 0x25, 0x22, 0x26, 0x21, 0x27, 0x20]
+            
+            # Collect valid frames by slot for priority selection
+            valid_frames_by_slot = {}
             
             for (slot, page_idx), (frame, anim_parser, page_suffix) in sorted(valid_frames_all_pages.items()):
-                # Convert frame to image
-                img = anim_parser.frame_to_image(frame, self.palette, self.aux_palette_parser)
+                # Convert frame to image using the correct auxiliary palette from ASSOC.ANM
+                img = anim_parser.frame_to_image(frame, self.palette, self.aux_palette_parser, auxpal_index)
                 if img:
                     extracted_frames += 1
                     # Validate the image
@@ -398,10 +469,10 @@ class ImageExtractor:
                         npc_frames[unique_slot] = img
                         validated_frames += 1
                         
-                        # Prefer idle frames (slots 0x20-0x27) for representative image
-                        # These are standing/idle animations that show the NPC clearly
-                        if slot in preferred_slots and preferred_frame is None:
-                            preferred_frame = img
+                        # Track valid frames by base slot for priority selection
+                        frame_size = img.width * img.height
+                        if slot not in valid_frames_by_slot or frame_size > valid_frames_by_slot[slot][1]:
+                            valid_frames_by_slot[slot] = (img, frame_size)
                         
                         # Use the first valid frame as fallback if no preferred frame found
                         if first_valid_frame is None:
@@ -409,10 +480,20 @@ class ImageExtractor:
                     else:
                         failed_validation_count += 1
             
+            # Select representative frame using priority order
+            # Prefer forward-facing idle frames (0x20, 0x24) with size-based scoring
+            representative_frame = None
+            for slot in priority_slots:
+                if slot in valid_frames_by_slot:
+                    representative_frame = valid_frames_by_slot[slot][0]
+                    break
+            
+            # Fall back to first valid frame if no priority slot found
+            if representative_frame is None:
+                representative_frame = first_valid_frame
+            
             if npc_frames:
                 self.extracted_npc_frames[npc_id] = npc_frames
-                # Use preferred frame (idle animation) if available, otherwise first valid frame
-                representative_frame = preferred_frame if preferred_frame else first_valid_frame
                 if representative_frame:
                     self.extracted_npc_images[npc_id] = representative_frame
                 npcs_with_frames += 1
@@ -520,6 +601,397 @@ class ImageExtractor:
     def has_npc_image(self, npc_id: int) -> bool:
         """Check if an NPC image exists for an NPC object ID."""
         return npc_id in self.extracted_npc_images
+    
+    def extract_door_images(self) -> bool:
+        """
+        Extract door texture images from DOORS.GR.
+        
+        DOORS.GR contains 13 door textures (32x64 pixels each).
+        Door object IDs are 0x140-0x14F:
+        - 0x140-0x145: Closed doors (different styles)
+        - 0x0146: Portcullis
+        - 0x0147: Secret door
+        - 0x148-0x14F: Open versions of closed doors
+        
+        Returns:
+            True if any door images were successfully extracted, False otherwise
+        """
+        if not PIL_AVAILABLE:
+            print("Warning: PIL/Pillow not available, cannot extract door images")
+            return False
+        
+        # Ensure palette is loaded
+        if not self.palette:
+            self._load_palette()
+            if not self.palette:
+                print("  Warning: Could not load palette for door images, using default grayscale palette")
+                self.palette = [(i, i, i) for i in range(256)]
+        
+        # Load auxiliary palette file if not already loaded
+        if not self.aux_palette_parser:
+            self._load_aux_palettes()
+        
+        # Load DOORS.GR
+        doors_gr_path = self.data_path / "DOORS.GR"
+        if not doors_gr_path.exists():
+            print("  Error: DOORS.GR not found, cannot extract door images")
+            return False
+        
+        try:
+            print(f"  Parsing DOORS.GR...")
+            self.doors_gr = GrFileParser(doors_gr_path)
+            self.doors_gr.parse()
+            sprites = self.doors_gr.get_all_sprites()
+            print(f"    Found {len(sprites)} door textures")
+        except Exception as e:
+            print(f"    Error parsing DOORS.GR: {e}")
+            return False
+        
+        extracted_count = 0
+        for sprite_idx, sprite in sorted(sprites.items()):
+            try:
+                # Door textures don't need flipping (they're already correct orientation)
+                img = self.doors_gr.sprite_to_image(sprite, self.palette, self.aux_palette_parser, flip_vertical=False)
+                if img:
+                    self.extracted_door_images[sprite_idx] = img
+                    extracted_count += 1
+            except Exception as e:
+                print(f"    Warning: Failed to extract door texture {sprite_idx}: {e}")
+                continue
+        
+        print(f"  Extracted {extracted_count} door texture images")
+        return extracted_count > 0
+    
+    def save_door_images(self, output_dir: str | Path) -> Dict[int, str]:
+        """
+        Save extracted door images to PNG files.
+        
+        Args:
+            output_dir: Directory to save images to
+            
+        Returns:
+            Dictionary mapping door texture index to image file path
+        """
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        image_paths = {}
+        
+        for door_idx, img in self.extracted_door_images.items():
+            filename = f"door_{door_idx:02d}.png"
+            filepath = output_path / filename
+            
+            try:
+                img.save(filepath, 'PNG')
+                image_paths[door_idx] = f"images/doors/{filename}"
+            except Exception as e:
+                print(f"    Warning: Failed to save {filename}: {e}")
+        
+        if image_paths:
+            print(f"  Saved {len(image_paths)} door images")
+        
+        return image_paths
+    
+    def get_door_image_path(self, door_texture_idx: int) -> Optional[str]:
+        """
+        Get the image path for a door texture index.
+        
+        Args:
+            door_texture_idx: Door texture index (0-12)
+            
+        Returns:
+            Image path string or None if no image available
+        """
+        if door_texture_idx in self.extracted_door_images:
+            return f"images/doors/door_{door_texture_idx:02d}.png"
+        return None
+    
+    def has_door_image(self, door_texture_idx: int) -> bool:
+        """Check if a door image exists for a texture index."""
+        return door_texture_idx in self.extracted_door_images
+    
+    def extract_tmobj_images(self) -> bool:
+        """
+        Extract texture images from TMOBJ.GR for various 3D model objects.
+        
+        TMOBJ.GR contains textures for:
+        - Pillars (0x160): image at offset flags
+        - Levers (0x161): image at offset flags+4
+        - Switches (0x162): image starting at 12
+        - Writings (0x166): image at offset flags+20
+        - Gravestones (0x165): image at offset flags+28
+        - Bridges (0x164): image at offset 30+flags (for flags<2)
+        - Tables (0x158): texture 32
+        - Chairs (0x15c): texture 38
+        - Shelves (0x169, UW2): texture flags+36
+        - Pictures (0x163, UW2): texture flags+42
+        
+        Returns:
+            True if any images were successfully extracted, False otherwise
+        """
+        if not PIL_AVAILABLE:
+            print("Warning: PIL/Pillow not available, cannot extract TMOBJ images")
+            return False
+        
+        # Ensure palette is loaded
+        if not self.palette:
+            self._load_palette()
+            if not self.palette:
+                print("  Warning: Could not load palette for TMOBJ images, using default grayscale palette")
+                self.palette = [(i, i, i) for i in range(256)]
+        
+        # Load auxiliary palette file if not already loaded
+        if not self.aux_palette_parser:
+            self._load_aux_palettes()
+        
+        # Load TMOBJ.GR (reuse if already loaded)
+        tmobj_gr_path = self.data_path / "TMOBJ.GR"
+        if not tmobj_gr_path.exists():
+            print("  Error: TMOBJ.GR not found, cannot extract decal images")
+            return False
+        
+        try:
+            print(f"  Parsing TMOBJ.GR...")
+            tmobj_gr = GrFileParser(tmobj_gr_path)
+            tmobj_gr.parse()
+            sprites = tmobj_gr.get_all_sprites()
+            print(f"    Found {len(sprites)} textures")
+        except Exception as e:
+            print(f"    Error parsing TMOBJ.GR: {e}")
+            return False
+        
+        extracted_count = 0
+        for sprite_idx, sprite in sorted(sprites.items()):
+            try:
+                # TMOBJ textures are used as wall/floor decals, don't flip
+                img = tmobj_gr.sprite_to_image(sprite, self.palette, self.aux_palette_parser, flip_vertical=False)
+                if img:
+                    self.extracted_tmobj_images[sprite_idx] = img
+                    extracted_count += 1
+            except Exception as e:
+                print(f"    Warning: Failed to extract TMOBJ texture {sprite_idx}: {e}")
+                continue
+        
+        print(f"  Extracted {extracted_count} TMOBJ texture images")
+        return extracted_count > 0
+    
+    def save_tmobj_images(self, output_dir: str | Path) -> Dict[int, str]:
+        """
+        Save extracted TMOBJ images to PNG files.
+        
+        Args:
+            output_dir: Directory to save images to
+            
+        Returns:
+            Dictionary mapping sprite index to image file path
+        """
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        image_paths = {}
+        
+        for sprite_idx, img in self.extracted_tmobj_images.items():
+            filename = f"tmobj_{sprite_idx:02d}.png"
+            filepath = output_path / filename
+            
+            try:
+                img.save(filepath, 'PNG')
+                image_paths[sprite_idx] = f"images/tmobj/{filename}"
+            except Exception as e:
+                print(f"    Warning: Failed to save {filename}: {e}")
+        
+        if image_paths:
+            print(f"  Saved {len(image_paths)} TMOBJ images")
+        
+        return image_paths
+    
+    def get_writing_image_path(self, flags: int) -> Optional[str]:
+        """
+        Get the image path for a writing object (0x166) based on flags.
+        
+        Writings use TMOBJ.GR texture at index flags+20.
+        
+        Args:
+            flags: The flags value from the object (determines texture variant)
+            
+        Returns:
+            Image path string or None if no image available
+        """
+        texture_idx = flags + 20
+        if texture_idx in self.extracted_tmobj_images:
+            return f"images/tmobj/tmobj_{texture_idx:02d}.png"
+        return None
+    
+    def get_gravestone_image_path(self, flags: int) -> Optional[str]:
+        """
+        Get the image path for a gravestone object (0x165) based on flags.
+        
+        Gravestones use TMOBJ.GR texture at index flags+28.
+        
+        Args:
+            flags: The flags value from the object (determines texture variant)
+            
+        Returns:
+            Image path string or None if no image available
+        """
+        texture_idx = flags + 28
+        if texture_idx in self.extracted_tmobj_images:
+            return f"images/tmobj/tmobj_{texture_idx:02d}.png"
+        return None
+    
+    def get_lever_image_path(self, flags: int) -> Optional[str]:
+        """
+        Get the image path for a lever object (0x161) based on flags.
+        
+        Levers use TMOBJ.GR texture at index (flags & 0x07)+4.
+        
+        Args:
+            flags: The flags value from the object (lower 3 bits determine texture)
+            
+        Returns:
+            Image path string or None if no image available
+        """
+        texture_idx = (flags & 0x07) + 4
+        if texture_idx in self.extracted_tmobj_images:
+            return f"images/tmobj/tmobj_{texture_idx:02d}.png"
+        return None
+    
+    def get_pillar_image_path(self, flags: int) -> Optional[str]:
+        """
+        Get the image path for a pillar object (0x160) based on flags.
+        
+        Pillars use TMOBJ.GR texture at index flags (lower byte).
+        
+        Args:
+            flags: The flags value from the object
+            
+        Returns:
+            Image path string or None if no image available
+        """
+        texture_idx = flags & 0xFF
+        if texture_idx in self.extracted_tmobj_images:
+            return f"images/tmobj/tmobj_{texture_idx:02d}.png"
+        return None
+    
+    def has_tmobj_image(self, sprite_idx: int) -> bool:
+        """Check if a TMOBJ image exists for a sprite index."""
+        return sprite_idx in self.extracted_tmobj_images
+    
+    def extract_wall_textures(self) -> bool:
+        """
+        Extract wall textures from W64.TR for special tmap objects.
+        
+        Special tmap objects (item_id 0x016E, 0x016F) use wall textures:
+        - 0x016E (tmap_c): texture from "owner" field -> index into wall texture table
+        - 0x016F (tmap_s): same but with collision detection
+        
+        The "owner" field is an index into the texture mapping table, which then
+        references a texture in W64.TR.
+        
+        Returns:
+            True if any textures were successfully extracted, False otherwise
+        """
+        if not PIL_AVAILABLE:
+            print("Warning: PIL/Pillow not available, cannot extract wall textures")
+            return False
+        
+        # Ensure palette is loaded
+        if not self.palette:
+            self._load_palette()
+            if not self.palette:
+                print("  Warning: Could not load palette for wall textures, using default grayscale palette")
+                self.palette = [(i, i, i) for i in range(256)]
+        
+        # Load W64.TR
+        w64_path = self.data_path / "W64.TR"
+        if not w64_path.exists():
+            print("  Error: W64.TR not found, cannot extract wall textures")
+            return False
+        
+        try:
+            print(f"  Parsing W64.TR...")
+            self.wall_texture_parser = TextureParser(w64_path)
+            self.wall_texture_parser.parse()
+            textures = self.wall_texture_parser.get_all_textures()
+            print(f"    Found {len(textures)} wall textures ({self.wall_texture_parser.resolution}x{self.wall_texture_parser.resolution})")
+        except Exception as e:
+            print(f"    Error parsing W64.TR: {e}")
+            return False
+        
+        extracted_count = 0
+        for texture_idx, texture in sorted(textures.items()):
+            try:
+                img = self.wall_texture_parser.texture_to_image(texture, self.palette)
+                if img:
+                    self.extracted_wall_textures[texture_idx] = img
+                    extracted_count += 1
+            except Exception as e:
+                print(f"    Warning: Failed to extract wall texture {texture_idx}: {e}")
+                continue
+        
+        print(f"  Extracted {extracted_count} wall texture images")
+        return extracted_count > 0
+    
+    def save_wall_textures(self, output_dir: str | Path, 
+                          texture_indices: Optional[Set[int]] = None) -> Dict[int, str]:
+        """
+        Save extracted wall textures to PNG files.
+        
+        Args:
+            output_dir: Directory to save images to
+            texture_indices: Optional set of texture indices to save.
+                           If None, saves all textures.
+            
+        Returns:
+            Dictionary mapping texture index to image file path
+        """
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        image_paths = {}
+        skipped = 0
+        
+        for texture_idx, img in self.extracted_wall_textures.items():
+            if texture_indices is not None and texture_idx not in texture_indices:
+                skipped += 1
+                continue
+            
+            filename = f"wall_{texture_idx:03d}.png"
+            filepath = output_path / filename
+            
+            try:
+                img.save(filepath, 'PNG')
+                image_paths[texture_idx] = f"images/walls/{filename}"
+            except Exception as e:
+                print(f"    Warning: Failed to save {filename}: {e}")
+        
+        if image_paths:
+            print(f"  Saved {len(image_paths)} wall texture images")
+        if skipped > 0:
+            print(f"  Skipped {skipped} unused wall textures")
+        
+        return image_paths
+    
+    def get_special_tmap_image_path(self, owner_field: int) -> Optional[str]:
+        """
+        Get the image path for a special tmap object (0x016E, 0x016F) based on owner field.
+        
+        The owner field is an index into the wall texture table (W64.TR).
+        
+        Args:
+            owner_field: The owner field from the object (indexes wall texture)
+            
+        Returns:
+            Image path string or None if no image available
+        """
+        texture_idx = owner_field
+        if texture_idx in self.extracted_wall_textures:
+            return f"images/walls/wall_{texture_idx:03d}.png"
+        return None
+    
+    def has_wall_texture(self, texture_idx: int) -> bool:
+        """Check if a wall texture exists for an index."""
+        return texture_idx in self.extracted_wall_textures
     
     def _validate_image(self, img: Image.Image, object_id: Optional[int] = None, is_npc: bool = False) -> Tuple[bool, Optional[str]]:
         """
