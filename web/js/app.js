@@ -5238,7 +5238,38 @@ function selectInventoryItem(item, parentNpc = null) {
     
     // Build details for the selected inventory item
     let html = '<div class="detail-card">';
-    html += `<div class="detail-name">${getItemDisplayName(item)}</div>`;
+    const displayName = getItemDisplayName(item);
+    html += `<div class="detail-name">${displayName}</div>`;
+    
+    // Display image if available (for objects only, not NPCs)
+    // Exclude images for writings, doors, and texture map objects
+    if (item.image_path) {
+        // Object images - exclude writings, doors, and texture map objects
+        const objId = item.object_id || 0;
+        // Handle string hex values (e.g., "0x0AA" or "0AA")
+        let imageObjId = typeof objId === 'string' ? 
+            (objId.startsWith('0x') || objId.startsWith('0X') ? parseInt(objId, 16) : 
+             /^[0-9A-Fa-f]+$/.test(objId) ? parseInt(objId, 16) : parseInt(objId, 10)) : 
+            (objId || 0);
+        imageObjId = Number(imageObjId) || 0;
+        
+        const isWriting = imageObjId === 0x166;
+        const isDoor = (imageObjId >= 0x140 && imageObjId <= 0x14F);
+        const isTextureMap = (imageObjId >= 0x16E && imageObjId <= 0x16F);
+        
+        if (!isWriting && !isDoor && !isTextureMap) {
+            html += `
+                <div class="detail-image-container">
+                    <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="detail-image-placeholder" style="display: none;">
+                        <span class="image-placeholder-icon">🖼️</span>
+                        <span class="image-placeholder-text">No image available</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
     
     const catColor = getCategoryColor(item.category);
     html += `
@@ -5384,7 +5415,49 @@ function selectContainerItem(item, parentContainer = null) {
     
     // Build details for the selected container item
     let html = '<div class="detail-card">';
-    html += `<div class="detail-name">${getItemDisplayName(item)}</div>`;
+    const displayName = getItemDisplayName(item);
+    html += `<div class="detail-name">${displayName}</div>`;
+    
+    // Display image if available (for objects only, not NPCs)
+    // Exclude images for writings, doors, and texture map objects
+    if (item.image_path) {
+        // Object images - exclude writings, doors, and texture map objects
+        let imageObjId = item.object_id;
+        if (imageObjId === undefined || imageObjId === null || imageObjId === '') {
+            if (item.object_id_hex) {
+                imageObjId = parseInt(item.object_id_hex, 16);
+            } else {
+                imageObjId = 0;
+            }
+        }
+        if (typeof imageObjId === 'string') {
+            if (imageObjId.startsWith('0x') || imageObjId.startsWith('0X')) {
+                imageObjId = parseInt(imageObjId, 16);
+            } else if (/^[0-9A-Fa-f]+$/.test(imageObjId)) {
+                imageObjId = parseInt(imageObjId, 16);
+            } else {
+                imageObjId = parseInt(imageObjId, 10);
+            }
+        }
+        imageObjId = Number(imageObjId) || 0;
+        
+        const isWriting = imageObjId === 0x166;
+        const isDoor = (imageObjId >= 0x140 && imageObjId <= 0x14F);
+        const isTextureMap = (imageObjId >= 0x16E && imageObjId <= 0x16F);
+        
+        if (!isWriting && !isDoor && !isTextureMap) {
+            html += `
+                <div class="detail-image-container">
+                    <img src="${item.image_path}" alt="${displayName}" class="detail-image" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="detail-image-placeholder" style="display: none;">
+                        <span class="image-placeholder-icon">🖼️</span>
+                        <span class="image-placeholder-text">No image available</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
     
     const catColor = getCategoryColor(item.category);
     
