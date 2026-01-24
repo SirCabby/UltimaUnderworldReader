@@ -57,7 +57,7 @@ const CONFIG = {
  */
 const CATEGORY_GROUPS = {
     npcs: ['npcs_named', 'npcs_friendly', 'npcs_hostile'],
-    items: ['quest', 'runes', 'weapons', 'armor', 'keys', 'containers', 'spell_scrolls', 'potions', 'wands', 'food', 'treasure', 'light', 'misc', 'scrolls', 'books', 'useless_item'],
+    items: ['quest', 'runes', 'weapons', 'armor', 'keys', 'containers', 'spell_scrolls', 'potions', 'wands', 'food', 'treasure', 'light', 'misc', 'books_scrolls', 'useless_item'],
     world: ['stairs', 'shrines', 'secret_doors', 'doors_locked', 'doors_unlocked', 'storage', 'switches', 'traps', 'triggers', 'boulders', 'illusory_walls', 'writings', 'gravestones', 'bridges', 'furniture', 'scenery', 'texture_objects', 'animations']
 };
 

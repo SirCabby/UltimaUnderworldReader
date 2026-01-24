@@ -793,14 +793,14 @@ class JsonExporter:
             # Consumables
             'food': 'food',
             'potion': 'potions',
-            # Books & Scrolls - now split
-            'scroll': 'scrolls',
-            'book': 'books',
-            'readable_scroll': 'scrolls',
-            'readable_book': 'books',
+            # Books & Scrolls - combined into single category
+            'scroll': 'books_scrolls',
+            'book': 'books_scrolls',
+            'readable_scroll': 'books_scrolls',
+            'readable_book': 'books_scrolls',
             'quest_book': 'quest',  # Quest books like Book of Honesty
             'spell_scroll': 'spell_scrolls',
-            'map': 'books',  # Maps shown with books
+            'map': 'books_scrolls',  # Maps shown with books & scrolls
             # Light sources
             'light_source': 'light',
             # Runes (talismans/virtue keys are quest items)
@@ -1768,8 +1768,7 @@ class JsonExporter:
                 {'id': 'food', 'name': 'Food', 'color': '#a9e34b'},
                 {'id': 'potions', 'name': 'Potions', 'color': '#f783ac'},
                 # Books & Scrolls
-                {'id': 'books', 'name': 'Readable Books', 'color': '#e8d4b8'},
-                {'id': 'scrolls', 'name': 'Readable Scrolls', 'color': '#d4c4a8'},
+                {'id': 'books_scrolls', 'name': 'Books & Scrolls', 'color': '#e8d4b8'},
                 {'id': 'spell_scrolls', 'name': 'Spell Scrolls', 'color': '#da77f2'},
                 {'id': 'writings', 'name': 'Writings', 'color': '#d4c4a8'},
                 {'id': 'gravestones', 'name': 'Gravestones', 'color': '#c4a484'},

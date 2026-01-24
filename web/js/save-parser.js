@@ -408,8 +408,8 @@ const CATEGORY_MAPPING = {
     'food': 'food',
     'potion': 'potions',
     // Books & Scrolls
-    'book': 'readable_scrolls_books',
-    'scroll': 'readable_scrolls_books',
+    'book': 'books_scrolls',
+    'scroll': 'books_scrolls',
     'spell_scroll': 'spell_scrolls',
     // Magic Items
     'rune': 'runes',

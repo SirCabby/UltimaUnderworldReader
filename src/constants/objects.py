@@ -205,6 +205,7 @@ CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
     "map": "Map",
     "readable_book": "Readable Book",
     "readable_scroll": "Readable Scroll",
+    "books_scrolls": "Books & Scrolls",
     "spell_scroll": "Spell Scroll",
     "door": "Door",
     "door_locked": "Locked Door",
@@ -333,11 +334,12 @@ def get_detailed_category(item_id: int, is_enchanted: bool = False,
         return 'container'
     
     # Books and scrolls: distinguish readable from spell scrolls
+    # Readable books and scrolls are combined into a single category
     if base_category in ('book', 'scroll'):
         if is_enchanted:
             return 'spell_scroll'
         else:
-            return f'readable_{base_category}'
+            return 'books_scrolls'
     
     # Special case: moongate (0x15A) should be categorized as door_unlocked
     if item_id == 0x15A:
