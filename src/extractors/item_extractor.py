@@ -269,7 +269,8 @@ class ItemExtractor:
         Return door metadata for this door object type.
 
         Door massiveness is determined per-instance:
-        - object_id 0x145 (door_style_5) => always massive (unbreakable)
+        - object_id 0x145 (door_style_5) and 0x14D (open door_style_5) => always massive (unbreakable)
+        - object_id 0x146 (portcullis) and 0x14E (open_portcullis) => always massive (unbreakable)
         - quality==63 on any door type => also massive
         - else => breakable, with quality representing health (0-40)
 
@@ -605,9 +606,11 @@ class ItemExtractor:
             
             # Determine if this door is massive (unbreakable):
             # - object_id 0x145 (door_style_5) is inherently massive regardless of quality
+            # - object_id 0x14D (open door_style_5) is inherently massive regardless of quality
             # - object_id 0x146 (portcullis) is inherently massive regardless of quality
+            # - object_id 0x14E (open_portcullis) is inherently massive regardless of quality
             # - quality==63 on any door type also indicates massive
-            is_massive_door = (obj.item_id == 0x145) or (obj.item_id == 0x146) or (raw_quality == 63)
+            is_massive_door = (obj.item_id == 0x145) or (obj.item_id == 0x14D) or (obj.item_id == 0x146) or (obj.item_id == 0x14E) or (raw_quality == 63)
             
             # Door health is max 40 for breakable doors
             door_max = 40

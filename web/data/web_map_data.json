@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-24T15:33:48.364082",
+    "generated": "2026-01-24T15:43:16.419876",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -49658,11 +49658,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, open, locked"
+            "door_status": "massive, open, locked"
           }
         },
         {
@@ -52473,11 +52473,11 @@
             "is_pickable": true,
             "door_health": 40,
             "door_max_health": 40,
-            "door_condition": "sturdy",
+            "door_condition": "massive",
             "door_variant": "portcullis",
             "door_variant_id": 326,
             "door_variant_id_hex": "0x146",
-            "door_status": "sturdy, open, locked"
+            "door_status": "massive, open, locked"
           }
         },
         {
