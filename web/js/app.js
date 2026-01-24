@@ -145,9 +145,7 @@ const STORAGE_KEY = 'uw_map_filters';
 function serializeUrlState() {
     const params = new URLSearchParams();
     params.set('level', (state.currentLevel || 0) + 1);
-    // Ensure zoom is a valid number before calling toFixed
-    const zoom = (typeof state.zoom === 'number' && !isNaN(state.zoom)) ? state.zoom : CONFIG.zoom.default;
-    params.set('zoom', zoom.toFixed(2));
+    // Explicitly do NOT save zoom - always reset to default on page load
     // Explicitly do NOT save pan - always reset to center on page load
     // Store selected marker as "id:isNpc" (e.g., "123:true" or "456:false")
     if (state.selectedMarker && state.selectedMarker.dataset) {
@@ -157,8 +155,9 @@ function serializeUrlState() {
             params.set('selected', `${id}:${isNpc}`);
         }
     }
-    // Ensure pan is never in the URL (remove it if somehow present)
+    // Ensure pan and zoom are never in the URL (remove them if somehow present)
     params.delete('pan');
+    params.delete('zoom');
     return params.toString();
 }
 
@@ -181,7 +180,8 @@ function saveFiltersToStorage() {
         ownedFilter: state.filters.ownedFilter,
         changeTypes: Array.from(state.filters.changeTypes),
         collapsedCategories: Array.from(state.collapsedCategories),
-        viewLocked: state.viewLocked
+        viewLocked: state.viewLocked,
+        zoom: state.zoom  // Persist zoom level
     };
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
@@ -223,14 +223,7 @@ function parseUrlState() {
         }
     }
     
-    // Parse zoom
-    if (params.has('zoom')) {
-        const zoom = parseFloat(params.get('zoom'));
-        if (!isNaN(zoom) && zoom >= CONFIG.zoom.min && zoom <= CONFIG.zoom.max) {
-            result.zoom = zoom;
-        }
-    }
-    
+    // Don't parse zoom - always reset to default on page load
     // Don't parse pan - always reset to center on page load
     
     // Parse selected marker (format: "id:isNpc")
@@ -333,6 +326,14 @@ function restoreState() {
         if (typeof storedFilters.viewLocked === 'boolean') {
             state.viewLocked = storedFilters.viewLocked;
         }
+        
+        // Restore zoom from localStorage if present and valid
+        if (typeof storedFilters.zoom === 'number' && 
+            !isNaN(storedFilters.zoom) && 
+            storedFilters.zoom >= CONFIG.zoom.min && 
+            storedFilters.zoom <= CONFIG.zoom.max) {
+            state.zoom = storedFilters.zoom;
+        }
     }
     
     // Restore navigation from URL hash
@@ -341,24 +342,21 @@ function restoreState() {
         if (typeof urlState.level === 'number') {
             state.currentLevel = urlState.level;
         }
-        // Restore zoom if present, otherwise use default
-        if (typeof urlState.zoom === 'number') {
-            state.zoom = urlState.zoom;
-        } else {
-            state.zoom = CONFIG.zoom.default;
-        }
+        // Zoom is restored from localStorage above, or defaults if not found
         // Always reset pan to center (don't restore pan position)
         state.pan = { x: 0, y: 0 };
         // Store pending selection to restore after markers render
         if (urlState.selectedId) {
             state.pendingSelection = {
-                id: urlState.selectedId,
-                isNpc: urlState.selectedIsNpc
+                id: String(urlState.selectedId),  // Ensure it's a string for comparison
+                isNpc: String(urlState.selectedIsNpc)  // Ensure it's a string for comparison
             };
         }
     } else {
-        // No URL state - ensure defaults are set
-        state.zoom = CONFIG.zoom.default;
+        // No URL state - ensure defaults are set (zoom already restored from localStorage if available)
+        if (typeof state.zoom !== 'number' || isNaN(state.zoom)) {
+            state.zoom = CONFIG.zoom.default;
+        }
         state.pan = { x: 0, y: 0 };
     }
 }
@@ -377,21 +375,30 @@ function restorePendingSelection() {
     const { id, isNpc } = state.pendingSelection;
     state.pendingSelection = null;
     
+    // Normalize values to strings for comparison
+    const normalizedId = String(id);
+    const normalizedIsNpc = String(isNpc);
+    
     // Find the marker with matching id and isNpc
+    // Check both regular markers and markers within groups (for stacked markers)
     const markers = document.querySelectorAll('.marker');
     for (const marker of markers) {
-        if (marker.dataset.id === id && marker.dataset.isNpc === isNpc) {
+        // Normalize dataset values to strings for comparison
+        const markerId = String(marker.dataset.id || '');
+        const markerIsNpc = String(marker.dataset.isNpc || '');
+        
+        if (markerId === normalizedId && markerIsNpc === normalizedIsNpc) {
             // Find the item data
             const level = state.data.levels[state.currentLevel];
             if (!level) return;
             
             let item = null;
-            let itemIsNpc = isNpc === 'true';
+            let itemIsNpc = normalizedIsNpc === 'true';
             
             if (itemIsNpc) {
-                item = level.npcs.find(npc => String(npc.id) === id);
+                item = level.npcs.find(npc => String(npc.id) === normalizedId);
             } else {
-                item = level.objects.find(obj => String(obj.id) === id);
+                item = level.objects.find(obj => String(obj.id) === normalizedId);
             }
             
             if (item) {
@@ -399,6 +406,35 @@ function restorePendingSelection() {
                 selectItem(item, itemIsNpc, marker);
             }
             return;
+        }
+    }
+    
+    // Also check for stacked marker groups
+    const groups = document.querySelectorAll('.stacked-marker-group');
+    for (const group of groups) {
+        const markersInGroup = group.querySelectorAll('.marker');
+        for (const marker of markersInGroup) {
+            const markerId = String(marker.dataset.id || '');
+            const markerIsNpc = String(marker.dataset.isNpc || '');
+            
+            if (markerId === normalizedId && markerIsNpc === normalizedIsNpc) {
+                const level = state.data.levels[state.currentLevel];
+                if (!level) return;
+                
+                let item = null;
+                let itemIsNpc = normalizedIsNpc === 'true';
+                
+                if (itemIsNpc) {
+                    item = level.npcs.find(npc => String(npc.id) === normalizedId);
+                } else {
+                    item = level.objects.find(obj => String(obj.id) === normalizedId);
+                }
+                
+                if (item) {
+                    selectItem(item, itemIsNpc, group);  // Select the group for stacked markers
+                }
+                return;
+            }
         }
     }
 }
@@ -507,8 +543,12 @@ async function init() {
         setupChangeTypesFilter();
         updateSaveGameUI();
         
-        // Load the restored level (or first level if none saved), preserving pan/zoom from URL
+        // Load the restored level (or first level if none saved)
         selectLevel(state.currentLevel, true);
+        // Update zoom level display after restoring from localStorage
+        if (elements.zoomLevel) {
+            elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
+        }
         updateCategoryCounts();
         
         // Set initial URL hash if not already set
@@ -6049,6 +6089,7 @@ function adjustZoom(delta) {
     state.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, state.zoom + delta));
     updateMapTransform();
     elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
+    saveFiltersToStorage();  // Persist zoom to localStorage
     updateUrlHash();
 }
 
@@ -6058,6 +6099,7 @@ function resetView() {
     state.pan = { x: 0, y: 0 };
     updateMapTransform();
     elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
+    saveFiltersToStorage();  // Persist zoom to localStorage
     updateUrlHash();
 }
 
