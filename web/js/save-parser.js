@@ -548,6 +548,105 @@ function buildNameMap(baseData) {
     return nameMap;
 }
 
+function isDoorObjectId(objId) {
+    return objId >= 0x140 && objId <= 0x14F;
+}
+
+function doorConditionFromHealth(health) {
+    // Door-specific vocabulary (avoid cloth-like terms such as "tattered")
+    if (health <= 0) return 'broken';
+    if (health <= 13) return 'badly damaged';
+    if (health <= 26) return 'damaged';
+    return 'undamaged';
+}
+
+/**
+ * Build door extra_info (lock + health + type) to match base-game export.
+ * @param {Object} obj - Parsed object from lev.ark
+ * @param {Object} levelObjects - Map of index -> parsed object
+ * @param {Map} doorTypeMap - Map of object_id -> door metadata
+ * @returns {Object} extra_info object
+ */
+function buildDoorExtraInfo(obj, levelObjects) {
+    const objId = obj.item_id;
+    const extra = {};
+
+    extra.is_secret = (objId === 0x147 || objId === 0x14F);
+    extra.is_open = ((objId >= 0x148 && objId <= 0x14E) || objId === 0x14F);
+
+    // Doors are locked if they have a non-zero special link (to lock 0x10F) or non-zero owner (template doors)
+    const specialLink = (!obj.is_quantity) ? (obj.quantity_or_link || 0) : 0;
+    const owner = obj.owner || 0;
+
+    if (specialLink !== 0 || owner !== 0) {
+        extra.is_locked = true;
+
+        // Try to decode lock id from linked lock object (0x10F)
+        let lockId = undefined;
+        let lockQuality = undefined;
+
+        if (specialLink !== 0 && levelObjects && levelObjects[specialLink]) {
+            const lockObj = levelObjects[specialLink];
+            if (lockObj && lockObj.item_id === 0x10F) {
+                const lockQuantity = lockObj.is_quantity ? (lockObj.quantity_or_link || 0) : 0;
+                if (lockQuantity >= 512) {
+                    lockId = lockQuantity - 512;
+                }
+                lockQuality = lockObj.quality;
+            }
+        }
+
+        // Fallback: template doors store lock id in owner field
+        if (lockId === undefined && owner !== 0) {
+            lockId = owner;
+        }
+
+        if (lockId !== undefined) {
+            extra.lock_id = lockId;
+            extra.lock_type = 'keyed';
+        } else {
+            extra.lock_type = 'special';
+        }
+
+        if (lockQuality !== undefined) {
+            extra.is_pickable = (lockQuality === 40);
+        } else {
+            extra.is_pickable = false;
+        }
+    } else {
+        extra.is_locked = false;
+    }
+
+    // Health/type
+    // Determine if this door is massive (unbreakable):
+    // - object_id 0x145 (door_style_5) is inherently massive regardless of quality
+    // - quality==63 on any door type also indicates massive
+    const rawQuality = (obj.quality !== undefined) ? obj.quality : 0;
+    const isMassiveDoor = (objId === 0x145) || (rawQuality === 63);
+    
+    const doorMax = 40;
+    const doorHealth = isMassiveDoor ? doorMax : Math.max(0, Math.min(doorMax, rawQuality));
+    extra.door_health = doorHealth;
+    extra.door_max_health = doorMax;
+    extra.door_condition = doorConditionFromHealth(doorHealth);
+
+    // Override condition based on massive determination
+    if (isMassiveDoor) {
+        extra.door_condition = 'massive';
+    } else if (doorHealth === doorMax) {
+        extra.door_condition = 'sturdy';
+    }
+
+    const statusParts = [];
+    statusParts.push(extra.door_condition);
+    statusParts.push(extra.is_open ? 'open' : 'closed');
+    if (extra.is_locked) statusParts.push('locked');
+    if (extra.is_secret) statusParts.push('secret');
+    extra.door_status = statusParts.join(', ');
+
+    return extra;
+}
+
 /**
  * Check if a teleport trap likely represents a level transition (stairs).
  * 
@@ -830,6 +929,11 @@ function convertLevelToWebFormat(levelNum, level, categoryMap, baseData) {
                 quality: obj.quality,
                 owner: obj.owner
             };
+
+            // Doors: add extra_info for lock + health/type/status (matches base export)
+            if (isDoorObjectId(obj.item_id)) {
+                objData.extra_info = buildDoorExtraInfo(obj, level.objects);
+            }
             
             // Add stairs destination level if this is a stairs trigger
             if (category === 'stairs' && stairsDestLevel !== null) {

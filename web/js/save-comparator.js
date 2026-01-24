@@ -315,6 +315,24 @@ class SaveGameComparator {
                 to: saveLockId !== undefined ? saveLockId : 'none'
             });
         }
+
+        // Doors: check door health/condition (stored in extra_info to avoid door quality semantics)
+        const baseDoorHealth = baseExtra.door_health;
+        const saveDoorHealth = saveExtra.door_health;
+        if (baseDoorHealth !== saveDoorHealth && (baseDoorHealth !== undefined || saveDoorHealth !== undefined)) {
+            const baseMax = baseExtra.door_max_health !== undefined ? baseExtra.door_max_health : 40;
+            const saveMax = saveExtra.door_max_health !== undefined ? saveExtra.door_max_health : 40;
+            const baseCond = baseExtra.door_condition ? ` (${baseExtra.door_condition})` : '';
+            const saveCond = saveExtra.door_condition ? ` (${saveExtra.door_condition})` : '';
+            changes.push({
+                property: 'door_health',
+                displayName: 'Door Health',
+                from: (baseDoorHealth !== undefined) ? `${baseDoorHealth}/${baseMax}${baseCond}` : 'none',
+                to: (saveDoorHealth !== undefined) ? `${saveDoorHealth}/${saveMax}${saveCond}` : 'none'
+            });
+        }
+
+        // Door type is derived from health; don't compare a separate type field.
         
         return changes;
     }

@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-23T22:19:26.212958",
+    "generated": "2026-01-24T00:08:45.748075",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -1289,67 +1289,115 @@
     },
     "320": {
       "name": "door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_0",
+      "door_variant_id": 320,
+      "door_variant_id_hex": "0x140"
     },
     "321": {
       "name": "door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_1",
+      "door_variant_id": 321,
+      "door_variant_id_hex": "0x141"
     },
     "322": {
       "name": "door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_2",
+      "door_variant_id": 322,
+      "door_variant_id_hex": "0x142"
     },
     "323": {
       "name": "door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_3",
+      "door_variant_id": 323,
+      "door_variant_id_hex": "0x143"
     },
     "324": {
       "name": "door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_4",
+      "door_variant_id": 324,
+      "door_variant_id_hex": "0x144"
     },
     "325": {
       "name": "door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_5",
+      "door_variant_id": 325,
+      "door_variant_id_hex": "0x145"
     },
     "326": {
       "name": "portcullis",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "portcullis",
+      "door_variant_id": 326,
+      "door_variant_id_hex": "0x146"
     },
     "327": {
       "name": "secret door",
-      "category": "secret_doors"
+      "category": "secret_doors",
+      "door_variant": "secret_door",
+      "door_variant_id": 327,
+      "door_variant_id_hex": "0x147"
     },
     "328": {
       "name": "open door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_0",
+      "door_variant_id": 320,
+      "door_variant_id_hex": "0x140"
     },
     "329": {
       "name": "open door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_1",
+      "door_variant_id": 321,
+      "door_variant_id_hex": "0x141"
     },
     "330": {
       "name": "open door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_2",
+      "door_variant_id": 322,
+      "door_variant_id_hex": "0x142"
     },
     "331": {
       "name": "open door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_3",
+      "door_variant_id": 323,
+      "door_variant_id_hex": "0x143"
     },
     "332": {
       "name": "open door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_4",
+      "door_variant_id": 324,
+      "door_variant_id_hex": "0x144"
     },
     "333": {
       "name": "open door",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "door_style_5",
+      "door_variant_id": 325,
+      "door_variant_id_hex": "0x145"
     },
     "334": {
       "name": "open portcullis",
-      "category": "doors_unlocked"
+      "category": "doors_unlocked",
+      "door_variant": "portcullis",
+      "door_variant_id": 326,
+      "door_variant_id_hex": "0x146"
     },
     "335": {
       "name": "secret door",
-      "category": "secret_doors"
+      "category": "secret_doors",
+      "door_variant": "secret_door",
+      "door_variant_id": 327,
+      "door_variant_id_hex": "0x147"
     },
     "336": {
       "name": "bench",
@@ -3442,7 +3490,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -3963,7 +4018,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -4340,7 +4402,14 @@
             "is_locked": true,
             "lock_id": 2,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -4584,7 +4653,14 @@
             "is_locked": true,
             "lock_id": 4,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -4929,7 +5005,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -5062,7 +5145,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -5079,7 +5169,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -5371,7 +5468,14 @@
             "is_locked": true,
             "lock_id": 4,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -5597,7 +5701,14 @@
             "is_open": false,
             "is_locked": true,
             "lock_type": "special",
-            "is_pickable": false
+            "is_pickable": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -5808,7 +5919,14 @@
             "is_locked": true,
             "lock_id": 3,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -5894,7 +6012,14 @@
             "is_locked": true,
             "lock_id": 3,
             "lock_type": "keyed",
-            "is_pickable": false
+            "is_pickable": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -5911,7 +6036,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -5931,7 +6063,14 @@
             "is_locked": true,
             "lock_id": 3,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -6232,7 +6371,14 @@
             "is_locked": true,
             "lock_id": 2,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -6249,7 +6395,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -6266,7 +6419,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 26,
+            "door_max_health": 40,
+            "door_condition": "damaged",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "damaged, closed"
           }
         },
         {
@@ -6810,7 +6970,14 @@
             "is_locked": true,
             "lock_id": 2,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -6830,7 +6997,14 @@
             "is_locked": true,
             "lock_id": 2,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -7286,7 +7460,14 @@
             "is_locked": true,
             "lock_id": 2,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 2,
+            "door_max_health": 40,
+            "door_condition": "badly damaged",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "badly damaged, closed, locked"
           }
         },
         {
@@ -7306,7 +7487,14 @@
             "is_locked": true,
             "lock_id": 1,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -7561,7 +7749,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -7754,7 +7949,14 @@
             "is_locked": true,
             "lock_id": 1,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -7809,7 +8011,14 @@
             "is_locked": true,
             "lock_id": 2,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -7826,7 +8035,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -7929,7 +8145,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -7949,7 +8172,14 @@
             "is_locked": true,
             "lock_id": 1,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -7969,7 +8199,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -7989,7 +8226,14 @@
             "is_locked": true,
             "lock_id": 1,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -8006,7 +8250,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -8026,7 +8277,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -12261,7 +12519,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -12361,7 +12626,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -12456,7 +12728,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -12473,7 +12752,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -12560,7 +12846,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -12878,7 +13171,14 @@
             "is_locked": true,
             "lock_id": 6,
             "lock_type": "keyed",
-            "is_pickable": false
+            "is_pickable": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -12941,7 +13241,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "massive, closed"
           }
         },
         {
@@ -13562,7 +13869,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -13648,7 +13962,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed"
           }
         },
         {
@@ -13953,7 +14274,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -13970,7 +14298,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -13990,7 +14325,14 @@
             "is_locked": true,
             "lock_id": 6,
             "lock_type": "keyed",
-            "is_pickable": false
+            "is_pickable": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -14149,7 +14491,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed"
           }
         },
         {
@@ -14356,7 +14705,14 @@
             "is_locked": true,
             "lock_id": 5,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -14376,7 +14732,14 @@
             "is_locked": true,
             "lock_id": 5,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -14393,7 +14756,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -14410,7 +14780,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -14486,7 +14863,14 @@
             "is_locked": true,
             "lock_id": 5,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -14503,7 +14887,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -14536,7 +14927,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -14556,7 +14954,14 @@
             "is_locked": true,
             "lock_id": 5,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -14573,7 +14978,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -14712,7 +15124,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -14876,7 +15295,14 @@
             "is_locked": true,
             "lock_id": 5,
             "lock_type": "keyed",
-            "is_pickable": false
+            "is_pickable": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -16658,7 +17084,14 @@
             "is_locked": true,
             "lock_id": 9,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -16678,7 +17111,14 @@
             "is_locked": true,
             "lock_id": 9,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -16698,7 +17138,14 @@
             "is_locked": true,
             "lock_id": 9,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -16718,7 +17165,14 @@
             "is_locked": true,
             "lock_id": 9,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -16769,7 +17223,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -16786,7 +17247,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -17347,7 +17815,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -18617,7 +19092,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -18634,7 +19116,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -18663,7 +19152,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -18778,7 +19274,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -18836,7 +19339,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 11,
+            "door_max_health": 40,
+            "door_condition": "badly damaged",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "badly damaged, closed, locked"
           }
         },
         {
@@ -19966,7 +20476,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -19998,7 +20515,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -20018,7 +20542,14 @@
             "is_locked": true,
             "lock_id": 11,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -20038,7 +20569,14 @@
             "is_locked": true,
             "lock_id": 11,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -20110,7 +20648,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -20190,7 +20735,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -20210,7 +20762,14 @@
             "is_locked": true,
             "lock_id": 11,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -20301,7 +20860,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 20,
+            "door_max_health": 40,
+            "door_condition": "damaged",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "damaged, closed, locked"
           }
         },
         {
@@ -20321,7 +20887,14 @@
             "is_locked": true,
             "lock_id": 10,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -21048,7 +21621,14 @@
             "is_locked": true,
             "lock_id": 9,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -21068,7 +21648,14 @@
             "is_locked": true,
             "lock_id": 11,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -21088,7 +21675,14 @@
             "is_locked": true,
             "lock_id": 11,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -21108,7 +21702,14 @@
             "is_locked": true,
             "lock_id": 11,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -21205,7 +21806,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -21266,7 +21874,14 @@
             "is_locked": true,
             "lock_id": 9,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -21325,7 +21940,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed"
           }
         },
         {
@@ -21778,7 +22400,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -21857,7 +22486,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -21877,7 +22513,14 @@
             "is_locked": true,
             "lock_id": 8,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -21897,7 +22540,14 @@
             "is_locked": true,
             "lock_id": 8,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -24966,7 +25616,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -24983,7 +25640,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -25858,7 +26522,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -25950,7 +26621,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -25967,7 +26645,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -25984,7 +26669,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -26001,7 +26693,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -26191,7 +26890,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -26447,7 +27153,14 @@
             "is_locked": true,
             "lock_id": 8,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -27829,7 +28542,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -28651,7 +29371,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28668,7 +29395,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28685,7 +29419,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28702,7 +29443,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28816,7 +29564,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28833,7 +29588,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28850,7 +29612,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28867,7 +29636,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28884,7 +29660,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28940,7 +29723,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28957,7 +29747,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28974,7 +29771,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -28991,7 +29795,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -29008,7 +29819,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -29025,7 +29843,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -29042,7 +29867,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -29062,7 +29894,14 @@
             "is_locked": true,
             "lock_id": 13,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -32849,7 +33688,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -32975,7 +33821,14 @@
             "is_locked": true,
             "lock_id": 15,
             "lock_type": "keyed",
-            "is_pickable": false
+            "is_pickable": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "massive, open, locked"
           }
         },
         {
@@ -32995,7 +33848,14 @@
             "is_locked": true,
             "lock_id": 15,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -35534,7 +36394,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -35564,7 +36431,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -36309,7 +37183,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -36387,7 +37268,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed"
           }
         },
         {
@@ -36561,7 +37449,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -36761,7 +37656,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37104,7 +38006,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37121,7 +38030,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37138,7 +38054,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37155,7 +38078,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37172,7 +38102,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37256,7 +38193,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37288,7 +38232,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37321,7 +38272,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37486,7 +38444,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37503,7 +38468,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -37553,7 +38525,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -42022,7 +43001,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43417,7 +44403,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43736,7 +44729,14 @@
             "is_open": false,
             "is_locked": true,
             "lock_type": "special",
-            "is_pickable": false
+            "is_pickable": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -43753,7 +44753,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43770,7 +44777,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43787,7 +44801,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43922,7 +44943,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43939,7 +44967,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed"
           }
         },
         {
@@ -43956,7 +44991,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43973,7 +45015,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -43990,7 +45039,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -44024,7 +45080,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -48330,7 +49393,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -48364,7 +49434,14 @@
             "is_locked": true,
             "lock_id": 27,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -48534,7 +49611,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -48554,7 +49638,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -48571,7 +49662,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -48591,7 +49689,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, open, locked"
           }
         },
         {
@@ -48611,7 +49716,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -48628,7 +49740,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -48748,7 +49867,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -49062,7 +50188,14 @@
             "is_locked": true,
             "lock_id": 25,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -49643,7 +50776,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -49663,7 +50803,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -49867,7 +51014,14 @@
             "is_locked": true,
             "lock_id": 25,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -50144,7 +51298,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -50194,7 +51355,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -50211,7 +51379,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -50228,7 +51403,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -50245,7 +51427,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -50313,7 +51502,14 @@
             "is_locked": true,
             "lock_id": 27,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -50688,7 +51884,14 @@
             "is_locked": true,
             "lock_id": 26,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -50936,7 +52139,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -50953,7 +52163,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -50973,7 +52190,14 @@
             "is_locked": true,
             "lock_id": 27,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -50990,7 +52214,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -51010,7 +52241,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -51030,7 +52268,14 @@
             "is_locked": true,
             "lock_id": 27,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -51050,7 +52295,14 @@
             "is_locked": true,
             "lock_id": 27,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -51070,7 +52322,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -51090,7 +52349,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -51107,7 +52373,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": true,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, open"
           }
         },
         {
@@ -51127,7 +52400,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -51144,7 +52424,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": true,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, open"
           }
         },
         {
@@ -51161,7 +52448,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": true,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, open"
           }
         },
         {
@@ -51210,7 +52504,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "portcullis",
+            "door_variant_id": 326,
+            "door_variant_id_hex": "0x146",
+            "door_status": "sturdy, open, locked"
           }
         },
         {
@@ -51230,7 +52531,14 @@
             "is_locked": true,
             "lock_id": 23,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_0",
+            "door_variant_id": 320,
+            "door_variant_id_hex": "0x140",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -51250,7 +52558,14 @@
             "is_locked": true,
             "lock_id": 24,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {
@@ -51340,7 +52655,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -51420,7 +52742,14 @@
             "is_locked": true,
             "lock_id": 24,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_4",
+            "door_variant_id": 324,
+            "door_variant_id_hex": "0x144",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -56632,7 +57961,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_3",
+            "door_variant_id": 323,
+            "door_variant_id_hex": "0x143",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -56649,7 +57985,14 @@
           "extra_info": {
             "is_secret": false,
             "is_open": false,
-            "is_locked": false
+            "is_locked": false,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_2",
+            "door_variant_id": 322,
+            "door_variant_id_hex": "0x142",
+            "door_status": "sturdy, closed"
           }
         },
         {
@@ -59241,7 +60584,14 @@
             "is_locked": true,
             "lock_id": 0,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "sturdy",
+            "door_variant": "door_style_1",
+            "door_variant_id": 321,
+            "door_variant_id_hex": "0x141",
+            "door_status": "sturdy, closed, locked"
           }
         },
         {
@@ -59756,7 +61106,14 @@
             "is_locked": true,
             "lock_id": 28,
             "lock_type": "keyed",
-            "is_pickable": true
+            "is_pickable": true,
+            "door_health": 40,
+            "door_max_health": 40,
+            "door_condition": "massive",
+            "door_variant": "door_style_5",
+            "door_variant_id": 325,
+            "door_variant_id_hex": "0x145",
+            "door_status": "massive, closed, locked"
           }
         },
         {

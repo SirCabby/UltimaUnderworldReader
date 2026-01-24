@@ -195,6 +195,7 @@ class ItemExtractor:
     def _extract_item_types(self) -> None:
         """Extract all item type definitions."""
         object_names = self.strings.get_block(StringsParser.BLOCK_OBJECT_NAMES) or []
+        object_look = self.strings.get_block(StringsParser.BLOCK_OBJECT_LOOK) or []
         
         for item_id in range(self.NUM_ITEM_TYPES):
             # Get base name from strings
@@ -224,7 +225,7 @@ class ItemExtractor:
             common_props = self.common.get_object(item_id)
             
             # Get class-specific properties
-            properties = self._get_class_properties(item_id)
+            properties = self._get_class_properties(item_id, object_look)
             
             # Get category using detailed category to handle scenery -> useless_item split
             can_be_picked_up = common_props.can_be_picked_up if common_props else False
@@ -250,9 +251,73 @@ class ItemExtractor:
             
             self.item_types[item_id] = info
     
-    def _get_class_properties(self, item_id: int) -> Dict[str, Any]:
+    def _normalize_door_object_id(self, item_id: int) -> int:
+        """Normalize open/closed variants to a stable 'base' door id."""
+        # Closed doors (0x140-0x145) <-> open doors (0x148-0x14D)
+        if 0x148 <= item_id <= 0x14D:
+            return item_id - 8
+        # Open portcullis -> portcullis
+        if item_id == 0x14E:
+            return 0x146
+        # Open secret door -> secret door
+        if item_id == 0x14F:
+            return 0x147
+        return item_id
+
+    def _get_door_type_info(self, item_id: int, object_look: list[str]) -> Dict[str, Any]:
+        """
+        Return door metadata for this door object type.
+
+        Door massiveness is determined per-instance:
+        - object_id 0x145 (door_style_5) => always massive (unbreakable)
+        - quality==63 on any door type => also massive
+        - else => breakable, with quality representing health (0-40)
+
+        For type tables (`object_types`), we provide variant info only.
+        Actual massive/sturdy determination happens per-instance in _get_extra_info.
+        """
+        base_id = self._normalize_door_object_id(item_id)
+        # Provide a stable variant identity even when we can't name the material.
+        if 0x140 <= base_id <= 0x145:
+            door_variant = f"door_style_{base_id - 0x140}"
+        elif base_id == 0x146:
+            door_variant = "portcullis"
+        elif base_id == 0x147:
+            door_variant = "secret_door"
+        else:
+            door_variant = f"door_0x{base_id:03X}"
+
+        return {
+            "type": "door",
+            "door_variant": door_variant,
+            "door_variant_id": base_id,
+            "door_variant_id_hex": f"0x{base_id:03X}",
+        }
+
+    @staticmethod
+    def _door_condition_from_health(health: int) -> str:
+        """
+        Convert door health (0-63) to a UI-friendly condition label.
+
+        We intentionally keep these broad buckets; UW uses many per-item quality semantics.
+        """
+        # Doors use a different vocabulary than cloth/armor condition; avoid "tattered".
+        # Health is treated as 0..40 for breakable doors.
+        if health <= 0:
+            return "broken"
+        if health <= 13:
+            return "badly damaged"
+        if health <= 26:
+            return "damaged"
+        return "undamaged"
+
+    def _get_class_properties(self, item_id: int, object_look: list[str]) -> Dict[str, Any]:
         """Get class-specific properties for an item."""
         props = {}
+
+        # Doors (including portcullis and secret doors)
+        if is_door(item_id):
+            return self._get_door_type_info(item_id, object_look)
         
         # Melee weapons
         if item_id <= 0x0F:
@@ -475,7 +540,7 @@ class ItemExtractor:
         if is_door(obj.item_id):
             extra['is_secret'] = is_secret_door(obj.item_id)
             # Check if door is open (IDs 0x148-0x14E are open versions)
-            extra['is_open'] = 0x148 <= obj.item_id <= 0x14E
+            extra['is_open'] = (0x148 <= obj.item_id <= 0x14E) or (obj.item_id == 0x14F)
             
             # A door is locked if:
             # 1. It has a non-zero special_link (pointing to a lock object 0x10F), OR
@@ -515,6 +580,48 @@ class ItemExtractor:
                     extra['is_pickable'] = False
             else:
                 extra['is_locked'] = False
+
+            # Door health/type/status
+            raw_quality = int(getattr(obj, "quality", 0))
+            
+            # Determine if this door is massive (unbreakable):
+            # - object_id 0x145 (door_style_5) is inherently massive regardless of quality
+            # - quality==63 on any door type also indicates massive
+            is_massive_door = (obj.item_id == 0x145) or (raw_quality == 63)
+            
+            # Door health is max 40 for breakable doors
+            door_max = 40
+            if is_massive_door:
+                door_health = door_max  # Massive doors show full health
+            else:
+                door_health = max(0, min(door_max, raw_quality))
+            extra['door_health'] = door_health
+            extra['door_max_health'] = door_max
+            extra['door_condition'] = self._door_condition_from_health(door_health)
+
+            # Merge door variant metadata from item_types when available
+            item_info = self.item_types.get(obj.item_id)
+            door_props = (item_info.properties if item_info and item_info.properties else {}) if item_info else {}
+            if door_props:
+                for k in ('door_variant', 'door_variant_id', 'door_variant_id_hex'):
+                    if k in door_props:
+                        extra[k] = door_props.get(k)
+
+            # Override condition based on massive determination
+            if is_massive_door:
+                extra['door_condition'] = "massive"
+            elif door_health == door_max:
+                extra['door_condition'] = "sturdy"
+
+            # Friendly combined status string for UI/search
+            status_parts: list[str] = []
+            status_parts.append(str(extra.get('door_condition')))
+            status_parts.append('open' if extra.get('is_open') else 'closed')
+            if extra.get('is_locked'):
+                status_parts.append('locked')
+            if extra.get('is_secret'):
+                status_parts.append('secret')
+            extra['door_status'] = ", ".join(status_parts)
         
         # Containers (chests, barrels, etc.) - check for locks
         # Containers use the same lock mechanism as doors

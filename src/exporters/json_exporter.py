@@ -1728,10 +1728,23 @@ class JsonExporter:
             for obj_id, item_info in item_types.items():
                 # Map Python category to web category using the same category_map
                 web_category = category_map.get(item_info.category, 'misc')
-                object_types[obj_id] = {
+                entry = {
                     'name': item_info.name,
                     'category': web_category
                 }
+                
+                # Door type metadata (used by browser save-game parser/UI)
+                from ..constants import is_door
+                if is_door(obj_id):
+                    props = item_info.properties or {}
+                    if 'door_variant' in props:
+                        entry['door_variant'] = props.get('door_variant', '')
+                    if 'door_variant_id' in props:
+                        entry['door_variant_id'] = props.get('door_variant_id', obj_id)
+                    if 'door_variant_id_hex' in props:
+                        entry['door_variant_id_hex'] = props.get('door_variant_id_hex', f"0x{obj_id:03X}")
+                
+                object_types[obj_id] = entry
         
         # Build final data structure
         web_data = {

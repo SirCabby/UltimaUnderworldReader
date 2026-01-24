@@ -3353,6 +3353,22 @@ function showTooltip(e, item, isNpc) {
             }
             html += `<div class="tooltip-info" style="color: #ff6b6b; font-size: 0.85rem;">${lockText}</div>`;
         }
+        // Doors: show type + health/condition
+        if (objId >= 0x140 && objId <= 0x14F && item.extra_info) {
+            const doorVariant = item.extra_info.door_variant || '';
+            const doorHealth = item.extra_info.door_health;
+            const doorMax = item.extra_info.door_max_health !== undefined ? item.extra_info.door_max_health : 40;
+            const doorCond = item.extra_info.door_condition || '';
+            
+            const variantText = doorVariant ? ` • ${escapeHtml(String(doorVariant).replace(/_/g, ' '))}` : '';
+            
+            const condDisplay = doorCond;
+            html += `<div class="tooltip-info" style="font-size: 0.8rem; color: var(--text-muted);">Status: ${escapeHtml(condDisplay)}${variantText}</div>`;
+            if (doorHealth !== undefined) {
+                const healthText = (doorCond === 'massive') ? 'unbreakable' : `${doorHealth}/${doorMax}`;
+                html += `<div class="tooltip-info" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-accent);">Health: ${healthText}</div>`;
+            }
+        }
         // Show lock number for keys (0x100-0x10E)
         if (objId >= 0x100 && objId <= 0x10E && item.effect) {
             const lockMatch = item.effect.match(/lock #(\d+)/i);
@@ -5568,6 +5584,16 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         
         // Build damage/armor/weight info line
         let statsLine = '';
+        // Doors: show condition + health
+        const isDoorObj = (objId >= 0x140 && objId <= 0x14F);
+        if (isDoorObj && obj.extra_info && obj.extra_info.door_health !== undefined) {
+            const rawCond = obj.extra_info.door_condition || '';
+            const condDisplay = rawCond;
+            statsLine += `<div style="font-size: 0.75rem; color: var(--text-muted);">Status: ${escapeHtml(condDisplay)}</div>`;
+            const doorMax = (obj.extra_info.door_max_health !== undefined) ? obj.extra_info.door_max_health : 40;
+            const healthText = (rawCond === 'massive') ? 'unbreakable' : `${obj.extra_info.door_health}/${doorMax}`;
+            statsLine += `<div style="font-size: 0.75rem; color: var(--text-accent); font-family: var(--font-mono);">Health: ${healthText}</div>`;
+        }
         if (objId <= 0x0F && (obj.slash_damage !== undefined || obj.bash_damage !== undefined || obj.stab_damage !== undefined)) {
             statsLine = `<div style="font-size: 0.75rem; color: #e03131; font-family: var(--font-mono);">${formatDamage(obj)}</div>`;
         }
@@ -6039,6 +6065,52 @@ function getTypeSpecificDetails(item) {
                 </div>
             `;
         }
+        return html;
+    }
+
+    // Doors (0x140-0x14F) - show door status and health/condition
+    if (objId >= 0x140 && objId <= 0x14F) {
+        const extra = item.extra_info || {};
+        const condLabel = extra.door_condition || '';
+        if (condLabel) {
+            const condDisplay = condLabel;
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Condition</span>
+                    <span class="detail-value">${escapeHtml(condDisplay)}</span>
+                </div>
+            `;
+        }
+        
+        if (extra.door_health !== undefined) {
+            const doorMax = (extra.door_max_health !== undefined) ? extra.door_max_health : 40;
+            const healthText = (extra.door_condition === 'massive') ? 'unbreakable' : `${extra.door_health}/${doorMax}`;
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Health</span>
+                    <span class="detail-value" style="font-family: var(--font-mono);">${healthText}</span>
+                </div>
+            `;
+        }
+        
+        if (extra.door_variant) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Variant</span>
+                    <span class="detail-value">${escapeHtml(String(extra.door_variant).replace(/_/g, ' '))}</span>
+                </div>
+            `;
+        }
+        
+        if (extra.door_status) {
+            html += `
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">${escapeHtml(extra.door_status)}</span>
+                </div>
+            `;
+        }
+        
         return html;
     }
     

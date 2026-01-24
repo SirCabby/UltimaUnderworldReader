@@ -1432,6 +1432,7 @@ body {
     justify-content: space-between;
     padding: 3px 0;
     border-bottom: 1px solid var(--border-color);
+    gap: 12px;
 }
 
 .detail-row:last-child {
@@ -1440,12 +1441,17 @@ body {
 
 .detail-label {
     color: var(--text-muted);
+    flex: 0 0 auto;
 }
 
 .detail-value {
     color: var(--text-primary);
     font-family: var(--font-mono);
     font-size: 0.85rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
 }
 
 .detail-category {
