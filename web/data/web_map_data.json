@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-24T17:57:42.787456",
+    "generated": "2026-01-24T18:55:14.414597",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -2286,7 +2286,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_039.png",
           "extra_info": {
             "texture_index": 37,
             "type": "special",
@@ -2358,7 +2358,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_038.png",
           "extra_info": {
             "texture_index": 46,
             "type": "special",
@@ -3103,7 +3103,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_027.png",
+          "image_path": "images/extracted/tmobj/tmobj_27.png",
           "description": "Keep Out"
         },
         {
@@ -3175,7 +3175,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_008.png",
+          "image_path": "images/extracted/tmobj/tmobj_08.png",
           "description": "Triggers action (type=3, param=0)"
         },
         {
@@ -3603,7 +3603,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Oh weary traveler, partake from these waters and feel new life course through thy veins."
         },
         {
@@ -3643,7 +3643,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Seeker of the mastery of practical skills, speak Om Cah, the mantra of Love."
         },
         {
@@ -3896,7 +3896,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Here lies Korianous, the master builder. Long he toiled to rework the Abyss into a home fit for the coming of Cabirus' colonists. Tragedy did strike before his task was done, when a stone block fell upon his head."
         },
         {
@@ -4021,7 +4021,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Seeker of the mysterious arts, speak Mu Ahm, the mantra of Truth."
         },
         {
@@ -4034,7 +4034,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Seeker of honor and valor in battle, speak Summ Ra, the mantra of Courage."
         },
         {
@@ -4221,7 +4221,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_029.png",
+          "image_path": "images/extracted/tmobj/tmobj_29.png",
           "description": "Keep Out"
         },
         {
@@ -4444,7 +4444,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_003.png"
+          "image_path": "images/extracted/tmobj/tmobj_03.png"
         },
         {
           "id": 730,
@@ -4456,7 +4456,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_003.png"
+          "image_path": "images/extracted/tmobj/tmobj_03.png"
         },
         {
           "id": 731,
@@ -4468,7 +4468,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_003.png"
+          "image_path": "images/extracted/tmobj/tmobj_03.png"
         },
         {
           "id": 732,
@@ -4480,7 +4480,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_003.png"
+          "image_path": "images/extracted/tmobj/tmobj_03.png"
         },
         {
           "id": 733,
@@ -4654,7 +4654,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_001.png"
+          "image_path": "images/extracted/tmobj/tmobj_01.png"
         },
         {
           "id": 753,
@@ -4666,7 +4666,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_001.png"
+          "image_path": "images/extracted/tmobj/tmobj_01.png"
         },
         {
           "id": 754,
@@ -4678,7 +4678,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_001.png"
+          "image_path": "images/extracted/tmobj/tmobj_01.png"
         },
         {
           "id": 755,
@@ -4690,7 +4690,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_001.png"
+          "image_path": "images/extracted/tmobj/tmobj_01.png"
         },
         {
           "id": 756,
@@ -5035,7 +5035,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 777,
@@ -5047,7 +5047,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 778,
@@ -5072,7 +5072,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 780,
@@ -5084,7 +5084,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 781,
@@ -5469,7 +5469,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_006.png",
           "extra_info": {
             "texture_index": 14,
             "type": "wall_texture",
@@ -6298,7 +6298,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_007.png",
+          "image_path": "images/extracted/tmobj/tmobj_07.png",
           "description": "Triggers action (type=3, param=0)"
         },
         {
@@ -6311,7 +6311,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_006.png",
+          "image_path": "images/extracted/tmobj/tmobj_06.png",
           "description": "Triggers action (type=3, param=0)"
         },
         {
@@ -6324,7 +6324,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_005.png",
+          "image_path": "images/extracted/tmobj/tmobj_05.png",
           "description": "Triggers action (type=3, param=0)"
         },
         {
@@ -6460,7 +6460,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 23,
             "type": "wall_texture",
@@ -6477,7 +6477,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_071.png",
           "extra_info": {
             "texture_index": 19,
             "type": "wall_texture",
@@ -6494,7 +6494,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_071.png",
           "extra_info": {
             "texture_index": 19,
             "type": "wall_texture",
@@ -6511,7 +6511,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_071.png",
           "extra_info": {
             "texture_index": 19,
             "type": "wall_texture",
@@ -6528,7 +6528,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_071.png",
           "extra_info": {
             "texture_index": 19,
             "type": "wall_texture",
@@ -6545,7 +6545,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_071.png",
           "extra_info": {
             "texture_index": 19,
             "type": "wall_texture",
@@ -6562,7 +6562,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_071.png",
           "extra_info": {
             "texture_index": 19,
             "type": "wall_texture",
@@ -6747,7 +6747,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Here be the Grand Staircase which descends through all deeps of the Abyss. - Korianous"
         },
         {
@@ -6760,7 +6760,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_160.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -6909,7 +6909,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -7062,7 +7062,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 927,
@@ -7074,7 +7074,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 928,
@@ -7102,7 +7102,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Plant the seed of the Silver Sapling and a new Sapling will spring forth.  In return for this gift of life, thou shalt be granted a new life thyself, when this one doth end."
         },
         {
@@ -7115,7 +7115,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 931,
@@ -7127,7 +7127,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 932,
@@ -7139,7 +7139,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 933,
@@ -7151,7 +7151,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 939,
@@ -7319,7 +7319,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_173.png",
           "extra_info": {
             "texture_index": 16,
             "type": "wall_texture",
@@ -7403,7 +7403,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "We attacked the entrance with all manner of tools, but it gave not a hair.  It simply cannot be breached.  Hence we have resigned ourselves to die in this hellish pit. - Elsmore"
         },
         {
@@ -7731,7 +7731,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -7934,7 +7934,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_023.png",
           "extra_info": {
             "texture_index": 2,
             "type": "wall_texture",
@@ -8297,7 +8297,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_170.png",
           "extra_info": {
             "texture_index": 39,
             "type": "wall_texture",
@@ -8314,7 +8314,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_170.png",
           "extra_info": {
             "texture_index": 39,
             "type": "wall_texture",
@@ -9413,7 +9413,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 575,
@@ -9452,7 +9452,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_026.png",
+          "image_path": "images/extracted/tmobj/tmobj_26.png",
           "description": "Supply Room.  Please Partake Freely."
         },
         {
@@ -9507,7 +9507,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Warning - Dangerous Undertow"
         },
         {
@@ -9582,7 +9582,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -9599,7 +9599,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -10517,7 +10517,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_033.png",
+          "image_path": "images/extracted/tmobj/tmobj_33.png",
           "description": "Unstable mines ahead"
         },
         {
@@ -11986,7 +11986,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 782,
@@ -11998,7 +11998,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 783,
@@ -12010,7 +12010,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 784,
@@ -12022,7 +12022,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 785,
@@ -12034,7 +12034,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 786,
@@ -12046,7 +12046,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 787,
@@ -12058,7 +12058,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 788,
@@ -12070,7 +12070,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 789,
@@ -12082,7 +12082,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 790,
@@ -12094,7 +12094,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 791,
@@ -12106,7 +12106,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_117.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -12123,7 +12123,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_117.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -12140,7 +12140,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 794,
@@ -12152,7 +12152,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 795,
@@ -12164,7 +12164,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 796,
@@ -12176,7 +12176,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 797,
@@ -12188,7 +12188,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 798,
@@ -12200,7 +12200,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 799,
@@ -12212,7 +12212,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 800,
@@ -12224,7 +12224,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 801,
@@ -13784,7 +13784,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -13801,7 +13801,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -13818,7 +13818,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "South Branch (to Shak)"
         },
         {
@@ -13831,7 +13831,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "North Branch.  Beware of Monster!"
         },
         {
@@ -13844,7 +13844,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Helmet recommended"
         },
         {
@@ -13857,7 +13857,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Entrance to Mines"
         },
         {
@@ -14142,7 +14142,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -14159,7 +14159,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -14516,7 +14516,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -14533,7 +14533,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -14578,7 +14578,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Quarters of Corby"
         },
         {
@@ -14591,7 +14591,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Quarters of Mondor"
         },
         {
@@ -15018,7 +15018,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_009.png",
           "extra_info": {
             "texture_index": 3,
             "type": "wall_texture",
@@ -15149,7 +15149,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 996,
@@ -15161,7 +15161,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 997,
@@ -15173,7 +15173,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 998,
@@ -15185,7 +15185,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 999,
@@ -15197,7 +15197,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1000,
@@ -15209,7 +15209,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1001,
@@ -15221,7 +15221,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1002,
@@ -15233,7 +15233,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1003,
@@ -15245,7 +15245,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1004,
@@ -15257,7 +15257,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1005,
@@ -15269,7 +15269,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1006,
@@ -15281,7 +15281,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1007,
@@ -15336,7 +15336,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 46,
             "type": "wall_texture",
@@ -15384,7 +15384,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_160.png",
           "extra_info": {
             "texture_index": 45,
             "type": "wall_texture",
@@ -15401,7 +15401,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -15464,7 +15464,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 46,
             "type": "wall_texture",
@@ -15512,7 +15512,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -16604,7 +16604,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_198.png",
           "extra_info": {
             "texture_index": 11,
             "type": "special"
@@ -16668,7 +16668,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_198.png",
           "extra_info": {
             "texture_index": 11,
             "type": "special"
@@ -16876,7 +16876,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_150.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -17056,7 +17056,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Go to the very base of the Abyss, then battle your way back up, to find the key to your fortitude."
         },
         {
@@ -17115,7 +17115,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_152.png",
           "extra_info": {
             "texture_index": 2,
             "type": "wall_texture",
@@ -17323,7 +17323,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Storage Room: East",
           "owner": 1,
           "owner_name": "red mages"
@@ -17338,7 +17338,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Storage Room: West",
           "owner": 1,
           "owner_name": "red mages"
@@ -17563,7 +17563,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -17580,7 +17580,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 36,
             "type": "wall_texture",
@@ -18302,7 +18302,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_144.png",
           "extra_info": {
             "texture_index": 0,
             "type": "wall_texture",
@@ -18440,7 +18440,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_150.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -18858,7 +18858,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_144.png",
           "extra_info": {
             "texture_index": 0,
             "type": "wall_texture",
@@ -18964,7 +18964,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_144.png",
           "extra_info": {
             "texture_index": 0,
             "type": "wall_texture",
@@ -19044,7 +19044,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_040.png",
           "extra_info": {
             "texture_index": 22,
             "type": "wall_texture",
@@ -19678,7 +19678,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_144.png",
           "extra_info": {
             "texture_index": 0,
             "type": "wall_texture",
@@ -20436,7 +20436,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Left Right Center"
         },
         {
@@ -20464,7 +20464,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_033.png",
+          "image_path": "images/extracted/tmobj/tmobj_33.png",
           "description": "ORA, the Mantra of Unarmed combat, helps the unfortunate."
         },
         {
@@ -20661,7 +20661,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_150.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -20830,7 +20830,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_034.png",
+          "image_path": "images/extracted/tmobj/tmobj_34.png",
           "description": "Heal thyself by using fountain."
         },
         {
@@ -21004,7 +21004,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Tom Loves Judy"
         },
         {
@@ -21082,7 +21082,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -21127,7 +21127,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "To protect thyself, use the ANRA chant."
         },
         {
@@ -21189,7 +21189,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_153.png",
           "extra_info": {
             "texture_index": 14,
             "type": "wall_texture",
@@ -21238,7 +21238,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_034.png",
+          "image_path": "images/extracted/tmobj/tmobj_34.png",
           "description": "Mountainman Shak: Master Weaponsmith"
         },
         {
@@ -21311,7 +21311,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -21343,7 +21343,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -21386,7 +21386,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_198.png",
           "extra_info": {
             "texture_index": 11,
             "type": "special",
@@ -21483,7 +21483,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_034.png",
+          "image_path": "images/extracted/tmobj/tmobj_34.png",
           "description": "Ask Shanklick about crazy wizard."
         },
         {
@@ -21581,7 +21581,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_150.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -21598,7 +21598,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_150.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -21777,7 +21777,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_127.png",
           "extra_info": {
             "texture_index": 23,
             "type": "wall_texture",
@@ -21794,7 +21794,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 954,
@@ -21806,7 +21806,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 955,
@@ -21818,7 +21818,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 956,
@@ -21830,7 +21830,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 957,
@@ -21890,7 +21890,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_040.png",
           "extra_info": {
             "texture_index": 22,
             "type": "wall_texture",
@@ -22195,7 +22195,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -22257,7 +22257,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_034.png",
+          "image_path": "images/extracted/tmobj/tmobj_34.png",
           "description": "Magic Crystal exposes hidden tombs and monsters."
         },
         {
@@ -22371,7 +22371,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -22418,7 +22418,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_168.png",
           "extra_info": {
             "texture_index": 3,
             "type": "wall_texture",
@@ -24149,7 +24149,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_059.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -24166,7 +24166,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_059.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -24183,7 +24183,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_059.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -24200,7 +24200,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_059.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -24217,7 +24217,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_059.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -24234,7 +24234,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_059.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -24617,7 +24617,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Armory"
         },
         {
@@ -24728,7 +24728,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Here lies Sir Ingvar, Knight of the Order of the Crux Ansata."
         },
         {
@@ -24921,7 +24921,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_058.png",
           "extra_info": {
             "texture_index": 1,
             "type": "wall_texture",
@@ -25498,7 +25498,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_150.png",
           "extra_info": {
             "texture_index": 41,
             "type": "special"
@@ -26703,7 +26703,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_145.png",
           "extra_info": {
             "texture_index": 4,
             "type": "wall_texture",
@@ -26879,7 +26879,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -26896,7 +26896,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -26913,7 +26913,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 22,
             "type": "wall_texture",
@@ -27033,7 +27033,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 751,
@@ -27045,7 +27045,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 752,
@@ -27087,7 +27087,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 22,
             "type": "wall_texture",
@@ -27150,7 +27150,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 760,
@@ -27162,7 +27162,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 761,
@@ -27216,7 +27216,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 22,
             "type": "wall_texture",
@@ -27233,7 +27233,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_067.png",
           "extra_info": {
             "texture_index": 18,
             "type": "wall_texture",
@@ -27919,7 +27919,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_029.png"
+          "image_path": "images/extracted/tmobj/tmobj_29.png"
         },
         {
           "id": 824,
@@ -27931,7 +27931,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 825,
@@ -27943,7 +27943,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Storage Room"
         },
         {
@@ -28143,7 +28143,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_150.png",
           "extra_info": {
             "texture_index": 41,
             "type": "special"
@@ -28536,7 +28536,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_189.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -30109,7 +30109,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 33,
             "type": "wall_texture",
@@ -30126,7 +30126,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 992,
@@ -30138,7 +30138,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 993,
@@ -30150,7 +30150,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 994,
@@ -30162,7 +30162,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 995,
@@ -30174,7 +30174,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_026.png",
+          "image_path": "images/extracted/tmobj/tmobj_26.png",
           "description": "Quarters of Dorna Ironfist, leader of the Knights of the Order of the Crux Ansata"
         },
         {
@@ -30187,7 +30187,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Guards"
         },
         {
@@ -30200,7 +30200,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Secure outpost ahead.  Be prepared."
         },
         {
@@ -30213,7 +30213,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Secure outpost ahead.  Be prepared."
         },
         {
@@ -30226,7 +30226,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Armorer"
         },
         {
@@ -30239,7 +30239,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "First Officer"
         },
         {
@@ -30252,7 +30252,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Office of Troll Watching"
         },
         {
@@ -30265,7 +30265,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Treasurer"
         },
         {
@@ -30278,7 +30278,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Right: Main Office.  Left: Checkpoint."
         },
         {
@@ -30304,7 +30304,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_004.png",
+          "image_path": "images/extracted/tmobj/tmobj_04.png",
           "description": "Triggers action (type=24, param=2)"
         },
         {
@@ -30317,7 +30317,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_004.png",
+          "image_path": "images/extracted/tmobj/tmobj_04.png",
           "description": "Triggers action (type=24, param=3)"
         },
         {
@@ -30343,7 +30343,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "The Great Stair"
         },
         {
@@ -30356,7 +30356,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "This leaves the great hall to enter the realm of the Knights"
         },
         {
@@ -30369,7 +30369,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "This leaves the great hall to enter the realm of the Trolls"
         },
         {
@@ -30382,7 +30382,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 34,
             "type": "wall_texture",
@@ -30399,7 +30399,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 34,
             "type": "wall_texture",
@@ -30416,7 +30416,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 34,
             "type": "wall_texture",
@@ -30433,7 +30433,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_029.png",
+          "image_path": "images/extracted/tmobj/tmobj_29.png",
           "description": "Trolls welcome"
         },
         {
@@ -30446,7 +30446,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 21,
             "type": "wall_texture",
@@ -30556,7 +30556,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 22,
             "type": "wall_texture",
@@ -30573,7 +30573,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 22,
             "type": "wall_texture",
@@ -31927,7 +31927,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Here lies one who is no longer among the living.  Enter not unless thou dost wish to join him."
         },
         {
@@ -31955,7 +31955,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_027.png",
+          "image_path": "images/extracted/tmobj/tmobj_27.png",
           "description": "Although no more gargoyles will reside in the Abyss, we thank them for the sacrifice they made."
         },
         {
@@ -32113,7 +32113,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_006.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -32130,7 +32130,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_006.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -32147,7 +32147,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_006.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -32629,7 +32629,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 546,
@@ -32641,7 +32641,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 547,
@@ -32653,7 +32653,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 548,
@@ -32665,7 +32665,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 549,
@@ -32677,7 +32677,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 550,
@@ -32689,7 +32689,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 551,
@@ -32701,7 +32701,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 552,
@@ -32713,7 +32713,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 553,
@@ -32725,7 +32725,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 554,
@@ -32737,7 +32737,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 555,
@@ -32749,7 +32749,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 556,
@@ -32761,7 +32761,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 557,
@@ -32773,7 +32773,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 558,
@@ -32785,7 +32785,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 559,
@@ -32797,7 +32797,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 560,
@@ -32809,7 +32809,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 561,
@@ -33141,7 +33141,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 591,
@@ -33153,7 +33153,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 592,
@@ -33165,7 +33165,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 593,
@@ -33177,7 +33177,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 594,
@@ -33245,7 +33245,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Here lies Sir Cabirus, whose work created peace and harmony where there was none.  May he rest in peace"
         },
         {
@@ -33258,7 +33258,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "The empty grave of Garamon"
         },
         {
@@ -33390,7 +33390,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_006.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -33759,7 +33759,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Teleport door control"
         },
         {
@@ -33802,7 +33802,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Teleport door lock.  Mine dispatch operators only."
         },
         {
@@ -33815,7 +33815,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_004.png",
+          "image_path": "images/extracted/tmobj/tmobj_04.png",
           "description": "Sets puzzle_state = 0"
         },
         {
@@ -33843,7 +33843,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Exit corridor"
         },
         {
@@ -33952,7 +33952,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Exit corridor"
         },
         {
@@ -33991,7 +33991,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Herein lies Nolant, formerly Sir, stripped of his title.  He strayed from the path of virtue by murdering the young Endicott in cold blood."
         },
         {
@@ -34084,7 +34084,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_004.png",
+          "image_path": "images/extracted/tmobj/tmobj_04.png",
           "description": "Sets puzzle_state = 0"
         },
         {
@@ -34097,7 +34097,7 @@
           "category": "switches",
           "object_class": "decal",
           "detailed_category": "switch",
-          "image_path": "images/extracted/walls/wall_004.png",
+          "image_path": "images/extracted/tmobj/tmobj_04.png",
           "description": "Sets puzzle_state = 0"
         },
         {
@@ -34932,7 +34932,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -35106,7 +35106,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -36074,7 +36074,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_006.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -36303,7 +36303,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Shrine of the Virtues"
         },
         {
@@ -36356,7 +36356,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_006.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -36567,7 +36567,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Guard personnel only"
         },
         {
@@ -36604,7 +36604,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Guard personnel only"
         },
         {
@@ -36641,7 +36641,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "High State Chamber"
         },
         {
@@ -36654,7 +36654,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_018.png",
           "extra_info": {
             "texture_index": 32,
             "type": "wall_texture",
@@ -36671,7 +36671,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -36688,7 +36688,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -36705,7 +36705,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -36722,7 +36722,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -36739,7 +36739,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -36756,7 +36756,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -37119,7 +37119,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_027.png",
+          "image_path": "images/extracted/tmobj/tmobj_27.png",
           "description": "Here lie those Gargoyles who perished during the great plague shortly after the foundation of the Colony of the Abyss.  The effort they made to improve the Abyss shall not be forgotten."
         },
         {
@@ -37202,7 +37202,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -37219,7 +37219,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_172.png",
           "extra_info": {
             "texture_index": 20,
             "type": "wall_texture",
@@ -37622,7 +37622,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Tombs of the Great Stygian Abyss"
         },
         {
@@ -37659,7 +37659,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_021.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Herein lies Sir Cabirus"
         },
         {
@@ -37672,7 +37672,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Here lies Nolant, separated ignominiously from the rest of his order."
         },
         {
@@ -37685,7 +37685,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Mine dispatch chamber.  Enter only in presence of dispatch operator."
         },
         {
@@ -37866,7 +37866,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_206.png",
           "extra_info": {
             "texture_index": 8,
             "type": "wall_texture",
@@ -38029,7 +38029,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -38046,7 +38046,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 10,
             "type": "wall_texture",
@@ -38094,7 +38094,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -38127,7 +38127,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 10,
             "type": "wall_texture",
@@ -38144,7 +38144,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_049.png",
           "extra_info": {
             "texture_index": 13,
             "type": "wall_texture",
@@ -38482,7 +38482,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 23,
             "type": "wall_texture",
@@ -38499,7 +38499,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -38531,7 +38531,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_049.png",
           "extra_info": {
             "texture_index": 13,
             "type": "wall_texture",
@@ -38579,7 +38579,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_160.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -38596,7 +38596,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_160.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -38613,7 +38613,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -38678,7 +38678,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -38750,7 +38750,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 23,
             "type": "wall_texture",
@@ -39765,7 +39765,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_048.png",
           "extra_info": {
             "texture_index": 3,
             "type": "special"
@@ -40044,7 +40044,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_000.png",
           "extra_info": {
             "texture_index": 6,
             "type": "wall_texture",
@@ -40061,7 +40061,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_000.png",
           "extra_info": {
             "texture_index": 6,
             "type": "wall_texture",
@@ -40570,7 +40570,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_201.png",
           "extra_info": {
             "texture_index": 29,
             "type": "wall_texture",
@@ -42715,7 +42715,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_367.png",
+          "image_path": "images/extracted/walls/wall_201.png",
           "extra_info": {
             "texture_index": 29,
             "type": "wall_texture",
@@ -43008,7 +43008,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_048.png",
           "extra_info": {
             "texture_index": 3,
             "type": "wall_texture",
@@ -43041,7 +43041,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Library of the Academy.  Please return books promptly!"
         },
         {
@@ -43054,7 +43054,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Quarters of Nedge"
         },
         {
@@ -43067,7 +43067,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Quarters of Frang"
         },
         {
@@ -43093,7 +43093,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Quarters of Dominus"
         },
         {
@@ -44141,7 +44141,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_048.png",
           "extra_info": {
             "texture_index": 3,
             "type": "wall_texture",
@@ -44256,7 +44256,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "The Domain of Vilus.  Visitors NOT Welcome."
         },
         {
@@ -44594,7 +44594,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -45124,7 +45124,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_000.png",
           "extra_info": {
             "texture_index": 6,
             "type": "wall_texture",
@@ -45141,7 +45141,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_000.png",
           "extra_info": {
             "texture_index": 6,
             "type": "wall_texture",
@@ -45302,7 +45302,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 23,
             "type": "wall_texture",
@@ -45343,7 +45343,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Private Property"
         },
         {
@@ -45356,7 +45356,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "To the Shrine"
         },
         {
@@ -45405,7 +45405,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -45501,7 +45501,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 23,
             "type": "wall_texture",
@@ -45534,7 +45534,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -45566,7 +45566,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "The Academy of the Abyss"
         },
         {
@@ -45579,7 +45579,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "To the Great Stair"
         },
         {
@@ -45592,7 +45592,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_025.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Warning: Dangerous Area"
         },
         {
@@ -46765,7 +46765,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_208.png",
           "extra_info": {
             "texture_index": 30,
             "type": "wall_texture",
@@ -46814,7 +46814,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_000.png",
           "extra_info": {
             "texture_index": 0,
             "type": "wall_texture",
@@ -46893,7 +46893,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 359,
@@ -46905,7 +46905,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 360,
@@ -46917,7 +46917,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 361,
@@ -46929,7 +46929,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 362,
@@ -46941,7 +46941,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 369,
@@ -47190,7 +47190,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 413,
@@ -47202,7 +47202,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 419,
@@ -47214,7 +47214,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_005.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -47231,7 +47231,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_005.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -47339,7 +47339,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 431,
@@ -47351,7 +47351,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 432,
@@ -47363,7 +47363,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 435,
@@ -47669,7 +47669,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 45,
             "type": "wall_texture",
@@ -48025,7 +48025,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 491,
@@ -48037,7 +48037,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 492,
@@ -48049,7 +48049,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 493,
@@ -48061,7 +48061,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 494,
@@ -48073,7 +48073,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 495,
@@ -48085,7 +48085,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 496,
@@ -48097,7 +48097,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 497,
@@ -48109,7 +48109,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 498,
@@ -48223,7 +48223,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 507,
@@ -48235,7 +48235,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 508,
@@ -48247,7 +48247,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 509,
@@ -48259,7 +48259,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 510,
@@ -48384,7 +48384,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 518,
@@ -48396,7 +48396,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 519,
@@ -48408,7 +48408,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 520,
@@ -48420,7 +48420,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 521,
@@ -48496,7 +48496,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 526,
@@ -48508,7 +48508,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 527,
@@ -48546,7 +48546,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 26,
             "type": "wall_texture",
@@ -48563,7 +48563,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 535,
@@ -48575,7 +48575,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 536,
@@ -48587,7 +48587,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 537,
@@ -48599,7 +48599,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 538,
@@ -48611,7 +48611,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 540,
@@ -48623,7 +48623,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 542,
@@ -48635,7 +48635,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 543,
@@ -48647,7 +48647,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 544,
@@ -48659,7 +48659,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Heimdaarn\nHe who journeyed from afar"
         },
         {
@@ -48672,7 +48672,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48689,7 +48689,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48706,7 +48706,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48723,7 +48723,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48740,7 +48740,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48757,7 +48757,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48774,7 +48774,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48791,7 +48791,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48808,7 +48808,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 554,
@@ -48820,7 +48820,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 555,
@@ -48832,7 +48832,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 556,
@@ -48844,7 +48844,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 557,
@@ -48856,7 +48856,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48873,7 +48873,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Thost the Fi t"
         },
         {
@@ -48886,7 +48886,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48903,7 +48903,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 561,
@@ -48915,7 +48915,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 563,
@@ -48927,7 +48927,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48944,7 +48944,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -48961,7 +48961,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 566,
@@ -48973,7 +48973,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 567,
@@ -48985,7 +48985,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -49002,7 +49002,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -49019,7 +49019,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 570,
@@ -49031,7 +49031,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png"
+          "image_path": "images/extracted/tmobj/tmobj_28.png"
         },
         {
           "id": 571,
@@ -49043,7 +49043,7 @@
           "category": "gravestones",
           "object_class": "decal",
           "detailed_category": "gravestones",
-          "image_path": "images/extracted/walls/wall_028.png",
+          "image_path": "images/extracted/tmobj/tmobj_28.png",
           "description": "Thulsoom th Mad\nSurvivor of the Third Age"
         },
         {
@@ -49118,7 +49118,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 587,
@@ -49130,7 +49130,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_002.png"
+          "image_path": "images/extracted/tmobj/tmobj_02.png"
         },
         {
           "id": 599,
@@ -49222,7 +49222,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_033.png",
+          "image_path": "images/extracted/tmobj/tmobj_33.png",
           "description": "Antimagic + antimagic = 0!"
         },
         {
@@ -49288,7 +49288,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_033.png",
+          "image_path": "images/extracted/tmobj/tmobj_33.png",
           "description": "This be my death curse\n carved in stone on thou who reads it\n I am now dead"
         },
         {
@@ -49314,7 +49314,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 643,
@@ -49341,7 +49341,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_005.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -49358,7 +49358,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_032.png",
+          "image_path": "images/extracted/tmobj/tmobj_32.png",
           "description": "Grak is a corpseworm"
         },
         {
@@ -49403,7 +49403,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_005.png",
           "extra_info": {
             "texture_index": 25,
             "type": "wall_texture",
@@ -49435,7 +49435,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 665,
@@ -49549,7 +49549,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 685,
@@ -49561,7 +49561,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 688,
@@ -50428,7 +50428,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_035.png",
+          "image_path": "images/extracted/tmobj/tmobj_35.png",
           "description": "At last!  Now, all that is left is to conquer the maze..."
         },
         {
@@ -51143,7 +51143,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_192.png",
           "extra_info": {
             "texture_index": 5,
             "type": "wall_texture",
@@ -51439,7 +51439,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -51456,7 +51456,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_154.png",
           "extra_info": {
             "texture_index": 4,
             "type": "wall_texture",
@@ -51474,7 +51474,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_133.png",
           "extra_info": {
             "texture_index": 15,
             "type": "wall_texture",
@@ -51564,7 +51564,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_133.png",
           "extra_info": {
             "texture_index": 15,
             "type": "wall_texture",
@@ -51638,7 +51638,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_126.png",
           "extra_info": {
             "texture_index": 1,
             "type": "wall_texture",
@@ -51767,7 +51767,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_154.png",
           "extra_info": {
             "texture_index": 4,
             "type": "wall_texture",
@@ -51827,7 +51827,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_143.png",
           "extra_info": {
             "texture_index": 47,
             "type": "wall_texture",
@@ -51844,7 +51844,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_367.png",
+          "image_path": "images/extracted/walls/wall_158.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -51861,7 +51861,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 948,
@@ -51873,7 +51873,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_168.png",
           "extra_info": {
             "texture_index": 11,
             "type": "wall_texture",
@@ -51982,7 +51982,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 45,
             "type": "wall_texture",
@@ -52030,7 +52030,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 45,
             "type": "wall_texture",
@@ -52093,7 +52093,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 45,
             "type": "wall_texture",
@@ -52126,7 +52126,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 966,
@@ -52138,7 +52138,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 967,
@@ -52150,7 +52150,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_137.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -52209,7 +52209,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 42,
             "type": "wall_texture",
@@ -52226,7 +52226,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 972,
@@ -52238,7 +52238,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 973,
@@ -52250,7 +52250,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 40,
             "type": "wall_texture",
@@ -52267,7 +52267,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_141.png",
           "extra_info": {
             "texture_index": 45,
             "type": "wall_texture",
@@ -52284,7 +52284,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 40,
             "type": "wall_texture",
@@ -52301,7 +52301,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_367.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 40,
             "type": "wall_texture",
@@ -52318,7 +52318,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 978,
@@ -52423,7 +52423,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 40,
             "type": "wall_texture",
@@ -52883,7 +52883,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_020.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Beware... Evil Dead Beyond"
         },
         {
@@ -53067,7 +53067,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_139.png",
           "extra_info": {
             "texture_index": 42,
             "type": "wall_texture",
@@ -53084,7 +53084,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_132.png",
           "extra_info": {
             "texture_index": 26,
             "type": "wall_texture",
@@ -53101,7 +53101,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_142.png",
           "extra_info": {
             "texture_index": 46,
             "type": "wall_texture",
@@ -53118,7 +53118,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 1022,
@@ -53130,7 +53130,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_160.png",
           "extra_info": {
             "texture_index": 41,
             "type": "wall_texture",
@@ -53147,7 +53147,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_160.png",
           "extra_info": {
             "texture_index": 41,
             "type": "wall_texture",
@@ -55024,7 +55024,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_367.png",
+          "image_path": "images/extracted/walls/wall_207.png",
           "extra_info": {
             "texture_index": 3,
             "type": "wall_texture",
@@ -55041,7 +55041,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_367.png",
+          "image_path": "images/extracted/walls/wall_207.png",
           "extra_info": {
             "texture_index": 3,
             "type": "wall_texture",
@@ -55058,7 +55058,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_367.png",
+          "image_path": "images/extracted/walls/wall_207.png",
           "extra_info": {
             "texture_index": 3,
             "type": "wall_texture",
@@ -55090,7 +55090,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_128.png",
           "extra_info": {
             "texture_index": 7,
             "type": "wall_texture",
@@ -55122,7 +55122,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_128.png",
           "extra_info": {
             "texture_index": 7,
             "type": "wall_texture",
@@ -55139,7 +55139,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_045.png",
           "extra_info": {
             "texture_index": 39,
             "type": "wall_texture",
@@ -55156,7 +55156,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_065.png",
           "extra_info": {
             "texture_index": 45,
             "type": "wall_texture",
@@ -55188,7 +55188,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_044.png",
           "extra_info": {
             "texture_index": 38,
             "type": "wall_texture",
@@ -55205,7 +55205,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_047.png",
           "extra_info": {
             "texture_index": 14,
             "type": "wall_texture",
@@ -55223,7 +55223,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_043.png",
           "extra_info": {
             "texture_index": 27,
             "type": "wall_texture",
@@ -55240,7 +55240,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_046.png",
           "extra_info": {
             "texture_index": 44,
             "type": "wall_texture",
@@ -55737,7 +55737,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/walls/wall_033.png",
+          "image_path": "images/extracted/tmobj/tmobj_33.png",
           "description": "Thou canst not defeat the Drakhri!"
         },
         {
@@ -59209,7 +59209,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 833,
@@ -59221,7 +59221,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 834,
@@ -59293,7 +59293,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 839,
@@ -59305,7 +59305,7 @@
           "category": "scenery",
           "object_class": "decal",
           "detailed_category": "decal",
-          "image_path": "images/extracted/walls/wall_000.png"
+          "image_path": "images/extracted/tmobj/tmobj_00.png"
         },
         {
           "id": 840,
@@ -60811,7 +60811,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -60859,7 +60859,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -60876,7 +60876,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -60940,7 +60940,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -61477,7 +61477,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_160.png",
           "extra_info": {
             "texture_index": 9,
             "type": "wall_texture",
@@ -61521,7 +61521,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 10,
             "type": "wall_texture",
@@ -61538,7 +61538,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_161.png",
           "extra_info": {
             "texture_index": 10,
             "type": "wall_texture",
@@ -61586,7 +61586,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",
@@ -61754,7 +61754,7 @@
           "category": "texture_objects",
           "object_class": "special_tmap",
           "detailed_category": "special_tmap",
-          "image_path": "images/extracted/objects/object_366.png",
+          "image_path": "images/extracted/walls/wall_140.png",
           "extra_info": {
             "texture_index": 35,
             "type": "wall_texture",

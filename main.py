@@ -191,18 +191,19 @@ def extract_all(data_path: Path, output_path: Path, export_xlsx: bool = False) -
                 continue
     
     web_map_path = exporter.export_web_map_data(
-        items.placed_items, 
-        npcs.npcs, 
-        npcs.npc_names,
-        items.item_types,
-        levels.levels,
-        strings,
-        secrets.secrets,
-        convs.conversations,
-        image_paths,
-        npc_image_paths,
-        tmobj_image_paths,
-        wall_image_paths
+        placed_items=items.placed_items, 
+        npcs=npcs.npcs, 
+        npc_names=npcs.npc_names,
+        item_types=items.item_types,
+        levels=levels.levels,
+        strings_parser=strings,
+        secrets=secrets.secrets,
+        conversations=convs.conversations,
+        image_paths=image_paths,
+        npc_image_paths=npc_image_paths,
+        door_image_paths=None,  # Not yet implemented
+        tmobj_image_paths=tmobj_image_paths,
+        wall_image_paths=wall_image_paths
     )
     print(f"       Exported web map data to {web_map_path.name}")
     
