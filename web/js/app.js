@@ -126,6 +126,7 @@ const state = {
     tooltipHideTimeout: null,  // For delayed tooltip hiding
     isTooltipHovered: false,   // Track if tooltip is being hovered
     collapsedCategories: new Set(),  // Tracks which categories are collapsed in visible objects list
+    visibleObjectsListScrollTop: 0,  // Scroll position to restore when closing selected object
     saveGame: {
         currentSaveName: null,  // null = base game, string = save folder name
         saves: {},              // { folderName: { saveData, changes } }
@@ -4058,6 +4059,11 @@ function refreshVisibleObjectsIfNoSelection() {
  * Render the selection view with two sections: Selected Object and Objects at Location
  */
 function renderSelectionPane() {
+    // Remember scroll position of visible objects list so we can restore it when closing
+    const listEl = elements.detailsSidebar.querySelector('.visible-objects-list');
+    if (listEl) {
+        state.visibleObjectsListScrollTop = listEl.scrollTop;
+    }
     elements.detailsSidebar.innerHTML = `
         <div class="sidebar-section">
             <div class="section-header">
@@ -4088,11 +4094,14 @@ function renderSelectionPane() {
  * This is shown when no specific object is selected
  */
 function renderVisibleObjectsPane() {
-    // Save scroll position before re-rendering (if list container exists)
-    let savedScrollTop = 0;
+    // Save scroll position before re-rendering (if list container exists).
+    // When returning from selection, use state.visibleObjectsListScrollTop saved in renderSelectionPane.
+    let scrollToRestore = 0;
     const existingListContainer = elements.detailsSidebar.querySelector('.visible-objects-list');
     if (existingListContainer) {
-        savedScrollTop = existingListContainer.scrollTop;
+        scrollToRestore = existingListContainer.scrollTop;
+    } else if (state.visibleObjectsListScrollTop) {
+        scrollToRestore = state.visibleObjectsListScrollTop;
     }
     
     const level = state.data?.levels[state.currentLevel];
@@ -4665,11 +4674,11 @@ function renderVisibleObjectsPane() {
     
     elements.detailsSidebar.appendChild(section);
     
-    // Restore scroll position after rendering
-    if (savedScrollTop > 0) {
-        // Use requestAnimationFrame to ensure DOM is fully rendered
+    // Restore scroll position after rendering (from refresh or from closing selection)
+    if (scrollToRestore > 0) {
         requestAnimationFrame(() => {
-            listContainer.scrollTop = savedScrollTop;
+            listContainer.scrollTop = scrollToRestore;
+            state.visibleObjectsListScrollTop = 0;  // Clear after restore when returning from selection
         });
     }
 }
