@@ -6,8 +6,8 @@ from .json_exporter import JsonExporter
 
 # XlsxExporter is optional - requires openpyxl
 try:
-    from .xlsx_exporter import XlsxExporter
-    XLSX_AVAILABLE = True
+    from .xlsx import XlsxExporter, OPENPYXL_AVAILABLE
+    XLSX_AVAILABLE = OPENPYXL_AVAILABLE
 except ImportError:
     XLSX_AVAILABLE = False
     XlsxExporter = None
