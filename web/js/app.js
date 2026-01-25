@@ -749,14 +749,70 @@ function switchSaveGame(saveName) {
             console.warn('No base data available');
             return;
         }
-        
-        // Merge save data into state.data (replace levels with save game levels)
-        // Keep categories and metadata from base
-        state.data.levels = save.saveData.levels.map(level => ({
-            ...level,
-            // Preserve secrets from base game if they exist
-            secrets: state.saveGame.baseData.levels[level.level]?.secrets || []
-        }));
+
+        // Always start from a clean clone of base data so base-game and save-game
+        // views share the same component/data shape (only save deltas differ).
+        state.data = JSON.parse(JSON.stringify(state.saveGame.baseData));
+
+        // Helper: compute the default extracted sprite path for an object id.
+        // Base game data uses this convention (e.g., images/extracted/objects/object_145.png).
+        const defaultImagePathForObjectId = (objectId) => {
+            const idNum = Number(objectId);
+            if (!Number.isFinite(idNum) || idNum < 0) return null;
+            return `images/extracted/objects/object_${idNum}.png`;
+        };
+
+        // Helper: merge a save object/NPC into its base counterpart (by index id),
+        // preserving base metadata (image_path, derived stats, etc.) while applying save changes.
+        const mergeSaveEntity = (baseEntity, saveEntity) => {
+            const merged = baseEntity ? { ...baseEntity, ...saveEntity } : { ...saveEntity };
+
+            // Ensure images always work:
+            // - save parser does not currently include image_path
+            // - if object_id changes (e.g., door open/close), refresh image_path to match new id
+            const baseObjId = baseEntity?.object_id;
+            const saveObjId = saveEntity?.object_id;
+            const objIdForImage = merged.object_id ?? saveObjId ?? baseObjId;
+            const objIdChanged = (saveObjId !== undefined && baseObjId !== undefined && saveObjId !== baseObjId);
+
+            if (!merged.image_path || objIdChanged) {
+                const computed = defaultImagePathForObjectId(objIdForImage);
+                if (computed) merged.image_path = computed;
+            }
+
+            return merged;
+        };
+
+        // Merge save levels into base levels, preserving base-only fields (like secrets, tiles, etc.)
+        const baseLevels = state.saveGame.baseData.levels || [];
+        const getBaseLevelFor = (levelNum) => {
+            return baseLevels.find(l => l.level === levelNum) || baseLevels[levelNum] || {};
+        };
+
+        state.data.levels = (save.saveData.levels || []).map(saveLevel => {
+            const levelNum = saveLevel.level ?? 0;
+            const baseLevel = getBaseLevelFor(levelNum);
+
+            const baseObjById = new Map((baseLevel.objects || []).map(o => [o.id, o]));
+            const baseNpcById = new Map((baseLevel.npcs || []).map(n => [n.id, n]));
+
+            const mergedObjects = (saveLevel.objects || []).map(obj =>
+                mergeSaveEntity(baseObjById.get(obj.id), obj)
+            );
+            const mergedNpcs = (saveLevel.npcs || []).map(npc =>
+                mergeSaveEntity(baseNpcById.get(npc.id), npc)
+            );
+
+            return {
+                ...baseLevel,
+                ...saveLevel,
+                objects: mergedObjects,
+                npcs: mergedNpcs,
+                // Preserve secrets from base game if they exist
+                secrets: baseLevel.secrets || []
+            };
+        });
+
         state.saveGame.currentSaveName = saveName;
     }
     
