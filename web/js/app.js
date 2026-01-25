@@ -4088,6 +4088,13 @@ function renderSelectionPane() {
  * This is shown when no specific object is selected
  */
 function renderVisibleObjectsPane() {
+    // Save scroll position before re-rendering (if list container exists)
+    let savedScrollTop = 0;
+    const existingListContainer = elements.detailsSidebar.querySelector('.visible-objects-list');
+    if (existingListContainer) {
+        savedScrollTop = existingListContainer.scrollTop;
+    }
+    
     const level = state.data?.levels[state.currentLevel];
     if (!level) {
         elements.detailsSidebar.innerHTML = `
@@ -4657,6 +4664,14 @@ function renderVisibleObjectsPane() {
     section.appendChild(hint);
     
     elements.detailsSidebar.appendChild(section);
+    
+    // Restore scroll position after rendering
+    if (savedScrollTop > 0) {
+        // Use requestAnimationFrame to ensure DOM is fully rendered
+        requestAnimationFrame(() => {
+            listContainer.scrollTop = savedScrollTop;
+        });
+    }
 }
 
 function renderObjectDetails(item, isNpc) {
