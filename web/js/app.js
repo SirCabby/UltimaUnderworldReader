@@ -120,6 +120,7 @@ const state = {
         enchantedOnly: false,   // Show only enchanted items
         ownedFilter: null,      // null = all, "only" = owned only, "exclude" = exclude owned
         changeTypes: new Set(['added', 'removed', 'moved', 'modified', 'unchanged']),  // Selected change types to show (when save game loaded)
+        showChangeBadges: true, // Show save-game change indicators (badges/marker styling/tooltip+details sections)
     },
     selectedMarker: null,
     pendingSelection: null,    // For restoring selection after page load
@@ -180,6 +181,7 @@ function saveFiltersToStorage() {
         enchantedOnly: state.filters.enchantedOnly,
         ownedFilter: state.filters.ownedFilter,
         changeTypes: Array.from(state.filters.changeTypes),
+        showChangeBadges: state.filters.showChangeBadges,
         collapsedCategories: Array.from(state.collapsedCategories),
         viewLocked: state.viewLocked,
         zoom: state.zoom  // Persist zoom level
@@ -299,6 +301,11 @@ function restoreState() {
         // Restore change types filter
         if (storedFilters.changeTypes && Array.isArray(storedFilters.changeTypes)) {
             state.filters.changeTypes = new Set(storedFilters.changeTypes);
+        }
+
+        // Restore change badge toggle
+        if (typeof storedFilters.showChangeBadges === 'boolean') {
+            state.filters.showChangeBadges = storedFilters.showChangeBadges;
         }
         
         // Restore collapsed categories (validate they exist)
@@ -461,6 +468,11 @@ function applyRestoredStateToUI() {
     // Apply change types filter checkboxes
     updateChangeTypesFilterUI();
 
+    // Apply change badge toggle checkbox state (visibility handled by updateSaveGameUI)
+    if (elements.showChangesBadgesCheckbox) {
+        elements.showChangesBadgesCheckbox.checked = !!state.filters.showChangeBadges;
+    }
+
     // Apply zoom level display
     if (elements.zoomLevel) {
         elements.zoomLevel.textContent = `${Math.round(state.zoom * 100)}%`;
@@ -504,6 +516,8 @@ const elements = {
     changeTypesFilter: null,
     changeTypesDropdown: null,
     changeTypesCheckboxes: {},  // Map of change type to checkbox element
+    showChangesBadgesToggle: null,
+    showChangesBadgesCheckbox: null,
     saveGameInput: null,
     loadSaveBtn: null,
     saveGameSelector: null,
@@ -598,6 +612,8 @@ function cacheElements() {
     elements.changeTypesFilter = document.getElementById('change-types-filter');
     elements.changeTypesDropdown = document.getElementById('change-types-dropdown');
     // Change type and owned items checkboxes will be populated after DOM creation
+    elements.showChangesBadgesToggle = document.getElementById('show-changes-badges-toggle');
+    elements.showChangesBadgesCheckbox = document.getElementById('show-changes-badges-checkbox');
     elements.saveGameInput = document.getElementById('save-game-input');
     elements.loadSaveBtn = document.getElementById('load-save-btn');
     elements.saveGameSelector = document.getElementById('save-game-selector');
@@ -778,13 +794,37 @@ function updateSaveGameUI() {
     if (state.saveGame.currentSaveName) {
         elements.saveGameSelector.value = state.saveGame.currentSaveName;
         elements.saveGameSelector.classList.add('loaded');
-        // Show change types filter when save game is loaded
+        
+        // Show Δ toggle when save game is loaded
+        if (elements.showChangesBadgesToggle) {
+            elements.showChangesBadgesToggle.style.display = '';
+        }
+        if (elements.showChangesBadgesCheckbox) {
+            elements.showChangesBadgesCheckbox.checked = !!state.filters.showChangeBadges;
+        }
+        if (elements.showChangesBadgesToggle) {
+            const enabled = !!state.filters.showChangeBadges;
+            elements.showChangesBadgesToggle.title = enabled
+                ? 'Change indicators: ON (click to hide)'
+                : 'Change indicators: OFF (click to show)';
+            elements.showChangesBadgesToggle.classList.toggle('enabled', enabled);
+            elements.showChangesBadgesToggle.classList.toggle('disabled', !enabled);
+            elements.showChangesBadgesToggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+        }
+        
+        // Show change types filter only when change indicators are enabled
         if (elements.changeTypesFilter) {
-            elements.changeTypesFilter.style.display = '';
+            elements.changeTypesFilter.style.display = state.filters.showChangeBadges ? '' : 'none';
         }
     } else {
         elements.saveGameSelector.value = '';
         elements.saveGameSelector.classList.remove('loaded');
+        
+        // Hide Δ toggle when no save game is loaded
+        if (elements.showChangesBadgesToggle) {
+            elements.showChangesBadgesToggle.style.display = 'none';
+        }
+        
         // Hide change types filter when no save game is loaded
         if (elements.changeTypesFilter) {
             elements.changeTypesFilter.style.display = 'none';
@@ -835,6 +875,17 @@ function getObjectChangeType(item) {
 function shouldShowBasedOnChanges(item) {
     if (!state.saveGame.currentSaveName) {
         return true; // Show all when no save game loaded
+    }
+    
+    // When change indicators are disabled, mimic base-game styling:
+    // - don't apply change-type filtering
+    // - never show removed objects
+    if (!state.filters.showChangeBadges) {
+        const changeType = getObjectChangeType(item);
+        if (changeType === 'removed' || item?.change_type === 'removed') {
+            return false;
+        }
+        return true;
     }
     
     const changeType = getObjectChangeType(item);
@@ -907,6 +958,9 @@ function setupEventListeners() {
             switchSaveGame(selectedValue || null);
         });
     }
+    if (elements.showChangesBadgesCheckbox) {
+        elements.showChangesBadgesCheckbox.addEventListener('change', handleShowChangeBadgesToggle);
+    }
     
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboard);
@@ -917,6 +971,20 @@ function handleEnchantedFilter(e) {
     renderMarkers();
     updateStats();
     refreshVisibleObjectsIfNoSelection();
+    saveFiltersToStorage();
+}
+
+function handleShowChangeBadgesToggle(e) {
+    state.filters.showChangeBadges = !!e.target.checked;
+    
+    // Update dependent UI visibility (toggle title and change types filter visibility)
+    updateSaveGameUI();
+    
+    renderMarkers();
+    updateStats();
+    updateCategoryCounts();
+    refreshVisibleObjectsIfNoSelection();
+    refreshSelectionPaneIfSelection();
     saveFiltersToStorage();
 }
 
@@ -1685,8 +1753,8 @@ function renderMarkers() {
         }
     });
     
-    // Collect removed objects when a save game is loaded and 'removed' filter is active
-    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed')) {
+    // Collect removed objects when a save game is loaded, indicators are enabled, and 'removed' filter is active
+    if (state.saveGame.currentSaveName && state.filters.showChangeBadges && state.filters.changeTypes.has('removed')) {
         const currentSave = state.saveGame.saves[state.saveGame.currentSaveName];
         if (currentSave && currentSave.changes && currentSave.changes[state.currentLevel]) {
             const levelChanges = currentSave.changes[state.currentLevel];
@@ -1826,23 +1894,25 @@ function renderStackedMarkers(items, tileX, tileY, pxPerTileX, pxPerTileY) {
     if (bridges.length > 0) group.classList.add('has-bridge');
     if (stairs.length > 0) group.classList.add('has-stairs');
     
-    // Check for change types in stacked items
-    const changeTypes = new Set();
-    items.forEach(itemData => {
-        const changeType = getObjectChangeType(itemData.item);
-        if (changeType && changeType !== 'unchanged') {
-            changeTypes.add(changeType);
+    // Check for change types in stacked items (only when save-game change indicators are enabled)
+    if (state.saveGame.currentSaveName && state.filters.showChangeBadges) {
+        const changeTypes = new Set();
+        items.forEach(itemData => {
+            const changeType = getObjectChangeType(itemData.item);
+            if (changeType && changeType !== 'unchanged') {
+                changeTypes.add(changeType);
+            }
+        });
+        // Add change indicator classes (prioritize added > moved > modified > removed)
+        if (changeTypes.has('added')) {
+            group.classList.add('marker-added');
+        } else if (changeTypes.has('moved')) {
+            group.classList.add('marker-moved');
+        } else if (changeTypes.has('modified')) {
+            group.classList.add('marker-modified');
+        } else if (changeTypes.has('removed')) {
+            group.classList.add('marker-removed');
         }
-    });
-    // Add change indicator classes (prioritize added > moved > modified > removed)
-    if (changeTypes.has('added')) {
-        group.classList.add('marker-added');
-    } else if (changeTypes.has('moved')) {
-        group.classList.add('marker-moved');
-    } else if (changeTypes.has('modified')) {
-        group.classList.add('marker-modified');
-    } else if (changeTypes.has('removed')) {
-        group.classList.add('marker-removed');
     }
     
     group.dataset.tileX = tileX;
@@ -2312,8 +2382,8 @@ function showStackedTooltip(e, items, tileX, tileY) {
             }
         }
         
-        // Show change information when a save game is loaded
-        if (state.saveGame.currentSaveName && item.change_type && item.change_type !== 'unchanged') {
+        // Show change information when a save game is loaded (and change indicators are enabled)
+        if (state.saveGame.currentSaveName && state.filters.showChangeBadges && item.change_type && item.change_type !== 'unchanged') {
             const changeColor = window.SaveComparator?.getChangeTypeColor(item.change_type) || '#868e96';
             const changeIcon = window.SaveComparator?.getChangeTypeIcon(item.change_type) || '';
             const changeLabel = window.SaveComparator?.getChangeTypeLabel(item.change_type) || '';
@@ -2842,8 +2912,10 @@ function createMarker(item, color, pxPerTileX, pxPerTileY, isNpc) {
     const itemIsBridge = isBridge(item);
     const itemIsStairs = isStairs(item);
     
-    // Get change type for save game visualization
-    const changeType = getObjectChangeType(item);
+    // Get change type for save game visualization (only when change indicators are enabled)
+    const changeType = (state.saveGame.currentSaveName && state.filters.showChangeBadges)
+        ? getObjectChangeType(item)
+        : null;
     
     // Create a group to hold both hover area and marker
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -3541,8 +3613,8 @@ function showTooltip(e, item, isNpc) {
     
     html += `<div class="tooltip-position">Tile: (${item.tile_x}, ${item.tile_y})</div>`;
     
-    // Show change information when a save game is loaded
-    if (state.saveGame.currentSaveName && item.change_type) {
+    // Show change information when a save game is loaded (and change indicators are enabled)
+    if (state.saveGame.currentSaveName && state.filters.showChangeBadges && item.change_type) {
         const changeColor = window.SaveComparator?.getChangeTypeColor(item.change_type) || '#868e96';
         const changeIcon = window.SaveComparator?.getChangeTypeIcon(item.change_type) || '';
         const changeLabel = window.SaveComparator?.getChangeTypeLabel(item.change_type) || item.change_type;
@@ -4056,6 +4128,39 @@ function refreshVisibleObjectsIfNoSelection() {
 }
 
 /**
+ * Refresh the selection pane if an object is currently selected.
+ * This is used when toggles/filters affect what's shown in the details UI.
+ */
+function refreshSelectionPaneIfSelection() {
+    if (!state.selectedMarker || !state.selectedMarker.dataset) {
+        return;
+    }
+    
+    const id = String(state.selectedMarker.dataset.id || '');
+    const isNpc = String(state.selectedMarker.dataset.isNpc || '') === 'true';
+    if (!id) {
+        return;
+    }
+    
+    const level = state.data?.levels?.[state.currentLevel];
+    if (!level) {
+        return;
+    }
+    
+    const item = isNpc
+        ? level.npcs.find(npc => String(npc.id) === id)
+        : level.objects.find(obj => String(obj.id) === id);
+    
+    if (!item) {
+        return;
+    }
+    
+    renderSelectionPane();
+    renderObjectDetails(item, isNpc);
+    renderLocationObjects(item.tile_x, item.tile_y, item.id);
+}
+
+/**
  * Render the selection view with two sections: Selected Object and Objects at Location
  */
 function renderSelectionPane() {
@@ -4144,8 +4249,8 @@ function renderVisibleObjectsPane() {
         }
     });
     
-    // Collect removed objects when a save game is loaded and 'removed' filter is active
-    if (state.saveGame.currentSaveName && state.filters.changeTypes.has('removed')) {
+    // Collect removed objects when a save game is loaded, indicators are enabled, and 'removed' filter is active
+    if (state.saveGame.currentSaveName && state.filters.showChangeBadges && state.filters.changeTypes.has('removed')) {
         const currentSave = state.saveGame.saves[state.saveGame.currentSaveName];
         if (currentSave && currentSave.changes && currentSave.changes[state.currentLevel]) {
             const levelChanges = currentSave.changes[state.currentLevel];
@@ -4606,9 +4711,9 @@ function renderVisibleObjectsPane() {
                     `;
             }
             
-            // Build change badge if save game is loaded
+            // Build change badge if save game is loaded (and change indicators are enabled)
             let changeBadgeHtml = '';
-            if (state.saveGame.currentSaveName && item.change_type && item.change_type !== 'unchanged') {
+            if (state.saveGame.currentSaveName && state.filters.showChangeBadges && item.change_type && item.change_type !== 'unchanged') {
                 const changeColor = window.SaveComparator?.getChangeTypeColor(item.change_type) || '#868e96';
                 const changeIcon = window.SaveComparator?.getChangeTypeIcon(item.change_type) || '';
                 const changeLabel = window.SaveComparator?.getChangeTypeLabel(item.change_type) || '';
@@ -4910,8 +5015,8 @@ function renderObjectDetails(item, isNpc) {
         </div>
     `;
     
-    // Show change information when a save game is loaded
-    if (state.saveGame.currentSaveName && item.change_type) {
+    // Show change information when a save game is loaded (and change indicators are enabled)
+    if (state.saveGame.currentSaveName && state.filters.showChangeBadges && item.change_type) {
         const changeColor = window.SaveComparator?.getChangeTypeColor(item.change_type) || '#868e96';
         const changeIcon = window.SaveComparator?.getChangeTypeIcon(item.change_type) || '';
         const changeLabel = window.SaveComparator?.getChangeTypeLabel(item.change_type) || item.change_type;
@@ -5688,9 +5793,9 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
         const isUnique = hasUniqueName(npc);
         const uniqueIndicator = isUnique ? '⭐ ' : '';
 
-        // Build change badge if save game is loaded
+        // Build change badge if save game is loaded (and change indicators are enabled)
         let npcChangeBadge = '';
-        if (state.saveGame.currentSaveName && npc.change_type && npc.change_type !== 'unchanged') {
+        if (state.saveGame.currentSaveName && state.filters.showChangeBadges && npc.change_type && npc.change_type !== 'unchanged') {
             const changeColor = window.SaveComparator?.getChangeTypeColor(npc.change_type) || '#868e96';
             const changeIcon = window.SaveComparator?.getChangeTypeIcon(npc.change_type) || '';
             const changeLabel = window.SaveComparator?.getChangeTypeLabel(npc.change_type) || '';
@@ -5863,9 +5968,9 @@ function renderLocationObjects(tileX, tileY, selectedItemId = null) {
             `;
         }
         
-        // Build change badge if save game is loaded
+        // Build change badge if save game is loaded (and change indicators are enabled)
         let objChangeBadge = '';
-        if (state.saveGame.currentSaveName && obj.change_type && obj.change_type !== 'unchanged') {
+        if (state.saveGame.currentSaveName && state.filters.showChangeBadges && obj.change_type && obj.change_type !== 'unchanged') {
             const changeColor = window.SaveComparator?.getChangeTypeColor(obj.change_type) || '#868e96';
             const changeIcon = window.SaveComparator?.getChangeTypeIcon(obj.change_type) || '';
             const changeLabel = window.SaveComparator?.getChangeTypeLabel(obj.change_type) || '';

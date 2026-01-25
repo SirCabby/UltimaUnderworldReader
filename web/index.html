@@ -23,9 +23,11 @@
                     <span class="search-icon">🔍</span>
                 </div>
                 <div class="save-game-controls">
-                    <label class="save-game-toggle" id="show-changes-badges-toggle" style="display: none;" title="Show Change Badges">
+                    <label class="save-game-toggle" id="show-changes-badges-toggle" style="display: none;" title="Change indicators: ON (click to hide)" aria-pressed="true">
                         <input type="checkbox" id="show-changes-badges-checkbox" checked>
-                        <span class="toggle-icon">Δ</span>
+                        <svg class="toggle-icon" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Delta">
+                            <path class="toggle-triangle" d="M12 4L20 20H4L12 4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        </svg>
                     </label>
                     <select id="save-game-selector" class="save-game-selector">
                         <option value="">Base Game</option>

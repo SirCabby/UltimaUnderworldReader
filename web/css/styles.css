@@ -199,7 +199,14 @@ body {
     cursor: pointer;
     padding: 4px 6px;
     border-radius: 4px;
+    border: 1px solid transparent;
     transition: all 0.2s;
+}
+
+.save-game-toggle.enabled {
+    color: #69db7c;
+    background: rgba(105, 219, 124, 0.08);
+    border-color: rgba(105, 219, 124, 0.25);
 }
 
 .save-game-toggle:hover {
@@ -208,15 +215,24 @@ body {
 }
 
 .save-game-toggle input[type="checkbox"] {
-    cursor: pointer;
-    margin: 0;
+    /* Make this a single-icon toggle button (label click still toggles) */
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .save-game-toggle .toggle-icon {
-    font-size: 1.1rem;
-    font-weight: bold;
-    line-height: 1;
+    width: 14px;
+    height: 14px;
+    display: block;
     user-select: none;
+}
+
+.save-game-toggle.disabled {
+    opacity: 1;
+    color: var(--text-muted);
+    background: rgba(134, 142, 150, 0.08);
+    border-color: rgba(134, 142, 150, 0.25);
 }
 
 .search-box {
