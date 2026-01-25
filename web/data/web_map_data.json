@@ -2,7 +2,7 @@
   "metadata": {
     "type": "web_map_data",
     "game": "Ultima Underworld I",
-    "generated": "2026-01-24T18:55:14.414597",
+    "generated": "2026-01-24T20:40:46.206754",
     "grid_size": 64,
     "num_levels": 9
   },
@@ -4221,7 +4221,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_29.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Keep Out"
         },
         {
@@ -7403,7 +7403,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_28.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "We attacked the entrance with all manner of tools, but it gave not a hair.  It simply cannot be breached.  Hence we have resigned ourselves to die in this hellish pit. - Elsmore"
         },
         {
@@ -10517,7 +10517,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_33.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Unstable mines ahead"
         },
         {
@@ -17056,7 +17056,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_28.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Go to the very base of the Abyss, then battle your way back up, to find the key to your fortitude."
         },
         {
@@ -20464,7 +20464,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_33.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "ORA, the Mantra of Unarmed combat, helps the unfortunate."
         },
         {
@@ -20830,7 +20830,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_34.png",
+          "image_path": "images/extracted/tmobj/tmobj_26.png",
           "description": "Heal thyself by using fountain."
         },
         {
@@ -21004,7 +21004,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_28.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Tom Loves Judy"
         },
         {
@@ -21127,7 +21127,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_28.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "To protect thyself, use the ANRA chant."
         },
         {
@@ -21238,7 +21238,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_34.png",
+          "image_path": "images/extracted/tmobj/tmobj_26.png",
           "description": "Mountainman Shak: Master Weaponsmith"
         },
         {
@@ -21483,7 +21483,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_34.png",
+          "image_path": "images/extracted/tmobj/tmobj_26.png",
           "description": "Ask Shanklick about crazy wizard."
         },
         {
@@ -22257,7 +22257,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_34.png",
+          "image_path": "images/extracted/tmobj/tmobj_26.png",
           "description": "Magic Crystal exposes hidden tombs and monsters."
         },
         {
@@ -30265,7 +30265,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_28.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Treasurer"
         },
         {
@@ -30433,7 +30433,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_29.png",
+          "image_path": "images/extracted/tmobj/tmobj_21.png",
           "description": "Trolls welcome"
         },
         {
@@ -33843,7 +33843,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_28.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Exit corridor"
         },
         {
@@ -33952,7 +33952,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_28.png",
+          "image_path": "images/extracted/tmobj/tmobj_20.png",
           "description": "Exit corridor"
         },
         {
@@ -49222,7 +49222,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_33.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Antimagic + antimagic = 0!"
         },
         {
@@ -49288,7 +49288,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_33.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "This be my death curse\n carved in stone on thou who reads it\n I am now dead"
         },
         {
@@ -49358,7 +49358,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_32.png",
+          "image_path": "images/extracted/tmobj/tmobj_24.png",
           "description": "Grak is a corpseworm"
         },
         {
@@ -50428,7 +50428,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_35.png",
+          "image_path": "images/extracted/tmobj/tmobj_27.png",
           "description": "At last!  Now, all that is left is to conquer the maze..."
         },
         {
@@ -55737,7 +55737,7 @@
           "category": "writings",
           "object_class": "decal",
           "detailed_category": "writings",
-          "image_path": "images/extracted/tmobj/tmobj_33.png",
+          "image_path": "images/extracted/tmobj/tmobj_25.png",
           "description": "Thou canst not defeat the Drakhri!"
         },
         {

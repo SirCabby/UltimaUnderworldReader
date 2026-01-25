@@ -1602,16 +1602,21 @@ class JsonExporter:
             # - Gravestones (0x165): texture from tmobj.gr at image "flags" + 28
             
             # DEBUG: Check writing/tmap conditions
-            if obj_id == 0x166:
-                tmobj_idx_dbg = (item_flags & 0xFF) + 20
-                print(f"DEBUG Writing: obj_id=0x{obj_id:X}, item_flags={item_flags}, tmobj_idx={tmobj_idx_dbg}, tmobj_paths={bool(tmobj_image_paths)}, idx_in_paths={tmobj_idx_dbg in (tmobj_image_paths or {})}")
+            # Per uw-formats.txt section 6.1:
+            # - Writings (0x166): texture from tmobj.gr at "flags" + 20
+            #   Only lower 3 bits of flags determine texture (8 textures: tmobj_20-27)
+            #   Upper bits may indicate other properties (e.g. wall vs floor sign)
+            # - Gravestones (0x165): texture from tmobj.gr at "flags" + 28
+            #   Lower 4 bits give 10 gravestone textures (tmobj_28-37)
             
             if obj_id == 0x166 and tmobj_image_paths:  # Writing
-                tmobj_idx = (item_flags & 0xFF) + 20
+                # Mask to lower 3 bits to stay within writing texture range (20-27)
+                tmobj_idx = (item_flags & 0x07) + 20
                 if tmobj_idx in tmobj_image_paths:
                     web_obj['image_path'] = tmobj_image_paths[tmobj_idx]
             elif obj_id == 0x165 and tmobj_image_paths:  # Gravestone
-                tmobj_idx = (item_flags & 0xFF) + 28
+                # Mask to lower 4 bits to stay within gravestone texture range (28-37)
+                tmobj_idx = (item_flags & 0x0F) + 28
                 if tmobj_idx in tmobj_image_paths:
                     web_obj['image_path'] = tmobj_image_paths[tmobj_idx]
             elif obj_id == 0x161 and tmobj_image_paths:  # Lever
