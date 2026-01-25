@@ -13,12 +13,24 @@ class NPCSheetsMixin:
     
     def export_npcs(self, npcs: List, npc_names: Dict, strings_parser, level_parser=None) -> None:
         """Export NPCs with correct name mapping, goal descriptions, and inventory."""
-        headers = [
-            "Level", "Tile X", "Tile Y", "Creature Type", "Creature ID",
-            "Named NPC", "Conv Slot", "HP",
-            "Attitude", "Goal", "Goal Description", "Inventory", "Home X", "Home Y"
-        ]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = [
+                "Image", "Level", "Tile X", "Tile Y", "Creature Type", "Creature ID",
+                "Named NPC", "Conv Slot", "HP",
+                "Attitude", "Goal", "Goal Description", "Inventory", "Home X", "Home Y"
+            ]
+        else:
+            headers = [
+                "Level", "Tile X", "Tile Y", "Creature Type", "Creature ID",
+                "Named NPC", "Conv Slot", "HP",
+                "Attitude", "Goal", "Goal Description", "Inventory", "Home X", "Home Y"
+            ]
         ws = self._create_sheet("NPCs", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         obj_names = strings_parser.get_block(4) or []
         block7 = strings_parser.get_block(7) or []
@@ -49,16 +61,34 @@ class NPCSheetsMixin:
             # Get NPC inventory
             inventory_str = self._get_npc_inventory(npc, level_parser, strings_parser, obj_names)
             
-            values = [
-                npc.level + 1, npc.tile_x, npc.tile_y, creature_type, f"0x{npc.object_id:02X}",
-                named_npc, npc.conversation_slot if npc.conversation_slot > 0 else "",
-                npc.hp,
-                attitude_name, npc.goal, goal_desc, inventory_str,
-                npc.home_x, npc.home_y
-            ]
+            if has_images:
+                values = [
+                    "",  # Placeholder for image
+                    npc.level + 1, npc.tile_x, npc.tile_y, creature_type, f"0x{npc.object_id:02X}",
+                    named_npc, npc.conversation_slot if npc.conversation_slot > 0 else "",
+                    npc.hp,
+                    attitude_name, npc.goal, goal_desc, inventory_str,
+                    npc.home_x, npc.home_y
+                ]
+            else:
+                values = [
+                    npc.level + 1, npc.tile_x, npc.tile_y, creature_type, f"0x{npc.object_id:02X}",
+                    named_npc, npc.conversation_slot if npc.conversation_slot > 0 else "",
+                    npc.hp,
+                    attitude_name, npc.goal, goal_desc, inventory_str,
+                    npc.home_x, npc.home_y
+                ]
             self._add_row(ws, row, values, row % 2 == 0)
+            
+            # Add NPC image if available
+            if has_images:
+                pil_img = self._get_npc_image(npc.object_id)
+                if pil_img:
+                    self._add_image_to_cell(ws, pil_img, f'A{row}')
+                    self._set_row_height_for_image(ws, row)
+            
             row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def _get_npc_inventory(self, npc, level_parser, strings_parser, obj_names) -> str:
         """Get inventory string for an NPC."""

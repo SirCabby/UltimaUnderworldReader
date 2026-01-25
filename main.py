@@ -262,6 +262,26 @@ def export_to_xlsx(data_path: Path, output_path: Path, extracted_data: dict) -> 
     common_parser = CommonObjectsParser(data_path / "COMOBJ.DAT")
     common_parser.parse()
     
+    # Extract images for embedding in sheets
+    print("  - Extracting images for Excel embedding...")
+    try:
+        from src.extractors import ImageExtractor
+        image_extractor = ImageExtractor(data_path)
+        
+        # Extract object images
+        image_extractor.extract()
+        image_extractor.replace_placeholder_sprites()
+        
+        # Extract NPC images
+        image_extractor.extract_npc_images()
+        
+        # Pass image extractor to xlsx exporter
+        xlsx.set_image_extractor(image_extractor)
+    except ImportError:
+        print("    PIL/Pillow not available, Excel will not include images")
+    except Exception as e:
+        print(f"    Warning: Could not extract images: {e}")
+    
     # Export all sheets
     print("  - Items sheet (with weights)...")
     xlsx.export_items(items.item_types, items.placed_items)

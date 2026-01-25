@@ -18,11 +18,22 @@ class PlacedObjectsSheetsMixin:
     def export_placed_objects(self, placed_items: List, item_types: Dict, 
                              strings_parser, level_parser=None) -> None:
         """Export placed objects with actual locations, descriptions, and effects."""
-        headers = [
-            "Level", "Tile X", "Tile Y", "Item Name", "Item ID",
-            "Category", "Description", "Enchantment/Effect"
-        ]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = [
+                "Image", "Level", "Tile X", "Tile Y", "Item Name", "Item ID",
+                "Category", "Description", "Enchantment/Effect"
+            ]
+        else:
+            headers = [
+                "Level", "Tile X", "Tile Y", "Item Name", "Item ID",
+                "Category", "Description", "Enchantment/Effect"
+            ]
         ws = self._create_sheet("Placed Objects", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         obj_names = strings_parser.get_block(4) or []
         block3 = strings_parser.get_block(3) or []
@@ -52,13 +63,28 @@ class PlacedObjectsSheetsMixin:
             description = self._get_item_description(item, block3, block5, spell_names, level_parser)
             effect = self._get_item_effect(item, strings_parser, level_parser)
             
-            values = [
-                item.level + 1, item.tile_x, item.tile_y, name, f"0x{item.object_id:03X}",
-                category, description, effect
-            ]
+            if has_images:
+                values = [
+                    "",  # Placeholder for image
+                    item.level + 1, item.tile_x, item.tile_y, name, f"0x{item.object_id:03X}",
+                    category, description, effect
+                ]
+            else:
+                values = [
+                    item.level + 1, item.tile_x, item.tile_y, name, f"0x{item.object_id:03X}",
+                    category, description, effect
+                ]
             self._add_row(ws, row, values, row % 2 == 0)
+            
+            # Add object image if available
+            if has_images:
+                pil_img = self._get_object_image(item.object_id)
+                if pil_img:
+                    self._add_image_to_cell(ws, pil_img, f'A{row}')
+                    self._set_row_height_for_image(ws, row)
+            
             row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def _get_item_description(self, item, block3, block5, spell_names, level_parser=None) -> str:
         """Get item description based on type and quality/owner fields."""
@@ -396,8 +422,16 @@ class PlacedObjectsSheetsMixin:
     
     def export_unused_items(self, item_types: Dict, placed_items: List, strings_parser) -> None:
         """Export items never placed in game."""
-        headers = ["ID", "ID (Hex)", "Name", "Category", "Notes"]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = ["Image", "ID", "ID (Hex)", "Name", "Category", "Notes"]
+        else:
+            headers = ["ID", "ID (Hex)", "Name", "Category", "Notes"]
         ws = self._create_sheet("Unused Items", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         obj_names = strings_parser.get_block(4) or []
         placed_ids: Set[int] = {item.object_id for item in placed_items}
@@ -419,10 +453,21 @@ class PlacedObjectsSheetsMixin:
                 else:
                     notes = "Defined but never placed"
                 
-                values = [item_id, f"0x{item_id:03X}", name, item.category, notes]
+                if has_images:
+                    values = ["", item_id, f"0x{item_id:03X}", name, item.category, notes]
+                else:
+                    values = [item_id, f"0x{item_id:03X}", name, item.category, notes]
                 self._add_row(ws, row, values, row % 2 == 0)
+                
+                # Add object image if available
+                if has_images:
+                    pil_img = self._get_object_image(item_id)
+                    if pil_img:
+                        self._add_image_to_cell(ws, pil_img, f'A{row}')
+                        self._set_row_height_for_image(ws, row)
+                
                 row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def export_secrets(self, secrets: List) -> None:
         """Export secrets."""

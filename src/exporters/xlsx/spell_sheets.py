@@ -45,17 +45,42 @@ class SpellSheetsMixin:
         self._auto_column_width(ws)
     
     def export_runes(self, runes: Dict) -> None:
-        """Export runes."""
-        headers = ["ID", "Rune Name", "Meaning"]
+        """Export runes with images."""
+        has_images = self._images_available
+        
+        # Rune object IDs start at 0xE0 (224)
+        RUNE_OBJECT_BASE = 0xE0
+        
+        if has_images:
+            headers = ["Image", "ID", "Rune Name", "Meaning"]
+        else:
+            headers = ["ID", "Rune Name", "Meaning"]
         ws = self._create_sheet("Runes", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         row = 2
         for rune_id in sorted(runes.keys()):
             name = runes[rune_id]
             meaning = RUNE_MEANINGS.get(name, "")
-            self._add_row(ws, row, [rune_id, name, meaning], row % 2 == 0)
+            
+            if has_images:
+                values = ["", rune_id, name, meaning]
+            else:
+                values = [rune_id, name, meaning]
+            self._add_row(ws, row, values, row % 2 == 0)
+            
+            # Add rune image - object ID is 0xE0 + rune_id
+            if has_images:
+                object_id = RUNE_OBJECT_BASE + rune_id
+                pil_img = self._get_object_image(object_id)
+                if pil_img:
+                    self._add_image_to_cell(ws, pil_img, f'A{row}')
+                    self._set_row_height_for_image(ws, row)
+            
             row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def export_mantras(self) -> None:
         """Export complete mantra list with point increases."""

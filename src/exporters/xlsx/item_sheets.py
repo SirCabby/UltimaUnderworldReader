@@ -6,6 +6,8 @@ Includes: Items, Weapons, Armor, Containers, Food, Light Sources
 
 from typing import Dict, List
 
+from openpyxl.utils import get_column_letter
+
 from ...constants import (
     CARRYABLE_CATEGORIES,
     CARRYABLE_CONTAINERS,
@@ -18,12 +20,25 @@ class ItemSheetsMixin:
     
     def export_items(self, item_types: Dict, placed_items: List) -> None:
         """Export all item types."""
-        headers = [
-            "ID", "ID (Hex)", "Name", "Category",
-            "Weight", "Value", 
-            "Property 1", "Property 2", "Property 3", "Property 4"
-        ]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = [
+                "Image", "ID", "ID (Hex)", "Name", "Category",
+                "Weight", "Value", 
+                "Property 1", "Property 2", "Property 3", "Property 4"
+            ]
+        else:
+            headers = [
+                "ID", "ID (Hex)", "Name", "Category",
+                "Weight", "Value", 
+                "Property 1", "Property 2", "Property 3", "Property 4"
+            ]
         ws = self._create_sheet("Items", headers)
+        
+        # Set image column width if images are available
+        if has_images:
+            ws.column_dimensions['A'].width = 6  # ~40 pixels for image column
         
         row = 2
         for item_id in sorted(item_types.keys()):
@@ -44,19 +59,43 @@ class ItemSheetsMixin:
             # Value in gold
             value_str = str(item.value) if item.value > 0 else ""
             
-            values = [
-                item.item_id, f"0x{item.item_id:03X}", item.name, item.category,
-                weight_str, value_str,
-                prop_strs[0], prop_strs[1], prop_strs[2], prop_strs[3]
-            ]
+            if has_images:
+                values = [
+                    "",  # Placeholder for image
+                    item.item_id, f"0x{item.item_id:03X}", item.name, item.category,
+                    weight_str, value_str,
+                    prop_strs[0], prop_strs[1], prop_strs[2], prop_strs[3]
+                ]
+            else:
+                values = [
+                    item.item_id, f"0x{item.item_id:03X}", item.name, item.category,
+                    weight_str, value_str,
+                    prop_strs[0], prop_strs[1], prop_strs[2], prop_strs[3]
+                ]
             self._add_row(ws, row, values, row % 2 == 0)
+            
+            # Add image if available
+            if has_images:
+                pil_img = self._get_object_image(item_id)
+                if pil_img:
+                    self._add_image_to_cell(ws, pil_img, f'A{row}')
+                    self._set_row_height_for_image(ws, row)
+            
             row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def export_weapons(self, item_types: Dict, objects_parser) -> None:
         """Export weapons."""
-        headers = ["ID", "Name", "Type", "Slash", "Bash", "Stab", "Skill", "Durability", "Weight", "Value"]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = ["Image", "ID", "Name", "Type", "Slash", "Bash", "Stab", "Skill", "Durability", "Weight", "Value"]
+        else:
+            headers = ["ID", "Name", "Type", "Slash", "Bash", "Stab", "Skill", "Durability", "Weight", "Value"]
         ws = self._create_sheet("Weapons", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         row = 2
         # Melee weapons (0x00-0x0F)
@@ -66,9 +105,19 @@ class ItemSheetsMixin:
             if item and weapon:
                 skill = weapon.skill_type.name if hasattr(weapon.skill_type, 'name') else str(weapon.skill_type)
                 weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
-                values = [item_id, item.name, "Melee", weapon.slash_damage, weapon.bash_damage,
-                         weapon.stab_damage, skill, weapon.durability, weight_str, item.value]
+                if has_images:
+                    values = ["", item_id, item.name, "Melee", weapon.slash_damage, weapon.bash_damage,
+                             weapon.stab_damage, skill, weapon.durability, weight_str, item.value]
+                else:
+                    values = [item_id, item.name, "Melee", weapon.slash_damage, weapon.bash_damage,
+                             weapon.stab_damage, skill, weapon.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
+                
+                if has_images:
+                    pil_img = self._get_object_image(item_id)
+                    if pil_img:
+                        self._add_image_to_cell(ws, pil_img, f'A{row}')
+                        self._set_row_height_for_image(ws, row)
                 row += 1
         
         # Ranged weapons (0x10-0x1F)
@@ -77,16 +126,34 @@ class ItemSheetsMixin:
             weapon = objects_parser.get_ranged_weapon(item_id)
             if item and weapon:
                 weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
-                values = [item_id, item.name, "Ranged", "-", "-", "-", "Missile",
-                         weapon.durability, weight_str, item.value]
+                if has_images:
+                    values = ["", item_id, item.name, "Ranged", "-", "-", "-", "Missile",
+                             weapon.durability, weight_str, item.value]
+                else:
+                    values = [item_id, item.name, "Ranged", "-", "-", "-", "Missile",
+                             weapon.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
+                
+                if has_images:
+                    pil_img = self._get_object_image(item_id)
+                    if pil_img:
+                        self._add_image_to_cell(ws, pil_img, f'A{row}')
+                        self._set_row_height_for_image(ws, row)
                 row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def export_armor(self, item_types: Dict, objects_parser) -> None:
         """Export armor."""
-        headers = ["ID", "Name", "Category", "Protection", "Durability", "Weight", "Value"]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = ["Image", "ID", "Name", "Category", "Protection", "Durability", "Weight", "Value"]
+        else:
+            headers = ["ID", "Name", "Category", "Protection", "Durability", "Weight", "Value"]
         ws = self._create_sheet("Armor", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         row = 2
         for item_id in range(0x20, 0x40):
@@ -95,15 +162,32 @@ class ItemSheetsMixin:
             if item and armor:
                 cat = armor.category.name if hasattr(armor.category, 'name') else str(armor.category)
                 weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
-                values = [item_id, item.name, cat, armor.protection, armor.durability, weight_str, item.value]
+                if has_images:
+                    values = ["", item_id, item.name, cat, armor.protection, armor.durability, weight_str, item.value]
+                else:
+                    values = [item_id, item.name, cat, armor.protection, armor.durability, weight_str, item.value]
                 self._add_row(ws, row, values, row % 2 == 0)
+                
+                if has_images:
+                    pil_img = self._get_object_image(item_id)
+                    if pil_img:
+                        self._add_image_to_cell(ws, pil_img, f'A{row}')
+                        self._set_row_height_for_image(ws, row)
                 row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def export_containers(self, item_types: Dict, objects_parser, common_parser=None) -> None:
         """Export carryable containers only."""
-        headers = ["ID", "Name", "Weight", "Capacity (stones)", "Accepts"]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = ["Image", "ID", "Name", "Weight", "Capacity (stones)", "Accepts"]
+        else:
+            headers = ["ID", "Name", "Weight", "Capacity (stones)", "Accepts"]
         ws = self._create_sheet("Containers", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         row = 2
         for item_id in sorted(CARRYABLE_CONTAINERS.keys()):
@@ -111,20 +195,40 @@ class ItemSheetsMixin:
             container = objects_parser.get_container(item_id)
             if item and container:
                 weight_str = f"{item.mass / 10:.1f}" if item.mass > 0 else ""
-                values = [
-                    item_id, item.name, weight_str, container.capacity_stones,
-                    container.accepted_type_name
-                ]
+                if has_images:
+                    values = [
+                        "", item_id, item.name, weight_str, container.capacity_stones,
+                        container.accepted_type_name
+                    ]
+                else:
+                    values = [
+                        item_id, item.name, weight_str, container.capacity_stones,
+                        container.accepted_type_name
+                    ]
                 self._add_row(ws, row, values, row % 2 == 0)
+                
+                if has_images:
+                    pil_img = self._get_object_image(item_id)
+                    if pil_img:
+                        self._add_image_to_cell(ws, pil_img, f'A{row}')
+                        self._set_row_height_for_image(ws, row)
                 row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def export_food(self, item_types: Dict, strings_parser=None) -> None:
         """Export food items with nutrition values."""
         from ...constants import FOOD_NUTRITION, FOOD_NOTES, FOOD_ID_MIN, FOOD_ID_MAX
         
-        headers = ["ID", "Name", "Nutrition", "Weight", "Nutrition/Weight", "Notes"]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = ["Image", "ID", "Name", "Nutrition", "Weight", "Nutrition/Weight", "Notes"]
+        else:
+            headers = ["ID", "Name", "Nutrition", "Weight", "Nutrition/Weight", "Notes"]
         ws = self._create_sheet("Food", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         obj_names = []
         if strings_parser:
@@ -153,17 +257,34 @@ class ItemSheetsMixin:
                 efficiency = nutrition / weight
                 efficiency_str = f"{efficiency:.1f}"
             
-            values = [item_id, name, nutrition, weight_str, efficiency_str, notes]
+            if has_images:
+                values = ["", item_id, name, nutrition, weight_str, efficiency_str, notes]
+            else:
+                values = [item_id, name, nutrition, weight_str, efficiency_str, notes]
             self._add_row(ws, row, values, row % 2 == 0)
+            
+            if has_images:
+                pil_img = self._get_object_image(item_id)
+                if pil_img:
+                    self._add_image_to_cell(ws, pil_img, f'A{row}')
+                    self._set_row_height_for_image(ws, row)
             row += 1
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
     
     def export_light_sources(self, item_types: Dict, objects_parser, strings_parser=None) -> None:
         """Export light sources and light-granting spells."""
         from ...constants import SPELL_CIRCLES, LIGHT_SPELL_LEVELS
         
-        headers = ["Type", "Name", "Light Level", "Duration", "Notes"]
+        has_images = self._images_available
+        
+        if has_images:
+            headers = ["Image", "Type", "Name", "Light Level", "Duration", "Notes"]
+        else:
+            headers = ["Type", "Name", "Light Level", "Duration", "Notes"]
         ws = self._create_sheet("Light Sources", headers)
+        
+        if has_images:
+            ws.column_dimensions['A'].width = 6
         
         obj_names = []
         if strings_parser:
@@ -203,15 +324,27 @@ class ItemSheetsMixin:
                     else:
                         notes = ""
                 
-                values = ["Item", name, light_level, duration_str, notes]
+                if has_images:
+                    values = ["", "Item", name, light_level, duration_str, notes]
+                else:
+                    values = ["Item", name, light_level, duration_str, notes]
                 self._add_row(ws, row, values, row % 2 == 0)
+                
+                if has_images:
+                    pil_img = self._get_object_image(obj_id)
+                    if pil_img:
+                        self._add_image_to_cell(ws, pil_img, f'A{row}')
+                        self._set_row_height_for_image(ws, row)
                 row += 1
         
         # Separator
-        self._add_row(ws, row, ["", "", "", "", ""], False)
+        if has_images:
+            self._add_row(ws, row, ["", "", "", "", "", ""], False)
+        else:
+            self._add_row(ws, row, ["", "", "", "", ""], False)
         row += 1
         
-        # Light spells
+        # Light spells (no images for spells)
         light_spells = [
             ("Light", 1, "~3 min", "IN LOR - Basic illumination"),
             ("Night Vision", 3, "~6 min", "QUAS LOR - See in darkness"),
@@ -221,8 +354,11 @@ class ItemSheetsMixin:
         for spell_name, circle, duration, notes in light_spells:
             light_level = LIGHT_SPELL_LEVELS.get(spell_name, circle)
             type_str = f"Spell (Circle {circle})"
-            values = [type_str, spell_name, light_level, duration, notes]
+            if has_images:
+                values = ["", type_str, spell_name, light_level, duration, notes]
+            else:
+                values = [type_str, spell_name, light_level, duration, notes]
             self._add_row(ws, row, values, row % 2 == 0)
             row += 1
         
-        self._auto_column_width(ws)
+        self._auto_column_width(ws, skip_columns=['A'] if has_images else [])
