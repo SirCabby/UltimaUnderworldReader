@@ -150,6 +150,12 @@ body {
     min-width: 120px;
 }
 
+/* Dropdown options - match base game dark theme for readability */
+.save-game-selector option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
 .save-game-selector:hover {
     background: var(--bg-elevated);
     border-color: var(--border-accent);

@@ -391,6 +391,45 @@ async function parseLevArk(file, baseData) {
 }
 
 /**
+ * Parse a lev.ark file from an ArrayBuffer (for URL-based loading)
+ * This is a variant of parseLevArk that accepts an ArrayBuffer directly
+ * instead of a File object, useful for loading saves fetched via fetch()
+ * @param {ArrayBuffer} buffer - The raw lev.ark file data
+ * @param {Object} baseData - Base game data for category mapping
+ * @returns {Object} - Save game data in web map format
+ */
+function parseLevArkBuffer(buffer, baseData) {
+    const ark = parseArkContainer(buffer);
+    
+    // Build a lookup map from base data for object categories
+    const categoryMap = buildCategoryMap(baseData);
+    
+    // Parse all levels
+    const levels = [];
+    
+    for (let levelNum = 0; levelNum < SaveParser.NUM_LEVELS; levelNum++) {
+        const levelData = getLevelData(ark, levelNum);
+        if (!levelData) {
+            levels.push({
+                level: levelNum,
+                name: `Level ${levelNum + 1}`,
+                objects: [],
+                npcs: []
+            });
+            continue;
+        }
+        
+        const level = parseLevel(levelNum, levelData);
+        
+        // Convert to web format
+        const webLevel = convertLevelToWebFormat(levelNum, level, categoryMap, baseData);
+        levels.push(webLevel);
+    }
+    
+    return { levels };
+}
+
+/**
  * Map Python/internal categories to web UI categories
  * This handles cases where object_types has internal category names
  */
@@ -1075,6 +1114,7 @@ async function parseSaveGameName(file) {
 // Export for use in app.js
 window.SaveParser = {
     parseLevArk,
+    parseLevArkBuffer,
     findLevArkFile,
     findDescFile,
     parseSaveGameName,

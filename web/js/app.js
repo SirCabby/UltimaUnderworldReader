@@ -571,6 +571,68 @@ async function init() {
             updateUrlHash();
         }
         
+        // Check for URL parameters (companion site integration)
+        const urlParams = new URLSearchParams(window.location.search);
+        const saveUrl = urlParams.get('saveUrl');
+        const folderUrl = urlParams.get('folderUrl');
+        const saveRootUrl = urlParams.get('saveRootUrl');
+        const saveName = urlParams.get('saveName');
+        
+        // saveRootUrl takes highest precedence - recursively scans for all saves
+        if (saveRootUrl) {
+            console.log('Found saveRootUrl parameter, scanning for saves:', saveRootUrl);
+            // Update loading message
+            if (elements.loadingOverlay) {
+                elements.loadingOverlay.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <p>Scanning for save games...</p>
+                `;
+                elements.loadingOverlay.classList.remove('hidden');
+            }
+            
+            // Attempt to load all saves from root URL
+            const loaded = await loadSavesFromRootUrl(saveRootUrl, saveName);
+            
+            if (!loaded) {
+                console.warn('Failed to load saves from root URL, continuing with base game');
+            }
+        } else if (folderUrl) {
+            // folderUrl loads a single folder (backwards compatibility)
+            console.log('Found folderUrl parameter, loading save from folder:', folderUrl);
+            // Update loading message
+            if (elements.loadingOverlay) {
+                elements.loadingOverlay.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <p>Loading save game from folder...</p>
+                `;
+                elements.loadingOverlay.classList.remove('hidden');
+            }
+            
+            // Attempt to load save from folder URL
+            const loaded = await loadSaveFromFolderUrl(folderUrl, saveName);
+            
+            if (!loaded) {
+                console.warn('Failed to load save from folder URL, continuing with base game');
+            }
+        } else if (saveUrl) {
+            console.log('Found saveUrl parameter, loading save from:', saveUrl);
+            // Update loading message
+            if (elements.loadingOverlay) {
+                elements.loadingOverlay.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <p>Loading save game from URL...</p>
+                `;
+                elements.loadingOverlay.classList.remove('hidden');
+            }
+            
+            // Attempt to load save from URL
+            const loaded = await loadSaveFromUrl(saveUrl, saveName);
+            
+            if (!loaded) {
+                console.warn('Failed to load save from URL, continuing with base game');
+            }
+        }
+        
         // Hide loading overlay
         elements.loadingOverlay.classList.add('hidden');
     } catch (error) {
@@ -648,6 +710,432 @@ async function loadData() {
 // ============================================================================
 // Save Game Loading
 // ============================================================================
+
+/**
+ * Clean up URL parameters after loading a save from URL
+ * Removes saveUrl, folderUrl, saveRootUrl, and saveName parameters while preserving the hash
+ */
+function cleanupUrlAfterLoad() {
+    try {
+        if (window.history && window.history.replaceState) {
+            const url = new URL(window.location.href);
+            // Remove companion site parameters
+            url.searchParams.delete('saveUrl');
+            url.searchParams.delete('folderUrl');
+            url.searchParams.delete('saveRootUrl');
+            url.searchParams.delete('saveName');
+            
+            // Build clean URL (preserve hash for level/selection state)
+            const cleanUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '') + url.hash;
+            window.history.replaceState({}, document.title, cleanUrl);
+            console.log('Cleaned up URL parameters');
+        }
+    } catch (error) {
+        console.warn('Failed to clean up URL:', error);
+    }
+}
+
+/**
+ * List folder contents from a GST folder listing endpoint
+ * @param {string} listUrl - URL to the folder listing endpoint (e.g., .../files/list or .../files/list/subfolder)
+ * @returns {Promise<{entries: Array<{name: string, type: 'file'|'folder'}>, path: string, saveFolderName: string}>}
+ */
+async function listFolderContents(listUrl) {
+    const response = await fetch(listUrl);
+    if (!response.ok) {
+        throw new Error(`Failed to list folder: ${response.status} ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+/**
+ * Recursively scan a save root folder to find all save games (folders containing lev.ark)
+ * @param {string} serveBaseUrl - Base URL for serving files (e.g., .../files/serve)
+ * @param {string} listBaseUrl - Base URL for listing folders (e.g., .../files/list)
+ * @returns {Promise<Array<{path: string, name: string, serveUrl: string}>>} Array of discovered saves
+ */
+async function scanForSaveGames(serveBaseUrl, listBaseUrl) {
+    const saves = [];
+    
+    // Normalize URLs (remove trailing slashes)
+    const serveUrl = serveBaseUrl.replace(/\/+$/, '');
+    const listUrl = listBaseUrl.replace(/\/+$/, '');
+    
+    try {
+        // List the root folder
+        const rootListing = await listFolderContents(listUrl);
+        console.log('Root folder contents:', rootListing);
+        
+        // Check if root folder has lev.ark
+        const rootHasLevArk = rootListing.entries.some(e => 
+            e.type === 'file' && e.name.toLowerCase() === 'lev.ark'
+        );
+        
+        if (rootHasLevArk) {
+            saves.push({
+                path: '',
+                name: rootListing.saveFolderName || 'Root Save',
+                serveUrl: serveUrl
+            });
+        }
+        
+        // Check each subfolder for lev.ark
+        const subfolders = rootListing.entries.filter(e => e.type === 'folder');
+        
+        for (const folder of subfolders) {
+            try {
+                const subListing = await listFolderContents(`${listUrl}/${folder.name}`);
+                const hasLevArk = subListing.entries.some(e => 
+                    e.type === 'file' && e.name.toLowerCase() === 'lev.ark'
+                );
+                
+                if (hasLevArk) {
+                    saves.push({
+                        path: folder.name,
+                        name: folder.name,
+                        serveUrl: `${serveUrl}/${folder.name}`
+                    });
+                }
+            } catch (err) {
+                console.warn(`Failed to scan subfolder ${folder.name}:`, err.message);
+            }
+        }
+        
+        console.log('Discovered saves:', saves);
+        return saves;
+    } catch (error) {
+        console.error('Error scanning for saves:', error);
+        throw error;
+    }
+}
+
+/**
+ * Load all saves from a save root URL (recursive scanning)
+ * @param {string} saveRootUrl - Base URL to the save's root folder for serving files
+ * @param {string} [saveName] - Optional base name for the saves
+ * @returns {Promise<boolean>} True if at least one save was loaded successfully
+ */
+async function loadSavesFromRootUrl(saveRootUrl, saveName = null) {
+    try {
+        console.log('Loading saves from root URL:', saveRootUrl);
+        
+        // Show loading state
+        if (elements.loadSaveBtn) {
+            elements.loadSaveBtn.disabled = true;
+            elements.loadSaveBtn.textContent = 'Scanning folders...';
+        }
+        
+        // Check if client-side parser is available
+        if (!window.SaveParser || !window.SaveComparator) {
+            throw new Error('Save game parser not loaded. Please refresh the page.');
+        }
+        
+        // Normalize the serve URL
+        const serveUrl = saveRootUrl.replace(/\/+$/, '');
+        
+        // Build the list URL by replacing 'serve' with 'list' in the path
+        const listUrl = serveUrl.replace(/\/files\/serve$/, '/files/list');
+        
+        // Scan for all saves
+        const discoveredSaves = await scanForSaveGames(serveUrl, listUrl);
+        
+        if (discoveredSaves.length === 0) {
+            console.warn('No saves found in root folder');
+            return false;
+        }
+        
+        // Update loading message
+        if (elements.loadingOverlay) {
+            elements.loadingOverlay.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>Loading ${discoveredSaves.length} save(s)...</p>
+            `;
+        }
+        
+        const baseData = state.saveGame.baseData || state.data;
+        let loadedCount = 0;
+        let firstSaveName = null;
+        
+        // Load each discovered save
+        for (const save of discoveredSaves) {
+            try {
+                if (elements.loadSaveBtn) {
+                    elements.loadSaveBtn.textContent = `Loading ${save.name}...`;
+                }
+                
+                // Try to fetch DESC file for save name
+                let descName = null;
+                try {
+                    const descResponse = await fetch(`${save.serveUrl}/DESC`);
+                    if (descResponse.ok) {
+                        const descText = await descResponse.text();
+                        descName = descText.trim().split('\n')[0];
+                        console.log(`Found DESC for ${save.path}:`, descName);
+                    }
+                } catch (e) {
+                    // DESC file not found, use folder name
+                }
+                
+                // Fetch lev.ark
+                const levArkUrl = `${save.serveUrl}/lev.ark`;
+                console.log('Fetching lev.ark from:', levArkUrl);
+                
+                const response = await fetch(levArkUrl);
+                if (!response.ok) {
+                    console.warn(`Failed to fetch lev.ark for ${save.name}: ${response.status}`);
+                    continue;
+                }
+                
+                const buffer = await response.arrayBuffer();
+                console.log(`Fetched lev.ark for ${save.name}, size:`, buffer.byteLength, 'bytes');
+                
+                // Parse the save game
+                const saveData = await window.SaveParser.parseLevArkBuffer(buffer, baseData);
+                const result = window.SaveComparator.compareSaveGame(baseData, saveData);
+                
+                if (!result.success) {
+                    console.warn(`Failed to parse save ${save.name}:`, result.error);
+                    continue;
+                }
+                
+                // Generate save name: prefer DESC, then folder name, then provided name
+                const finalSaveName = descName || save.name || saveName || 'Save';
+                let uniqueName = finalSaveName;
+                let counter = 1;
+                while (state.saveGame.saves[uniqueName]) {
+                    uniqueName = `${finalSaveName} (${counter++})`;
+                }
+                
+                // Store save game data
+                state.saveGame.saves[uniqueName] = {
+                    saveData: result.save_data,
+                    changes: result.changes,
+                    saveGameName: finalSaveName,
+                    sourceFolderUrl: save.serveUrl,
+                    folderPath: save.path
+                };
+                
+                loadedCount++;
+                if (!firstSaveName) {
+                    firstSaveName = uniqueName;
+                }
+                
+                console.log(`Loaded save: ${uniqueName}`);
+            } catch (err) {
+                console.error(`Error loading save ${save.name}:`, err);
+            }
+        }
+        
+        if (loadedCount === 0) {
+            console.warn('No saves could be loaded');
+            return false;
+        }
+        
+        // Switch to the first loaded save
+        if (firstSaveName) {
+            switchSaveGame(firstSaveName);
+        }
+        
+        // Clean up URL parameters
+        cleanupUrlAfterLoad();
+        
+        console.log(`Successfully loaded ${loadedCount} save(s)`);
+        return true;
+    } catch (error) {
+        console.error('Error loading saves from root URL:', error);
+        return false;
+    } finally {
+        if (elements.loadSaveBtn) {
+            elements.loadSaveBtn.disabled = false;
+            elements.loadSaveBtn.textContent = '📁 Load Save';
+        }
+    }
+}
+
+/**
+ * Load save game from a URL (for companion site integration)
+ * Fetches the save file from an external URL and parses it
+ * @param {string} url - URL to fetch the save file from
+ * @param {string} [saveName] - Optional name for the save (defaults to 'URL Save')
+ */
+async function loadSaveFromUrl(url, saveName = null) {
+    try {
+        console.log('Loading save from URL:', url);
+        
+        // Show loading state
+        if (elements.loadSaveBtn) {
+            elements.loadSaveBtn.disabled = true;
+            elements.loadSaveBtn.textContent = 'Loading from URL...';
+        }
+        
+        // Check if client-side parser is available
+        if (!window.SaveParser || !window.SaveComparator) {
+            throw new Error('Save game parser not loaded. Please refresh the page.');
+        }
+        
+        // Fetch the save file from the URL
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch save file: ${response.status} ${response.statusText}`);
+        }
+        
+        // Get the file as ArrayBuffer
+        const buffer = await response.arrayBuffer();
+        console.log('Fetched save file, size:', buffer.byteLength, 'bytes');
+        
+        // Parse the save game using the buffer-based parser
+        const baseData = state.saveGame.baseData || state.data;
+        const saveData = await window.SaveParser.parseLevArkBuffer(buffer, baseData);
+        
+        // Compare save game with base game
+        const result = window.SaveComparator.compareSaveGame(baseData, saveData);
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to load save game');
+        }
+        
+        // Generate a unique save name
+        const urlSaveName = saveName || 'URL Save';
+        let uniqueName = urlSaveName;
+        let counter = 1;
+        while (state.saveGame.saves[uniqueName]) {
+            uniqueName = `${urlSaveName} (${counter++})`;
+        }
+        
+        // Store save game data
+        state.saveGame.saves[uniqueName] = {
+            saveData: result.save_data,
+            changes: result.changes,
+            saveGameName: saveName,
+            sourceUrl: url
+        };
+        
+        // Switch to the newly loaded save
+        switchSaveGame(uniqueName);
+        
+        // Clean up URL parameters after successful load
+        cleanupUrlAfterLoad();
+        
+        // Show success message
+        const summary = result.summary;
+        console.log('Save game loaded from URL:', summary);
+        
+        return true;
+    } catch (error) {
+        console.error('Error loading save from URL:', error);
+        // Don't show alert for URL loads - just log the error
+        // This prevents annoying popups when URLs are invalid
+        return false;
+    } finally {
+        if (elements.loadSaveBtn) {
+            elements.loadSaveBtn.disabled = false;
+            elements.loadSaveBtn.textContent = '📁 Load Save';
+        }
+    }
+}
+
+/**
+ * Load save game from a folder URL (companion site integration)
+ * Fetches lev.ark from the folder and optionally DESC for the save name
+ * @param {string} folderUrl - Base URL to the folder (files are fetched relative to this)
+ * @param {string} [saveName] - Optional name for the save
+ */
+async function loadSaveFromFolderUrl(folderUrl, saveName = null) {
+    try {
+        console.log('Loading save from folder URL:', folderUrl);
+        
+        // Show loading state
+        if (elements.loadSaveBtn) {
+            elements.loadSaveBtn.disabled = true;
+            elements.loadSaveBtn.textContent = 'Loading from folder...';
+        }
+        
+        // Check if client-side parser is available
+        if (!window.SaveParser || !window.SaveComparator) {
+            throw new Error('Save game parser not loaded. Please refresh the page.');
+        }
+        
+        // Normalize folder URL (ensure it ends without a trailing slash for consistency)
+        const baseUrl = folderUrl.replace(/\/+$/, '');
+        
+        // Try to fetch DESC file first for save name (optional, don't fail if not found)
+        let descName = null;
+        if (!saveName) {
+            try {
+                const descResponse = await fetch(`${baseUrl}/DESC`);
+                if (descResponse.ok) {
+                    const descText = await descResponse.text();
+                    // DESC file typically contains the save description
+                    descName = descText.trim().split('\n')[0]; // First line is usually the name
+                    console.log('Found DESC file, save name:', descName);
+                }
+            } catch (e) {
+                console.log('No DESC file found or error reading it:', e.message);
+            }
+        }
+        
+        // Fetch lev.ark from the folder
+        const levArkUrl = `${baseUrl}/lev.ark`;
+        console.log('Fetching lev.ark from:', levArkUrl);
+        
+        const response = await fetch(levArkUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch lev.ark: ${response.status} ${response.statusText}`);
+        }
+        
+        // Get the file as ArrayBuffer
+        const buffer = await response.arrayBuffer();
+        console.log('Fetched lev.ark, size:', buffer.byteLength, 'bytes');
+        
+        // Parse the save game using the buffer-based parser
+        const baseData = state.saveGame.baseData || state.data;
+        const saveData = await window.SaveParser.parseLevArkBuffer(buffer, baseData);
+        
+        // Compare save game with base game
+        const result = window.SaveComparator.compareSaveGame(baseData, saveData);
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to load save game');
+        }
+        
+        // Generate a unique save name
+        const finalSaveName = saveName || descName || 'Folder Save';
+        let uniqueName = finalSaveName;
+        let counter = 1;
+        while (state.saveGame.saves[uniqueName]) {
+            uniqueName = `${finalSaveName} (${counter++})`;
+        }
+        
+        // Store save game data
+        state.saveGame.saves[uniqueName] = {
+            saveData: result.save_data,
+            changes: result.changes,
+            saveGameName: finalSaveName,
+            sourceFolderUrl: folderUrl
+        };
+        
+        // Switch to the newly loaded save
+        switchSaveGame(uniqueName);
+        
+        // Clean up URL parameters after successful load
+        cleanupUrlAfterLoad();
+        
+        // Show success message
+        const summary = result.summary;
+        console.log('Save game loaded from folder URL:', summary);
+        
+        return true;
+    } catch (error) {
+        console.error('Error loading save from folder URL:', error);
+        // Don't show alert for URL loads - just log the error
+        return false;
+    } finally {
+        if (elements.loadSaveBtn) {
+            elements.loadSaveBtn.disabled = false;
+            elements.loadSaveBtn.textContent = '📁 Load Save';
+        }
+    }
+}
 
 /**
  * Load save game from uploaded directory
